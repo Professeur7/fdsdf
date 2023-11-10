@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "488146842626",
+    "firebase_url": "https://fashion-mobile-mode-default-rtdb.firebaseio.com",
+    "project_id": "fashion-mobile-mode",
+    "storage_bucket": "fashion-mobile-mode.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488146842626:android:3ba251b16444f49c66a31b",
+        "android_client_info": {
+          "package_name": "com.example.fashion1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv7h61j0Lv6gKLZSQATdR6erEnc4VhqkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:488146842626:android:4e08029c40c1d42266a31b",
+        "android_client_info": {
+          "package_name": "com.example.fashion2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv7h61j0Lv6gKLZSQATdR6erEnc4VhqkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
