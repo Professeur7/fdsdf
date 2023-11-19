@@ -28,7 +28,7 @@ class Tailleurs {
       required this.email,
       required this.genre,
       this.telephone,
-      token});
+      this.token});
   factory Tailleurs.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final modelData = file!["Model"];
