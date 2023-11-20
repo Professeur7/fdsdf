@@ -62,7 +62,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
         // Naviguer vers HomeScreen après l'inscription réussie
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AtelierRegistrationPage()),
+          MaterialPageRoute(
+              builder: (context) => ClientRegistrationPage(
+                    //email: User.email,
+                   //password: User.password,
+                  )),
         );
       }
 
@@ -86,7 +90,11 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
         // Naviguer vers HomeScreen après la connexion réussie
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => AtelierRegistrationPage()),
+          MaterialPageRoute(
+              builder: (context) => ClientRegistrationPage(
+                   // password: tailleur.password,
+                   // email: tailleur.email,
+                  )),
         );
       }
 

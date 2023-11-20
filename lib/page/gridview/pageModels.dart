@@ -56,6 +56,7 @@ class _PageModelsState extends State<PageModels> {
         }).toList(),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF09126C),
         onPressed: () {
           _addGalleryButton();
         },
@@ -344,6 +345,7 @@ class _GalleryPageState extends State<GalleryPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF09126C),
         onPressed: () {
           _importImage();
         },

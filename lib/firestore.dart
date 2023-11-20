@@ -9,6 +9,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class FirebaseManagement with ChangeNotifier {
+  static String tokId = "";
   //create firebase Firestore database instance
   List<Tailleurs> tailleurs = [];
   List<Albums> _albums = [];
@@ -33,6 +34,8 @@ class FirebaseManagement with ChangeNotifier {
     final tailleur = await _db.collection("tailleurs").doc(ref.id).get();
     tailleurs.add(Tailleurs.fromSnapshot(tailleur));
     print("${tailleurs.length} est la taille de tailleurs");
+    tokId = ref.id;
+    print("$tokId le referece");
     notifyListeners();
   }
 
@@ -59,6 +62,7 @@ class FirebaseManagement with ChangeNotifier {
     final all = await _db.collection("tailleurs").get();
     final tailleurs = all.docs.map((e) => Tailleurs.fromSnapshot(e)).toList();
     print(tailleurs);
+    print(tailleurs.first.token);
     return tailleurs;
   }
 

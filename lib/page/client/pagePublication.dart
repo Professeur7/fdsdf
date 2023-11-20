@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:video_player/video_player.dart';
+
+import '../../screen/clientHomeScreen.dart';
+
 class Publications extends StatefulWidget {
   @override
   _PublicationsState createState() => _PublicationsState();
@@ -19,6 +23,33 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
     return Scaffold(
       appBar: AppBar(
         title: Text("Publications"),
+        backgroundColor: const Color(0xFF09126C),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ClientHomeScreen(),
+              ),
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () {
+              // Naviguez vers la page Favoris
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => FavoritesPage()),
+              );
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -48,9 +79,9 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
           PublicationList(
             type: "Vidéos",
             photos: [
-              "https://youtu.be/05GeRFy2FM4?si=-t9aGb_TfJOS10-_.mp4",
-              "https://youtu.be/05GeRFy2FM4?si=-t9aGb_TfJOS10-_.mp4",
-              "https://youtu.be/05GeRFy2FM4?si=-t9aGb_TfJOS10-_.mp4",
+              "https://www.facebook.com/watch/?v=368740601302632.mp4",
+              "https://www.facebook.com/watch/?v=368740601302632.mp4",
+              "https://www.facebook.com/watch/?v=368740601302632.mp4",
               // Ajoutez d'autres URLs de vidéos ici
             ],
             comments: [
@@ -61,6 +92,20 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Favoris'),
+      ),
+      body: Center(
+        child: Text('Contenu de la page Favoris'),
       ),
     );
   }
@@ -81,19 +126,56 @@ class PublicationList extends StatelessWidget {
         return PublicationTile(
           photoUrl: photos[index],
           comment: comments[index],
-          type: type,
+          type: type, workshopName: 'Naf Couture', workshopProfile: '', workshopLocation: 'Garantibougou',
         );
       },
     );
   }
 }
 
-class PublicationTile extends StatelessWidget {
+class PublicationTile extends StatefulWidget {
   final String photoUrl;
   final String comment;
   final String type;
+  final String workshopName;
+  final String workshopLocation;
+  final String workshopProfile;
 
-  PublicationTile({required this.photoUrl, required this.comment, required this.type});
+  PublicationTile({
+    required this.photoUrl,
+    required this.comment,
+    required this.type,
+    required this.workshopName,
+    required this.workshopLocation,
+    required this.workshopProfile,
+  });
+
+  @override
+  _PublicationTileState createState() => _PublicationTileState();
+}
+
+class _PublicationTileState extends State<PublicationTile> {
+  late VideoPlayerController _controller;
+  bool _isVideoPlaying = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.photoUrl.endsWith('.mp4')) {
+      _controller = VideoPlayerController.network(widget.photoUrl)
+        ..initialize().then((_) {
+          setState(() {});
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.photoUrl.endsWith('.mp4')) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,21 +184,70 @@ class PublicationTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(photoUrl),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 20,
+                  backgroundImage: NetworkImage(widget.workshopProfile),
+                ),
+                SizedBox(width: 16.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Atelier: ${widget.workshopName}",
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      "Lieu: ${widget.workshopLocation}",
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (widget.photoUrl.endsWith('.mp4') && _controller.value.isInitialized)
+            AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  VideoPlayer(_controller),
+                  if (!_isVideoPlaying)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isVideoPlaying = true;
+                          _controller.play();
+                        });
+                      },
+                      child: Icon(
+                        Icons.play_arrow,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          if (!widget.photoUrl.endsWith('.mp4')) // Si ce n'est pas une vidéo, afficher une image
+            Image.network(widget.photoUrl),
           Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              comment,
+              widget.comment,
               style: TextStyle(fontSize: 16.0),
             ),
           ),
           Text(
-            "Type: $type",
+            "Type: ${widget.type}",
             style: TextStyle(fontSize: 12.0),
           ),
-          // Bouton pour laisser un commentaire
           Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: ElevatedButton(
               onPressed: () {
                 // Ajoutez ici la logique pour laisser un commentaire
@@ -129,3 +260,8 @@ class PublicationTile extends StatelessWidget {
     );
   }
 }
+
+
+
+
+

@@ -18,7 +18,17 @@ class _ToDoListPageState extends State<ToDoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF09126C),
         title: Text('To-Do List'),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pop(context); // Revenir à la liste des demandes de commande
+          },
+        ),
       ),
       body: ListView.builder(
         itemCount: tasks.length,
@@ -32,6 +42,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Color(0xFF09126C),
         onPressed: () {
           showTaskForm();
         },
