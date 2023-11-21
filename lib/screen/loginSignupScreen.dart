@@ -56,41 +56,72 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
         print(User.runtimeType);
         userRef;
         User.runtimeType == Tailleurs
-            ? userRef = FirebaseFirestore.instance.collection("tailleurs")
-            : userRef = FirebaseFirestore.instance.collection("Clients");
-
-        _management.createTailleurs(User);
+            ? {
+                userRef = FirebaseFirestore.instance.collection("tailleurs"),
+                _management.createTailleurs(User),
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AtelierRegistrationPage()),
+                )
+              }
+            : {
+                userRef = FirebaseFirestore.instance.collection("Clients"),
+                _management.createClient(User),
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ClientRegistrationPage()))
+              };
 
         //Future.delayed(Duration(seconds: 30));
         // Naviguer vers HomeScreen après l'inscription réussie
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => AtelierRegistrationPage()),
-        );
       }
 
-      Future<void> loginUser(String email, String password) async {
+      Future<void> loginUser(email, password) async {
         UserCredential userCredential = await auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
-        final tailleurs = await _management.getAllTailleurs();
-        final tailleur = tailleurs
-            .where((t) => t.email == email && t.password == password)
-            .first;
-        _management.tailleurs.isEmpty
-            ? {_management.tailleurs.add(tailleur)}
-            : {
-                _management.tailleurs.clear,
-                _management.tailleurs.add(tailleur)
-              };
-        print(userCredential.user);
-        print(userCredential.additionalUserInfo);
-        // Naviguer vers HomeScreen après la connexion réussie
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => AtelierRegistrationPage()),
-        );
+
+        var listT = <Tailleurs>[];
+        var listC = <Client>[];
+        listT = await _management.getAllTailleurs();
+        listC = await _management.getAllClient();
+
+        if (listT
+            .where((element) =>
+                element.email == email && element.password == password)
+            .isNotEmpty) {
+          _management.getTailleur(listT
+              .where((element) =>
+                  element.email == email && element.password == password)
+              .first);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        } else {
+          _management.getClient(listC
+              .where((element) =>
+                  element.email == email && element.password == password)
+              .first);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => ClientHomeScreen()),
+          );
+        }
+        // User.runtimeType == Tailleurs ? {list = await _management.getAllTailleurs(),
+        // _management.getTailleur(list
+        //     .where((t) => t.email == email && t.password == password)
+        //     .first),
+        // print(userCredential.user),
+        // print(userCredential.additionalUserInfo),
+        // // Naviguer vers HomeScreen après la connexion réussie
+
+        //   list = await _management.getAllClient(),
+
+        // };
       }
 
       Future<bool> checkEmailExists(String email) async {
