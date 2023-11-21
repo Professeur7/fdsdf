@@ -1,5 +1,8 @@
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/screen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
@@ -30,25 +33,27 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
     }
   }
 
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('Enregistrement Tailleur'),
           backgroundColor: const Color(0xFF09126C),
+          title: Text('Enregistrement Tailleur'),
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
               color: Colors.grey,
             ),
             onPressed: () {
-              // Navigator.pushReplacement(
-              //   context,
-              //   MaterialPageRoute(
-              //     builder: (context) =>
-              //         AtelierRegistrationPage(), // Remplacez PageDefault par votre widget de page par défaut
-              //   ),
-              // );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      AtelierRegistrationPage(), // Remplacez PageDefault par votre widget de page par défaut
+                ),
+              );
             },
           ),
         ),
@@ -122,102 +127,107 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                 SizedBox(height: 20),
                 Text('Prénom'),
                 Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
                     ),
-                    child: TextFormField(
-                      controller: prenomController,
-                      //decoration:
-                      //InputDecoration(labelText: value.prenom ?? "")),
-                    )),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: TextFormField(
+                    controller: prenomController,
+                  ),
+                ),
                 SizedBox(height: 20),
                 Text('Téléphone'),
                 Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
                     ),
-                    child: TextFormField(
-                      controller: telephoneController,
-                      //decoration:
-                      //InputDecoration(labelText: value.telephone ?? "")),
-                    )),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: TextFormField(
+                    controller: telephoneController,
+                  ),
+                ),
                 SizedBox(height: 20),
                 Text('Email'),
                 Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
                     ),
-                    child: TextFormField(
-                      controller: emailController,
-                      //decoration:
-                      //InputDecoration(labelText: value.email ?? "")),
-                    )),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: TextFormField(
+                    controller: emailController,
+                  ),
+                ),
                 SizedBox(height: 20),
                 Text('Genre'),
                 Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
                     ),
-                    child: TextFormField(
-                      controller: genreController,
-                      //decoration: InputDecoration(labelText: value.genre)),
-                    )),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: TextFormField(
+                    controller: genreController,
+                  ),
+                ),
                 SizedBox(height: 20),
                 Text('Code'),
                 Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
                     ),
-                    child: TextFormField(
-                      controller: codeController,
-                      //decoration: InputDecoration(labelText: value.password)),
-                    )),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: TextFormField(
+                    controller: codeController,
+                  ),
+                ),
                 SizedBox(height: 20),
                 Text('Atelier'),
                 Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.grey,
+                      width: 1.0,
                     ),
-                    child: TextFormField(
-                      controller: atelierController,
-                      //decoration: InputDecoration(
-                      //labelText: value.atelier == null
-                      //? ""
-                      //: value.atelier!.nom)),
-                    )),
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: TextFormField(
+                    controller: atelierController,
+                  ),
+                ),
                 SizedBox(height: 20),
                 Container(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () async {
+                      Tailleurs newTailleuirs = Tailleurs(
+                          password: codeController.text,
+                          nom: nomController.text,
+                          token: _management.tailleurs.first.token,
+                          username: _management.tailleurs.first.username,
+                          email: emailController.text,
+                          genre: genreController.text,
+                          prenom: prenomController.text,
+                          telephone: telephoneController.text);
+                      _management.updateClientInformation(newTailleuirs);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(), // Remplacez "HomePage" par le nom de votre page d'accueil
+                          builder: (context) =>
+                              HomeScreen(), // Remplacez "HomePage" par le nom de votre page d'accueil
                         ),
                       );
                       // ... (votre code existant) ...

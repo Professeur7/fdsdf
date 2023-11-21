@@ -7,11 +7,12 @@ import 'package:fashion2/models/models.dart';
 import 'package:fashion2/models/tailleurs.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 
-class FirebaseManagement with ChangeNotifier {
-  static String tokId = "";
+class FirebaseManagement extends GetxController {
   //create firebase Firestore database instance
-  List<Tailleurs> tailleurs = [];
+  List<Tailleurs> tailleurs = <Tailleurs>[].obs;
   List<Albums> _albums = [];
   List<Albums> get albums => _albums;
   Atelier _atelier = Atelier(nom: "nom", lieu: "lieu");
@@ -34,9 +35,6 @@ class FirebaseManagement with ChangeNotifier {
     final tailleur = await _db.collection("tailleurs").doc(ref.id).get();
     tailleurs.add(Tailleurs.fromSnapshot(tailleur));
     print("${tailleurs.length} est la taille de tailleurs");
-    tokId = ref.id;
-    print("$tokId le referece");
-    notifyListeners();
   }
 
   //de la fonction
@@ -50,12 +48,14 @@ class FirebaseManagement with ChangeNotifier {
         "genre": client.genre,
         "password": client.password,
         "telephone": client.telephone,
+      }).then((value) async {
+        final tall = await _db.collection("tailleurs").doc(client.token).get();
+        tailleurs = [Tailleurs.fromSnapshot(await tall)];
       });
       print("updateClientInformation finish");
     } catch (e) {
       print(e);
     }
-    notifyListeners();
   }
 
   Future<List<Tailleurs>> getAllTailleurs() async {
@@ -102,7 +102,6 @@ class FirebaseManagement with ChangeNotifier {
       "logo": ateliers.logo
     }).then((value) async {
       _atelier = Atelier.fromSnapshot(await value.get());
-      notifyListeners();
     });
   }
 
@@ -114,7 +113,6 @@ class FirebaseManagement with ChangeNotifier {
         .get();
     _atelier =
         monatelier.docs.map((e) => Atelier.fromSnapshot(e)).toList().first;
-    notifyListeners();
   }
 
   addImageToAlbums(Images image, String userToken, String modelToken) async {
@@ -125,7 +123,6 @@ class FirebaseManagement with ChangeNotifier {
         .doc(modelToken)
         .collection("Images")
         .add({"image": image.image});
-    notifyListeners();
   }
 
   updateModel(Models mode, String userToken) async {
@@ -139,7 +136,6 @@ class FirebaseManagement with ChangeNotifier {
       "prix": mode.prix,
       "description": mode.description
     });
-    notifyListeners();
   }
 
   // Méthode de mise à jour de l'image de profil

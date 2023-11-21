@@ -9,6 +9,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 import '../widgets/pageEnregistrementClient.dart';
 import 'clientHomeScreen.dart';
@@ -24,7 +26,7 @@ class LoginSignupScreen extends StatefulWidget {
 class _LoginSignupScreenState extends State<LoginSignupScreen> {
   bool isTailleur = false;
   //bool isClient = false;
-  FirebaseManagement _management = FirebaseManagement();
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   bool isMale = true;
   bool isSignupScreen = false;
   bool isRememberMe = true;
@@ -58,7 +60,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
             : userRef = FirebaseFirestore.instance.collection("Clients");
 
         _management.createTailleurs(User);
-        Future.delayed(Duration(seconds: 30));
+
+        //Future.delayed(Duration(seconds: 30));
         // Naviguer vers HomeScreen après l'inscription réussie
         Navigator.pushReplacement(
           context,
