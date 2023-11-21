@@ -1,11 +1,13 @@
 import 'package:camera/camera.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/albums.dart';
 import 'package:fashion2/models/image_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
+import 'package:get/get.dart';
 
 import 'package:uuid/uuid.dart';
 
@@ -51,8 +53,9 @@ class _PageModelsState extends State<PageModels> {
       ),
       body: GridView.count(
         crossAxisCount: 2,
-        children: galleryButtons.map((button) {
-          return _buildGalleryButton(button);
+        children: c.tailleurs.first.albums!.map((button) {
+          return _buildGalleryButton(
+              GalleryButton(title: button.nom, id: button.token), button.token);
         }).toList(),
       ),
       floatingActionButton: FloatingActionButton(
@@ -65,13 +68,17 @@ class _PageModelsState extends State<PageModels> {
     );
   }
 
-  Widget _buildGalleryButton(GalleryButton button) {
+  Widget _buildGalleryButton(GalleryButton button, token) {
     return Card(
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => GalleryPage(button)),
+            MaterialPageRoute(
+                builder: (context) => GalleryPage(
+                      galleryButton: button,
+                      galerieToken: token,
+                    )),
           );
         },
         child: Center(
@@ -125,38 +132,51 @@ class _PageModelsState extends State<PageModels> {
   }
 }
 
-class GalleryButton {
-  final String title;
-  final String id;
-  GalleryButton({required this.title, String? id}) : id = id ?? Uuid().v4();
+final FirebaseManagement c = Get.put(FirebaseManagement());
 
-  CollectionReference get photosCollection {
-    return FirebaseFirestore.instance
-        .collection('galleryButtons')
-        .doc(id)
-        .collection('photos');
-  }
+class GalleryButton {
+  String title;
+  String? id;
+  GalleryButton({required this.title, this.id});
+
+  // CollectionReference get photosCollection {
+  //   return FirebaseFirestore.instance
+  //       .collection('galleryButtons')
+  //       .doc(id)
+  //       .collection('photos');
+  // }
 
   Future<void> save() async {
-    final data = {'title': title};
-    await FirebaseFirestore.instance
-        .collection('galleryButtons')
-        .doc(id)
-        .set(data);
+    c.creerAlbums(Albums(nom: title), c.tailleurs.first.token!);
   }
 
-  Future<void> addPhoto(String imageUrl) async {
-    await photosCollection.add({'url': imageUrl});
+  Future<void> addPhoto(String imageUrl, String albumsToken) async {
+    c.addImageToAlbums(imageUrl, c.tailleurs.first.token!, albumsToken);
+    //await photosCollection.add({'url': imageUrl});
   }
 
-  Future<List<String>> getPhotos() async {
-    final querySnapshot = await photosCollection.get();
-    return querySnapshot.docs.map((doc) => doc['url'] as String).toList();
+  Future<List<String>> getPhotos(String albumsToken) async {
+    //final querySnapshot = await photosCollection.get();
+    List<String> image = [];
+    if (c.tailleurs.first.albums!.isNotEmpty) {
+      for (final cs in c.tailleurs.first.albums!) {
+        if (cs.token == albumsToken) {
+          if (cs.images != null) {
+            cs.images!.isNotEmpty
+                ? cs.images!.forEach((element) {
+                    image.add(element.image);
+                  })
+                : [];
+          }
+        }
+      }
+    }
+    return image;
   }
 
-  Future<void> deletePhoto(String photoId) async {
-    await photosCollection.doc(photoId).delete();
-  }
+  // Future<void> deletePhoto(String photoId) async {
+  //   await photosCollection.doc(photoId).delete();
+  // }
 }
 
 class CameraPreviewPage extends StatefulWidget {
@@ -219,9 +239,9 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
 }
 
 class GalleryPage extends StatefulWidget {
-  final GalleryButton galleryButton;
-
-  GalleryPage(this.galleryButton);
+  final GalleryButton? galleryButton;
+  String galerieToken;
+  GalleryPage({this.galleryButton, required this.galerieToken});
 
   @override
   _GalleryPageState createState() => _GalleryPageState();
@@ -230,12 +250,12 @@ class GalleryPage extends StatefulWidget {
 class _GalleryPageState extends State<GalleryPage> {
   late CameraController _controller;
   List<String> galleryPhotos = [];
-
+  FirebaseStorage storage = FirebaseStorage.instance;
   @override
   void initState() {
     super.initState();
     _initializeCamera();
-    _loadGalleryPhotos();
+    _loadGalleryPhotos(widget.galerieToken);
   }
 
   Future<void> _initializeCamera() async {
@@ -246,8 +266,8 @@ class _GalleryPageState extends State<GalleryPage> {
     }
   }
 
-  Future<void> _loadGalleryPhotos() async {
-    final photos = await widget.galleryButton.getPhotos();
+  Future<void> _loadGalleryPhotos(String albumsToken) async {
+    final photos = await widget.galleryButton!.getPhotos(albumsToken);
     setState(() {
       galleryPhotos = photos;
     });
@@ -268,10 +288,30 @@ class _GalleryPageState extends State<GalleryPage> {
   void _importImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
+
     if (pickedFile != null) {
-      setState(() {
+      setState(() async {
         galleryPhotos.add(pickedFile.path);
+        File file = File(pickedFile.path);
+        c.addImageToAlbums(await uploadImage(file, pickedFile.name),
+            c.tailleurs.first.token!, widget.galerieToken);
       });
+    }
+  }
+
+  Future<String?> uploadImage(File imageFile, String fileName) async {
+    try {
+      Reference ref = storage.ref().child('images/$fileName');
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Erreur lors du chargement de l\'image : $e');
+      return null;
     }
   }
 
@@ -290,7 +330,7 @@ class _GalleryPageState extends State<GalleryPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.galleryButton.title),
+        title: Text(widget.galleryButton!.title),
         backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(

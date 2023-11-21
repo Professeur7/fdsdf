@@ -16,6 +16,6 @@ class Albums {
     } else {
       listImage = [];
     }
-    return Albums(token: data.id, nom: file["nom"], images: listImage);
+    return Albums(token: data.id, nom: file["title"], images: listImage);
   }
 }

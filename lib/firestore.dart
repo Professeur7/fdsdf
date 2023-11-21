@@ -13,10 +13,9 @@ import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 class FirebaseManagement extends GetxController {
   //create firebase Firestore database instance
   List<Tailleurs> tailleurs = <Tailleurs>[].obs;
-  List<Albums> _albums = [];
-  List<Albums> get albums => _albums;
-  Atelier _atelier = Atelier(nom: "nom", lieu: "lieu");
-  Atelier get atelier => _atelier;
+  List<Client> clients = <Client>[].obs;
+  List<Albums> albums = <Albums>[].obs;
+  Atelier atelier = Atelier(nom: "nom", lieu: "lieu");
   final _db = FirebaseFirestore.instance;
 
   //create firebase Storage database instance
@@ -37,8 +36,21 @@ class FirebaseManagement extends GetxController {
     print("${tailleurs.length} est la taille de tailleurs");
   }
 
+  createClient(Client User) async {
+    final ref = await _db.collection("Clients").add({
+      "email": User.email,
+      "password": User.password,
+      "gender": User.genre,
+      "username": User.username,
+      //"isTailleur": isTailleur,
+    });
+    final tailleur = await _db.collection("Clients").doc(ref.id).get();
+    clients.add(Client.fromSnapshot(tailleur));
+    print("${tailleurs.length} est la taille de clients");
+  }
+
   //de la fonction
-  updateClientInformation(Tailleurs client, Models mode) async {
+  updateTailleurInformation(Tailleurs client) async {
     try {
       await _db.collection("tailleurs").doc(client.token).update({
         "nom": client.nom,
@@ -58,12 +70,42 @@ class FirebaseManagement extends GetxController {
     }
   }
 
+  getTailleur(Tailleurs tailleur) async {
+    final all = await _db
+        .collection("tailleurs")
+        .doc(tailleur.token)
+        .collection("Albums")
+        .get();
+    final albums = all.docs.map((e) => Albums.fromSnapshot(e)).toList();
+    tailleur.albums = albums;
+    tailleurs.isEmpty
+        ? tailleurs.add(tailleur)
+        : {tailleurs.clear(), tailleurs.add(tailleur)};
+  }
+
+  getClient(Client c) async {
+    final all = await _db.collection("Clients").doc(c.token).get();
+    //final al = all.docs.map((e) => Albums.fromSnapshot(e)).toList();
+    //tailleur.albums = albums;
+    final client = Client.fromSnapshot(all);
+    clients.isEmpty
+        ? clients.add(client)
+        : {clients.clear(), clients.add(client)};
+  }
+
   Future<List<Tailleurs>> getAllTailleurs() async {
     final all = await _db.collection("tailleurs").get();
     final tailleurs = all.docs.map((e) => Tailleurs.fromSnapshot(e)).toList();
     print(tailleurs);
     print(tailleurs.first.token);
     return tailleurs;
+  }
+
+  Future<List<Client>> getAllClient() async {
+    final all = await _db.collection("Clients").get();
+    final client = all.docs.map((e) => Client.fromSnapshot(e)).toList();
+    print(client);
+    return client;
   }
 
   creerModel(Models mode, String userToken) async {
@@ -82,11 +124,13 @@ class FirebaseManagement extends GetxController {
   }
 
   creerAlbums(Albums mode, String userToken) async {
-    await _db
+    final ref = await _db
         .collection("tailleurs")
         .doc(userToken)
         .collection("Albums")
-        .add({"nom": mode.nom});
+        .add({"title": mode.nom});
+    mode.token = await ref.id;
+    tailleurs.first.albums!.add(mode);
   }
 
   createAtelier(Atelier ateliers, String userToken) async {
@@ -101,7 +145,7 @@ class FirebaseManagement extends GetxController {
       "lieu": ateliers.lieu,
       "logo": ateliers.logo
     }).then((value) async {
-      _atelier = Atelier.fromSnapshot(await value.get());
+      atelier = Atelier.fromSnapshot(await value.get());
     });
   }
 
@@ -111,18 +155,18 @@ class FirebaseManagement extends GetxController {
         .doc(userToken)
         .collection("ateliers")
         .get();
-    _atelier =
+    atelier =
         monatelier.docs.map((e) => Atelier.fromSnapshot(e)).toList().first;
   }
 
-  addImageToAlbums(Images image, String userToken, String modelToken) async {
+  addImageToAlbums(String? image, String userToken, String modelToken) async {
     await _db
         .collection("tailleurs")
         .doc(userToken)
         .collection("Albums")
         .doc(modelToken)
         .collection("Images")
-        .add({"image": image.image});
+        .add({"image": image});
   }
 
   updateModel(Models mode, String userToken) async {

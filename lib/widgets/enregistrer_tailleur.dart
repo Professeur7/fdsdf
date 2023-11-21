@@ -222,7 +222,7 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                           genre: genreController.text,
                           prenom: prenomController.text,
                           telephone: telephoneController.text);
-                      _management.updateClientInformation(newTailleuirs);
+                      _management.updateTailleurInformation(newTailleuirs);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
