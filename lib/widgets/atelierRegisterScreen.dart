@@ -176,7 +176,6 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                             ? 'chemin_de_l_image' // Remplacez cela par la logique réelle de téléchargement d'image vers Firebase
                             : null,
                       );
-
                       try {
                         final ateliersCollection =
                             FirebaseFirestore.instance.collection('ateliers');

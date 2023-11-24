@@ -59,6 +59,7 @@ class _PageModelsState extends State<PageModels> {
         }).toList(),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF09126C),
         onPressed: () {
           _addGalleryButton();
         },
@@ -289,12 +290,11 @@ class _GalleryPageState extends State<GalleryPage> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() async {
-        galleryPhotos.add(pickedFile.path);
-        File file = File(pickedFile.path);
-        c.addImageToAlbums(await uploadImage(file, pickedFile.name),
-            c.tailleurs.first.token!, widget.galerieToken);
-      });
+      galleryPhotos.add(pickedFile.path);
+      File file = File(pickedFile.path);
+      c.addImageToAlbums(await uploadImage(file, pickedFile.name),
+          c.tailleurs.first.token!, widget.galerieToken);
+      setState(() {});
     }
   }
 
@@ -384,6 +384,7 @@ class _GalleryPageState extends State<GalleryPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF09126C),
         onPressed: () {
           _importImage();
         },

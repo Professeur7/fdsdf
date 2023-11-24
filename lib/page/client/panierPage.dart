@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../screen/clientHomeScreen.dart';
+
 class PanierPage extends StatefulWidget {
   @override
   _PanierPageState createState() => _PanierPageState();
@@ -19,6 +21,21 @@ class _PanierPageState extends State<PanierPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Mon Panier'),
+        backgroundColor: const Color(0xFF09126C),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ClientHomeScreen(),
+              ),
+            );
+          },
+        ),
       ),
       body: Column(
         children: <Widget>[

@@ -1,16 +1,17 @@
 import 'dart:io';
 
-import 'package:fashion2/page/gridview/pageAbout.dart';
-import 'package:fashion2/page/gridview/pageJob.dart';
-import 'package:fashion2/page/gridview/pagePapers.dart';
+import 'package:fashion2/page/gridview/pageClient.dart';
+import 'package:fashion2/page/gridview/pagePromotion.dart';
+import 'package:fashion2/page/gridview/pagePaiement.dart';
 import 'package:fashion2/page/pageDrawer.dart';
 import 'package:fashion2/page/profileAtelierPage.dart';
 import 'package:fashion2/page/search.dart';
 import 'package:flutter/material.dart';
 
+import 'client/pagePublication.dart';
 import 'gridview/pageModels.dart';
-import 'gridview/pagePdf.dart';
-import 'gridview/pageQuiz.dart';
+import 'gridview/pageRDV.dart';
+import 'gridview/pageStock.dart';
 
 class Dashboard extends StatefulWidget {
   final File? selectedImage;
@@ -46,8 +47,8 @@ class _DashboardState extends State<Dashboard> {
     StockManagementPage(),
     InvoiceAndAccountingPage(),
     AppointmentAndSchedulingPage(),
-    MarketingAndPromotionPage(),
-    CustomerInformationPage(),
+    Publications(),
+    ClientsScreen(),
   ];
 
   @override

@@ -4,9 +4,11 @@ import 'package:fashion2/page/dashboard.dart';
 import 'package:fashion2/page/pageMesure.dart';
 import 'package:fashion2/page/todoListPage.dart';
 
+import '../page/client/ClientCommande.dart';
 import '../page/client/clientDashboard.dart';
 import '../page/client/pagePublication.dart';
 import '../page/client/panierPage.dart';
+import '../page/client/profileClient.dart';
 
 class ClientHomeScreen extends StatefulWidget {
   const ClientHomeScreen({Key? key});
@@ -20,8 +22,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   final List<Widget> screens = [
     HomePageClient(),
     Publications(), // Remplacez par votre widget de publications
-    ClientsScreen(),
-    ToDoListPage(),
+    ClientOrderPage(),
+    ProfilePage(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -35,7 +37,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         bucket: bucket,
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF3b5999),
+        backgroundColor: Color(0xFF09126C),
         child: Icon(Icons.add_shopping_cart), // Utilisez un icône de panier
         onPressed: () {
           Navigator.pushReplacement(
@@ -98,7 +100,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                         color: currentTab == 1 ? const Color(0xFF3b5999) : Colors.grey,
                       ),
                       Text(
-                        'Publication',
+                        '   Post  ',
                         style: TextStyle(
                           color: currentTab == 1 ? const Color(0xFF3b5999) : Colors.grey,
                         ),
@@ -112,7 +114,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   minWidth: 30,
                   onPressed: () {
                     setState(() {
-                      currentScreen = ClientsScreen();
+                      currentScreen = ClientOrderPage();
                       currentTab = 2;
                     });
                   },
@@ -120,11 +122,11 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
-                        Icons.favorite,
+                        Icons.shopping_cart,
                         color: currentTab == 2 ? const Color(0xFF3b5999) : Colors.grey,
                       ),
                       Text(
-                        'Favoris',
+                        'Commande',
                         style: TextStyle(
                           color: currentTab == 2 ? const Color(0xFF3b5999) : Colors.grey,
                         ),
@@ -138,7 +140,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   minWidth: 25,
                   onPressed: () {
                     setState(() {
-                      currentScreen = ToDoListPage();
+                      currentScreen = ProfilePage();
                       currentTab = 3;
                     });
                   },

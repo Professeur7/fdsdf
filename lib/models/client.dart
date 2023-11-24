@@ -46,7 +46,7 @@ class Client {
       nom: file["nom"],
       prenom: file["prenom"],
       email: file["email"],
-      genre: file["genre"],
+      genre: file["gender"],
       telephone: file["telephone"],
     );
   }
