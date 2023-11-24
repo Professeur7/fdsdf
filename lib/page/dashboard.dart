@@ -8,6 +8,7 @@ import 'package:fashion2/page/profileAtelierPage.dart';
 import 'package:fashion2/page/search.dart';
 import 'package:flutter/material.dart';
 
+import 'client/pagePublication.dart';
 import 'gridview/pageModels.dart';
 import 'gridview/pageRDV.dart';
 import 'gridview/pageStock.dart';
@@ -46,7 +47,7 @@ class _DashboardState extends State<Dashboard> {
     StockManagementPage(),
     InvoiceAndAccountingPage(),
     AppointmentAndSchedulingPage(),
-    MarketingAndPromotionPage(),
+    Publications(),
     ClientsScreen(),
   ];
 

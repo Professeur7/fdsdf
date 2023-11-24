@@ -290,12 +290,11 @@ class _GalleryPageState extends State<GalleryPage> {
         await ImagePicker().pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      setState(() async {
-        galleryPhotos.add(pickedFile.path);
-        File file = File(pickedFile.path);
-        c.addImageToAlbums(await uploadImage(file, pickedFile.name),
-            c.tailleurs.first.token!, widget.galerieToken);
-      });
+      galleryPhotos.add(pickedFile.path);
+      File file = File(pickedFile.path);
+      c.addImageToAlbums(await uploadImage(file, pickedFile.name),
+          c.tailleurs.first.token!, widget.galerieToken);
+      setState(() {});
     }
   }
 

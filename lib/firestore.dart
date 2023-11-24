@@ -57,7 +57,7 @@ class FirebaseManagement extends GetxController {
         "prenom": client.prenom,
         "username": client.username,
         "email": client.email,
-        "genre": client.genre,
+        "gender": client.genre,
         "password": client.password,
         "telephone": client.telephone,
       }).then((value) async {
@@ -197,7 +197,7 @@ class FirebaseManagement extends GetxController {
   }
 
   //function to delete client instance
-  deleteClient(Tailleurs client) async {
+  deleteTailleurs(Tailleurs client) async {
     await _db.collection("tailleurs").doc(client.token).delete();
   }
 

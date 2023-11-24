@@ -1,5 +1,4 @@
 import 'package:fashion2/firestore.dart';
-import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,20 +6,16 @@ import 'package:fashion2/models/atelier.dart';
 import 'package:fashion2/widgets/enregistrer_tailleur.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'dart:io';
+
+import '../screen/home_screen.dart';
 
 class AtelierRegistrationPage extends StatefulWidget {
   final Atelier? existingAtelier;
   File? selectedImage;
-  String password;
-  String email;
 
-  AtelierRegistrationPage(
-      {Key? key,
-      this.existingAtelier,
-      this.selectedImage,
-      required this.email,
-      required this.password})
+  AtelierRegistrationPage({Key? key, this.existingAtelier, this.selectedImage})
       : super(key: key);
 
   @override
@@ -32,12 +27,11 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
   final TextEditingController nomController = TextEditingController();
   final TextEditingController lieuController = TextEditingController();
   final TextEditingController sloganController = TextEditingController();
-  List<Tailleurs> tailleurs = [];
-  FirebaseManagement _management = FirebaseManagement();
 
   @override
   void initState() {
     super.initState();
+
     // Fill in the fields with the existing atelier's data (if available)
     if (widget.existingAtelier != null) {
       nomController.text = widget.existingAtelier!.nom;
@@ -61,30 +55,10 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
-    print("Begin");
-    print(FirebaseManagement.tokId);
     //final _management = Provider.of<FirebaseManagement>(context, listen: true);
-<<<<<<< HEAD
-    // tailleurs == [] ? getTailleurs() : [];
-    // String id = "";
-    // Tailleurs ta = Tailleurs(
-    //     password: "password",
-    //     username: "username",
-    //     email: "email",
-    //     genre: "genre");
-    // tailleurs.length != 0
-    //     ? {
-    //         ta = tailleurs.firstWhere((element) =>
-    //             element.email == widget.email &&
-    //             element.password == widget.password),
-    //       }
-    //     : [];
-    ;
-=======
     print("this is for get ${c.tailleurs.length}");
     print(
         "token tailleur ${c.tailleurs.length != 0 ? c.tailleurs.first.token : 22222222}");
->>>>>>> b1162c149e585f389cfd328892d0cbf5c91df0e1
     return Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xFF09126C),
@@ -202,7 +176,6 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                             ? 'chemin_de_l_image' // Remplacez cela par la logique réelle de téléchargement d'image vers Firebase
                             : null,
                       );
-
                       try {
                         final ateliersCollection =
                             FirebaseFirestore.instance.collection('ateliers');
@@ -216,21 +189,13 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                           //   'imageUrl': newAtelier.imageUrl,
                           //   // ... autres champs si nécessaire
                           // });
-<<<<<<< HEAD
-                          _management.createAtelier(
-=======
                           c.createAtelier(
->>>>>>> b1162c149e585f389cfd328892d0cbf5c91df0e1
                               Atelier(
                                   nom: newAtelier.nom,
                                   lieu: newAtelier.lieu,
                                   slogan: newAtelier.slogan,
                                   imageUrl: newAtelier.imageUrl),
-<<<<<<< HEAD
-                              _management.tailleurs.first.token!);
-=======
                               c.tailleurs.first.token!);
->>>>>>> b1162c149e585f389cfd328892d0cbf5c91df0e1
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -246,23 +211,15 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                           //   'imageUrl': newAtelier.imageUrl,
                           //   // ... autres champs si nécessaire
                           // });
-<<<<<<< HEAD
-                          _management.createAtelier(
-=======
                           c.createAtelier(
->>>>>>> b1162c149e585f389cfd328892d0cbf5c91df0e1
                               Atelier(
                                   nom: newAtelier.nom,
                                   lieu: newAtelier.lieu,
                                   slogan: newAtelier.slogan,
                                   imageUrl: newAtelier.imageUrl),
-<<<<<<< HEAD
-                              FirebaseManagement.tokId);
-=======
                               c.tailleurs != []
                                   ? c.tailleurs.first.token!
                                   : "");
->>>>>>> b1162c149e585f389cfd328892d0cbf5c91df0e1
                         }
 
                         // Après l'enregistrement, vous pouvez afficher une confirmation à l'utilisateur

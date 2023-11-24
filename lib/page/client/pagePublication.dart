@@ -1,8 +1,11 @@
+import 'package:dart_extensions/dart_extensions.dart';
 import 'package:flutter/material.dart';
 
 import 'package:video_player/video_player.dart';
 
 import '../../screen/clientHomeScreen.dart';
+import '../profileAtelierPage.dart';
+import 'ProfilePublication.dart';
 
 class Publications extends StatefulWidget {
   @override
@@ -11,6 +14,11 @@ class Publications extends StatefulWidget {
 
 class _PublicationsState extends State<Publications> with TickerProviderStateMixin {
   TabController? _tabController;
+  bool isAddedToCart = false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
+  bool isDisliked = false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite = false; // Exemple de variable pour savoir si l'article est favori
+
 
   @override
   void initState() {
@@ -157,6 +165,11 @@ class PublicationTile extends StatefulWidget {
 class _PublicationTileState extends State<PublicationTile> {
   late VideoPlayerController _controller;
   bool _isVideoPlaying = false;
+  bool isAddedToCart = false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
+  bool isDisliked = false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite = false; // Exemple de variable pour savoir si l'article est favori
+
 
   @override
   void initState() {
@@ -188,20 +201,37 @@ class _PublicationTileState extends State<PublicationTile> {
             padding: EdgeInsets.all(16.0),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(widget.workshopProfile),
+                InkWell(
+                  onTap: () {
+                    var location ="Garantibougou";
+                    var imageUrl ="https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProfilePage(
+                          name: ModalRoute.of(context)!.settings.arguments.toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
+                          location: location ="",
+                          imageUrl: imageUrl,
+                        )
+                      ),
+                    );
+                    // Votre logique de navigation pour le profil de l'atelier ici
+                  },
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(widget.workshopProfile),
+                  ),
                 ),
-                SizedBox(width: 16.0),
+                SizedBox(width: 14.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Atelier: ${widget.workshopName}",
+                      " ${widget.workshopName}",
                       style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      "Lieu: ${widget.workshopLocation}",
+                      " ${widget.workshopLocation}",
                       style: TextStyle(fontSize: 14.0),
                     ),
                   ],
@@ -248,11 +278,87 @@ class _PublicationTileState extends State<PublicationTile> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Ajoutez ici la logique pour laisser un commentaire
-              },
-              child: Text("Laisser un commentaire"),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.add_shopping_cart,
+                    color: isAddedToCart ? Colors.green : null, // Couleur verte si ajouté au panier
+                  ),
+                  onPressed: () {
+                    // Logique pour ajouter dans le panier
+                    setState(() {
+                      isAddedToCart = !isAddedToCart; // Inverse l'état lorsque l'icône est pressée
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.favorite,
+                    color: isFavorite ? Colors.red : null, // Couleur rouge si favori
+                  ),
+                  onPressed: () {
+                    // Logique pour ajouter aux favoris
+                    setState(() {
+                      isFavorite = !isFavorite; // Inverse l'état lorsque l'icône est pressée
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.thumb_up,
+                    color: isLiked ? Colors.blue : null, // Couleur bleue si aimé
+                  ),
+                  onPressed: () {
+                    // Logique pour aimer
+                    setState(() {
+                      isLiked = !isLiked; // Inverse l'état lorsque l'icône est pressée
+                      if (isDisliked) {
+                        isDisliked = false; // Si "Je n'aime pas" est sélectionné, décocher
+                      }
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.thumb_down,
+                    color: isDisliked ? Colors.orange : null, // Couleur orange si "Je n'aime pas"
+                  ),
+                  onPressed: () {
+                    // Logique pour ne pas aimer
+                    setState(() {
+                      isDisliked = !isDisliked; // Inverse l'état lorsque l'icône est pressée
+                      if (isLiked) {
+                        isLiked = false; // Si "J'aime" est sélectionné, décocher
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(child: ElevatedButton(
+                  onPressed: () {
+                    // Ajoutez ici la logique pour laisser un commentaire
+                  },
+                  child: Text("Laisser un commentaire"),
+                ),
+                ),
+                SizedBox(width: 15),
+                Expanded(child: ElevatedButton(
+                  onPressed: () {
+                    // Ajoutez ici la logique pour laisser un commentaire
+                  },
+                  child: Text("Contactez-nous"),
+                ),)
+
+              ],
             ),
           ),
         ],

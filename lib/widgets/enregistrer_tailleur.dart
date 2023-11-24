@@ -1,6 +1,7 @@
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/screen/home_screen.dart';
+import 'package:fashion2/widgets/atelierRegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
