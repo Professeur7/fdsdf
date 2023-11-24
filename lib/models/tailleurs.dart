@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/albums.dart';
 import 'package:fashion2/models/atelier.dart';
 import 'package:fashion2/models/models.dart';
+import 'package:fashion2/models/poste.dart';
 
 class Tailleurs {
   String? token;
@@ -16,6 +17,7 @@ class Tailleurs {
   Atelier? atelier;
   List<Models>? model;
   List<Albums>? albums;
+  List<Poste>? postes;
   Tailleurs(
       {required this.password,
       this.nom,
@@ -34,6 +36,7 @@ class Tailleurs {
     final modelData = file!["Model"];
     final albumsData = file["Albums"];
     final atelierData = file["Atelier"];
+    final posteData = file['Poste'];
     List<Models> listModel;
     if (modelData != null) {
       listModel = List<Models>.from(
@@ -55,6 +58,14 @@ class Tailleurs {
           atelierData.map((element) => Atelier.fromSnapshot(element)).first;
     } else {
       atelier = null;
+    }
+
+    List<Poste>? listpsote;
+    if (posteData != null) {
+      listpsote = List<Poste>.from(
+          albumsData.map((element) => Poste.fromSnapshot(element)));
+    } else {
+      listpsote = [];
     }
     return Tailleurs(
         albums: listAlbums,

@@ -1,5 +1,6 @@
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/screen/loginSignupScreen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/atelier.dart';
@@ -27,6 +28,8 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
   final TextEditingController nomController = TextEditingController();
   final TextEditingController lieuController = TextEditingController();
   final TextEditingController sloganController = TextEditingController();
+  FirebaseStorage storage = FirebaseStorage.instance;
+  String? imageUrl;
 
   @override
   void initState() {
@@ -40,15 +43,26 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
     }
   }
 
+  Future<String?> uploadImage(File imageFile, String fileName) async {
+    try {
+      Reference ref = storage.ref().child('images/$fileName');
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Erreur lors du chargement de l\'image : $e');
+      return null;
+    }
+  }
+
   Future<void> pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        widget.selectedImage = File(pickedFile.path);
-      });
-    }
+    imageUrl = await uploadImage(File(pickedFile!.path), pickedFile.name);
   }
 
   final FirebaseManagement c = Get.put(FirebaseManagement());
@@ -172,9 +186,9 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                         slogan: sloganController.text.isNotEmpty
                             ? sloganController.text
                             : null,
-                        imageUrl: widget.selectedImage != null
-                            ? 'chemin_de_l_image' // Remplacez cela par la logique réelle de téléchargement d'image vers Firebase
-                            : null,
+                        imageUrl: imageUrl != null
+                            ? imageUrl // Remplacez cela par la logique réelle de téléchargement d'image vers Firebase
+                            : "",
                       );
 
                       try {

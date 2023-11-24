@@ -86,8 +86,17 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
 
         var listT = <Tailleurs>[];
         var listC = <Client>[];
-        listT = await _management.getAllTailleurs();
-        listC = await _management.getAllClient();
+        try {
+          listT = await _management.getAllTailleurs();
+        } catch (e) {
+          print("errrrrrrrrrrrrr11111111111111111111111111111111");
+        }
+
+        try {
+          listC = await _management.getAllClient();
+        } catch (e) {
+          print("errrrrrrrrrrrrroooooooooooooooooooooooo");
+        }
 
         if (listT
             .where((element) =>
