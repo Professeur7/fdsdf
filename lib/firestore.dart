@@ -5,6 +5,7 @@ import 'package:fashion2/models/client.dart';
 import 'package:fashion2/models/image_model.dart';
 import 'package:fashion2/models/mesure.dart';
 import 'package:fashion2/models/models.dart';
+import 'package:fashion2/models/poste.dart';
 import 'package:fashion2/models/tailleurs.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
@@ -17,6 +18,7 @@ class FirebaseManagement extends GetxController {
   List<Mesures> mesures = <Mesures>[].obs;
   List<Albums> albums = <Albums>[].obs;
   List<Atelier> atelier = <Atelier>[].obs;
+  List<Poste> Postes = <Poste>[].obs;
   final _db = FirebaseFirestore.instance;
 
   //create firebase Storage database instance
@@ -35,6 +37,47 @@ class FirebaseManagement extends GetxController {
     final tailleur = await _db.collection("tailleurs").doc(ref.id).get();
     tailleurs.add(Tailleurs.fromSnapshot(tailleur));
     print("${tailleurs.length} est la taille de tailleurs");
+  }
+
+  postPublication(Poste poste, String token) async {
+    final ref = await _db
+        .collection("tailleurs")
+        .doc(token)
+        .collection("Poste")
+        .add({"description": poste.description});
+
+    for (final image in poste.images!) {
+      await _db
+          .collection("tailleurs")
+          .doc(token)
+          .collection("Poste")
+          .doc(ref.id)
+          .collection("Images")
+          .add({"image": image.image});
+    }
+    Postes.add(poste);
+    tailleurs.first.postes = Postes;
+  }
+
+  Future<List<Poste>> getPublication(String token) async {
+    final poste =
+        await _db.collection("tailleurs").doc(token).collection("Poste").get();
+    final posteList =
+        await poste.docs.map((e) => Poste.fromSnapshot(e)).toList();
+    for (final p in posteList) {
+      final imgs = await _db
+          .collection("tailleurs")
+          .doc(token)
+          .collection("Poste")
+          .doc(p.token)
+          .collection("Images")
+          .get();
+      final img = await imgs.docs.map((e) => Images.fromSnapshot(e)).toList();
+      p.images = img;
+    }
+    Postes = posteList;
+    tailleurs.first.postes = posteList;
+    return posteList;
   }
 
   createClient(Client User) async {
@@ -118,6 +161,7 @@ class FirebaseManagement extends GetxController {
     final all = await _db.collection("tailleurs").get();
     final tailleurs = all.docs.map((e) => Tailleurs.fromSnapshot(e)).toList();
     print(tailleurs);
+    print(tailleurs.first.token);
     return tailleurs;
   }
 
@@ -335,7 +379,7 @@ class FirebaseManagement extends GetxController {
   }
 
   //function to delete client instance
-  deleteClient(Tailleurs client) async {
+  deleteTailleurs(Tailleurs client) async {
     await _db.collection("tailleurs").doc(client.token).delete();
   }
 

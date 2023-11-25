@@ -1,12 +1,29 @@
+import 'package:dart_extensions/dart_extensions.dart';
+import 'package:fashion2/page/gridview/pagePromotion.dart';
+import 'package:fashion2/screen/home_screen.dart';
 import 'package:flutter/material.dart';
+
+import 'package:video_player/video_player.dart';
+
+import '../../screen/clientHomeScreen.dart';
+import '../profileAtelierPage.dart';
+import 'ProfilePublication.dart';
 
 class Publications extends StatefulWidget {
   @override
   _PublicationsState createState() => _PublicationsState();
 }
 
-class _PublicationsState extends State<Publications> with TickerProviderStateMixin {
+class _PublicationsState extends State<Publications>
+    with TickerProviderStateMixin {
   TabController? _tabController;
+  bool isAddedToCart =
+      false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
+  bool isDisliked =
+      false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite =
+      false; // Exemple de variable pour savoir si l'article est favori
 
   @override
   void initState() {
@@ -19,6 +36,33 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
     return Scaffold(
       appBar: AppBar(
         title: Text("Publications"),
+        backgroundColor: const Color(0xFF09126C),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ),
+            );
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite),
+            onPressed: () {
+              // Naviguez vers la page Favoris
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => NewPostPage()),
+              );
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
@@ -48,9 +92,9 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
           PublicationList(
             type: "Vidéos",
             photos: [
-              "https://youtu.be/05GeRFy2FM4?si=-t9aGb_TfJOS10-_.mp4",
-              "https://youtu.be/05GeRFy2FM4?si=-t9aGb_TfJOS10-_.mp4",
-              "https://youtu.be/05GeRFy2FM4?si=-t9aGb_TfJOS10-_.mp4",
+              "https://www.facebook.com/watch/?v=368740601302632.mp4",
+              "https://www.facebook.com/watch/?v=368740601302632.mp4",
+              "https://www.facebook.com/watch/?v=368740601302632.mp4",
               // Ajoutez d'autres URLs de vidéos ici
             ],
             comments: [
@@ -66,12 +110,27 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
   }
 }
 
+class FavoritesPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Favoris'),
+      ),
+      body: Center(
+        child: Text('Contenu de la page Favoris'),
+      ),
+    );
+  }
+}
+
 class PublicationList extends StatelessWidget {
   final String type;
   final List<String> photos;
   final List<String> comments;
 
-  PublicationList({required this.type, required this.photos, required this.comments});
+  PublicationList(
+      {required this.type, required this.photos, required this.comments});
 
   @override
   Widget build(BuildContext context) {
@@ -82,18 +141,65 @@ class PublicationList extends StatelessWidget {
           photoUrl: photos[index],
           comment: comments[index],
           type: type,
+          workshopName: 'Naf Couture',
+          workshopProfile: '',
+          workshopLocation: 'Garantibougou',
         );
       },
     );
   }
 }
 
-class PublicationTile extends StatelessWidget {
+class PublicationTile extends StatefulWidget {
   final String photoUrl;
   final String comment;
   final String type;
+  final String workshopName;
+  final String workshopLocation;
+  final String workshopProfile;
 
-  PublicationTile({required this.photoUrl, required this.comment, required this.type});
+  PublicationTile({
+    required this.photoUrl,
+    required this.comment,
+    required this.type,
+    required this.workshopName,
+    required this.workshopLocation,
+    required this.workshopProfile,
+  });
+
+  @override
+  _PublicationTileState createState() => _PublicationTileState();
+}
+
+class _PublicationTileState extends State<PublicationTile> {
+  late VideoPlayerController _controller;
+  bool _isVideoPlaying = false;
+  bool isAddedToCart =
+      false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
+  bool isDisliked =
+      false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite =
+      false; // Exemple de variable pour savoir si l'article est favori
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.photoUrl.endsWith('.mp4')) {
+      _controller = VideoPlayerController.network(widget.photoUrl)
+        ..initialize().then((_) {
+          setState(() {});
+        });
+    }
+  }
+
+  @override
+  void dispose() {
+    if (widget.photoUrl.endsWith('.mp4')) {
+      _controller.dispose();
+    }
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,26 +208,189 @@ class PublicationTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Image.network(photoUrl),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                InkWell(
+                  onTap: () {
+                    var location = "Garantibougou";
+                    var imageUrl =
+                        "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ProfilePage(
+                                name: ModalRoute.of(context)!
+                                    .settings
+                                    .arguments
+                                    .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
+                                location: location = "",
+                                imageUrl: imageUrl,
+                              )),
+                    );
+                    // Votre logique de navigation pour le profil de l'atelier ici
+                  },
+                  child: CircleAvatar(
+                    radius: 20,
+                    backgroundImage: NetworkImage(widget.workshopProfile),
+                  ),
+                ),
+                SizedBox(width: 14.0),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      " ${widget.workshopName}",
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      " ${widget.workshopLocation}",
+                      style: TextStyle(fontSize: 14.0),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (widget.photoUrl.endsWith('.mp4') &&
+              _controller.value.isInitialized)
+            AspectRatio(
+              aspectRatio: _controller.value.aspectRatio,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  VideoPlayer(_controller),
+                  if (!_isVideoPlaying)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _isVideoPlaying = true;
+                          _controller.play();
+                        });
+                      },
+                      child: Icon(
+                        Icons.play_arrow,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          if (!widget.photoUrl.endsWith(
+              '.mp4')) // Si ce n'est pas une vidéo, afficher une image
+            Image.network(widget.photoUrl),
           Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
-              comment,
+              widget.comment,
               style: TextStyle(fontSize: 16.0),
             ),
           ),
           Text(
-            "Type: $type",
+            "Type: ${widget.type}",
             style: TextStyle(fontSize: 12.0),
           ),
-          // Bouton pour laisser un commentaire
           Padding(
-            padding: EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                // Ajoutez ici la logique pour laisser un commentaire
-              },
-              child: Text("Laisser un commentaire"),
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(
+                    Icons.add_shopping_cart,
+                    color: isAddedToCart
+                        ? Colors.green
+                        : null, // Couleur verte si ajouté au panier
+                  ),
+                  onPressed: () {
+                    // Logique pour ajouter dans le panier
+                    setState(() {
+                      isAddedToCart =
+                          !isAddedToCart; // Inverse l'état lorsque l'icône est pressée
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.favorite,
+                    color: isFavorite
+                        ? Colors.red
+                        : null, // Couleur rouge si favori
+                  ),
+                  onPressed: () {
+                    // Logique pour ajouter aux favoris
+                    setState(() {
+                      isFavorite =
+                          !isFavorite; // Inverse l'état lorsque l'icône est pressée
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.thumb_up,
+                    color:
+                        isLiked ? Colors.blue : null, // Couleur bleue si aimé
+                  ),
+                  onPressed: () {
+                    // Logique pour aimer
+                    setState(() {
+                      isLiked =
+                          !isLiked; // Inverse l'état lorsque l'icône est pressée
+                      if (isDisliked) {
+                        isDisliked =
+                            false; // Si "Je n'aime pas" est sélectionné, décocher
+                      }
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(
+                    Icons.thumb_down,
+                    color: isDisliked
+                        ? Colors.orange
+                        : null, // Couleur orange si "Je n'aime pas"
+                  ),
+                  onPressed: () {
+                    // Logique pour ne pas aimer
+                    setState(() {
+                      isDisliked =
+                          !isDisliked; // Inverse l'état lorsque l'icône est pressée
+                      if (isLiked) {
+                        isLiked =
+                            false; // Si "J'aime" est sélectionné, décocher
+                      }
+                    });
+                  },
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Ajoutez ici la logique pour laisser un commentaire
+                    },
+                    child: Text("Laisser un commentaire"),
+                  ),
+                ),
+                SizedBox(width: 15),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Ajoutez ici la logique pour laisser un commentaire
+                    },
+                    child: Text("Contactez-nous"),
+                  ),
+                )
+              ],
             ),
           ),
         ],

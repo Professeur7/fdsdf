@@ -17,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int currentTab = 0;
   final List<Widget> screens = [
     Dashboard(),
-    ClientsScreen(),
+    CustomerInformationPage(),
     Transaction(),
     ToDoListPage(),
   ];
@@ -33,8 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
         bucket: bucket,
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF3b5999),
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFF09126C),
+        child: Icon(Icons.cut),
         onPressed: () {
           Navigator.pushReplacement(
             context,
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             : Colors.grey,
                       ),
                       Text(
-                        'Dashboard',
+                        'Accueil',
                         style: TextStyle(
                           color: currentTab == 0
                               ? const Color(0xFF3b5999)
@@ -89,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   minWidth: 30,
                   onPressed: () {
                     setState(() {
-                      currentScreen = ClientsScreen();
+                      currentScreen = CustomerInformationPage();
                       currentTab = 1;
                     });
                   },
@@ -103,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             : Colors.grey,
                       ),
                       Text(
-                        'Client',
+                        'Mesure',
                         style: TextStyle(
                           color: currentTab == 1
                               ? const Color(0xFF3b5999)

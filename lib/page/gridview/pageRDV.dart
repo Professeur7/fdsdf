@@ -81,7 +81,9 @@ class _AppointmentAndSchedulingPageState
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color(0xFF09126C),
         onPressed: () {
+          _showAddAppointmentDialog(context);
           // Ajoutez ici la logique pour planifier un nouveau rendez-vous
         },
         child: Icon(Icons.add),
@@ -89,6 +91,68 @@ class _AppointmentAndSchedulingPageState
     );
   }
 }
+
+void _showAddAppointmentDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Nouveau Rendez-vous'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Nom du client'),
+                // Utilisez un contrôleur TextEditingController pour récupérer la valeur du champ
+                // Par exemple : controller: _clientNameController,
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Date du rendez-vous'),
+                keyboardType: TextInputType.datetime,
+                // Utilisez un contrôleur TextEditingController pour récupérer la valeur du champ
+                // Par exemple : controller: _appointmentDateController,
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Heure du rendez-vous'),
+                keyboardType: TextInputType.datetime,
+                // Utilisez un contrôleur TextEditingController pour récupérer la valeur du champ
+                // Par exemple : controller: _appointmentTimeController,
+              ),
+              SizedBox(height: 10),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Objet du rendez-vous'),
+                // Utilisez un contrôleur TextEditingController pour récupérer la valeur du champ
+                // Par exemple : controller: _appointmentObjectController,
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Logique pour annuler la création du rendez-vous
+            },
+            child: Text('Annuler'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              // Logique pour sauvegarder le rendez-vous
+              // Utilisez les valeurs récupérées des champs pour créer un nouvel Event
+            },
+            child: Text('Enregistrer'),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
 class Event {
   final String clientName;

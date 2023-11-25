@@ -35,11 +35,6 @@ class _TransactionState extends State<Transaction> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Liste des demandes de commande",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: 10, // Remplacez par le nombre réel de demandes de commande

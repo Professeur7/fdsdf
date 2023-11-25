@@ -1,5 +1,6 @@
 import 'package:fashion2/screen/clientHomeScreen.dart';
 import 'package:fashion2/screen/introductionScreen.dart';
+import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:fashion2/models/models.dart';
 
@@ -27,6 +28,21 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Inscription Client'),
+        backgroundColor: const Color(0xFF09126C),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => LoginSignupScreen(),
+              ),
+            );
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

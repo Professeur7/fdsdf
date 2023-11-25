@@ -8,37 +8,18 @@ class Commande {
   String prixConvenu;
   DateTime dateCommande;
   DateTime dateLivraison;
-  Client client;
-  Tailleurs tailleurs;
+  String tailleurs;
   Models models;
   Commande(
       {required this.prixConvenu,
       required this.dateCommande,
       required this.dateLivraison,
-      required this.client,
       required this.tailleurs,
       required this.models,
       token});
   factory Commande.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
-    final dataClient = file!["Client"];
-    final dataTailleur = file["Tailleur"];
-    final dataModel = file["Models"];
-
-    Client client;
-    if (dataClient != null) {
-      client = dataClient.map((element) => Client.fromSnapshot(element));
-    } else {
-      client = [] as Client;
-    }
-
-    Tailleurs tailleurs;
-    if (dataTailleur != null) {
-      tailleurs =
-          dataTailleur.map((element) => Tailleurs.fromSnapshot(element));
-    } else {
-      tailleurs = [] as Tailleurs;
-    }
+    final dataModel = file!["Models"];
 
     Models models;
     if (dataModel != null) {
@@ -52,8 +33,7 @@ class Commande {
         prixConvenu: file["Prix Convenu"],
         dateCommande: file["date Commande"],
         dateLivraison: file["date Livraison"],
-        client: client,
-        tailleurs: tailleurs,
+        tailleurs: file["tailleurs"],
         models: models);
   }
 }

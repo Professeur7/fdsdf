@@ -59,6 +59,9 @@ dependencies:
   introduction_screen: ^3.1.12
   carousel_slider: ^4.2.1
   get: ^4.6.6
+  cached_network_image: ^3.3.0
+  multiple_images_picker: ^1.0.1
+  video_player: ^2.8.1
 
 
 

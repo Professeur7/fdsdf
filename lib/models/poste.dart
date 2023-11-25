@@ -16,6 +16,7 @@ class Poste {
     } else {
       listImage = [];
     }
-    return Poste(description: file['description'], images: listImage);
+    return Poste(
+        token: data.id, description: file['description'], images: listImage);
   }
 }
