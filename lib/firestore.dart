@@ -139,6 +139,7 @@ class FirebaseManagement extends GetxController {
       final gap = photos.docs.map((e) => Images.fromSnapshot(e)).toList();
       photo.images = gap;
     }
+    getPublication(tailleur.token!);
     tailleur.albums = albums;
     tailleur.atelier = listaltelier.first;
     atelier = listaltelier;

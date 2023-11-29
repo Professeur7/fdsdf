@@ -153,6 +153,7 @@ class _NewPostPageState extends State<NewPostPage> {
                 _management.postPublication(
                     Poste(description: _description.text, images: listImages),
                     _management.tailleurs.first.token!);
+                Navigator.pop(context);
               },
               child: Text('Publier'),
             ),

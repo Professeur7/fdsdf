@@ -1,7 +1,9 @@
 import 'package:dart_extensions/dart_extensions.dart';
+import 'package:fashion2/firestore.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
 import 'package:fashion2/screen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:video_player/video_player.dart';
 
@@ -29,8 +31,24 @@ class _PublicationsState extends State<Publications>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    c.getPublication(c.tailleurs.first.token!);
+    if (c.tailleurs.first.postes == null) {
+    } else {
+      for (final i in c.tailleurs.first.postes!) {
+        for (final c in i.images!) {
+          imageLinks.add(c.image);
+        }
+      }
+      for (final i in c.tailleurs.first.postes!) {
+        comment.add(i.description);
+      }
+    }
   }
 
+  List<String> imageLinks = [];
+  List<String> comment = [];
+
+  final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -76,18 +94,8 @@ class _PublicationsState extends State<Publications>
         children: [
           PublicationList(
             type: "Photos",
-            photos: [
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              // Ajoutez d'autres URLs de photos ici
-            ],
-            comments: [
-              "Contenu de la publication 1...",
-              "Contenu de la publication 2...",
-              "Contenu de la publication 3...",
-              // Ajoutez d'autres commentaires ici
-            ],
+            photos: imageLinks,
+            comments: comment,
           ),
           PublicationList(
             type: "Vidéos",
