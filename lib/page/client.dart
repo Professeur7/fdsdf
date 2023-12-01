@@ -1,6 +1,8 @@
+import 'package:fashion2/firestore.dart';
 import 'package:flutter/material.dart';
-import '../../screen/home_screen.dart';
-import 'pageMesure.dart'; // Assure-toi d'importer la bonne page ici
+import 'package:get/get.dart';
+import '../screen/home_screen.dart';
+import 'package:fashion2/page/pageMesure.dart'; // Assure-toi d'importer la bonne page ici
 
 class CustomerInformationPage extends StatefulWidget {
   @override
@@ -9,24 +11,34 @@ class CustomerInformationPage extends StatefulWidget {
 }
 
 class _CustomerInformationPageState extends State<CustomerInformationPage> {
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String customerName = "";
-  double measurements = 0.0;
-  String preferences = "";
-  String contactInfo = "";
-  List<String> savedMeasurements = [
-    'Tour de poitrine: 90 cm',
-    'Tour de taille: 75 cm',
-    'Tour de hanche: 95 cm',
-    'Longueur des manches: 60 cm',
-    // Ajoute d'autres mesures par défaut ici
-  ]; // Liste pour stocker les mesures
+  List<Map<String, dynamic>> savedForms =
+      []; // Liste pour stocker les formulaires
+  final FirebaseManagement c = Get.put(FirebaseManagement());
+  @override
+  void initState() {
+    super.initState();
+    // Exemples de formulaires enregistrés (peuvent être des données fictives pour l'exemple)
+    savedForms = [
+      {
+        'customerName': 'Alice',
+        // ... autres détails du formulaire
+      },
+      {
+        'customerName': 'Bob',
+        // ... autres détails du formulaire
+      },
+      {
+        'customerName': 'Eve',
+        // ... autres détails du formulaire
+      },
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Gestion des Informations Clients"),
+        title: Text("Liste de mesures"),
         backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
@@ -34,7 +46,7 @@ class _CustomerInformationPageState extends State<CustomerInformationPage> {
             color: Colors.grey,
           ),
           onPressed: () {
-            Navigator.pushReplacement(
+            Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => HomeScreen(),
@@ -47,33 +59,41 @@ class _CustomerInformationPageState extends State<CustomerInformationPage> {
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: <Widget>[
-            // ... Tes TextFormField existants
-            // Affichage des mesures enregistrées
+            // Affichage des formulaires enregistrés
             ListView.builder(
               shrinkWrap: true,
-              itemCount: savedMeasurements.length,
+              itemCount: c.mesures.length,
               itemBuilder: (context, index) {
+                final form = c.mesures[index];
                 return Card(
                   margin: EdgeInsets.all(10),
                   child: ListTile(
-                    leading: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: Colors.grey,
-                        image: DecorationImage(
-                          image: AssetImage('assets/ton_image.png'), // Chemin de l'image
-                          fit: BoxFit.cover,
-                        ),
+                    leading: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        color: Colors
+                            .grey, // Ici, tu peux afficher l'image de l'habit
+                        child: Image.network(form.habit.first.image),
                       ),
                     ),
-                    title: Text('Mesure $index'),
-                    subtitle: Text(savedMeasurements[index]),
-                    trailing: Icon(Icons.edit), // Icône pour modifier la mesure
+                    title: Text('Nom du client: ${form.client.first.nom}'),
+                    // trailing: Checkbox(
+                    //   value: form['isChecked'] ?? false,
+                    //   onChanged: (bool? value) {
+                    //     setState(() {
+                    //       form['isChecked'] = value;
+                    //     });
+                    //   },
+                    // ),
                     onTap: () {
-                      // Action à effectuer lors du tap sur la mesure
-                      // Par exemple, ouvrir une page pour éditer la mesure
+                      //  Navigator.push(
+                      //    context,
+                      //    MaterialPageRoute(
+                      //      builder: (context) => FormDetailsPage(form),
+                      //   ),
+                      //  );
                     },
                   ),
                 );
@@ -91,13 +111,116 @@ class _CustomerInformationPageState extends State<CustomerInformationPage> {
               builder: (context) => MesuresPage(),
             ),
           );
-          // Ouvre une nouvelle page pour ajouter des mesures si nécessaire
+          // Ouvre une nouvelle page pour ajouter un nouveau formulaire
         },
         child: Icon(Icons.add),
       ),
     );
   }
 }
+
+
+
+// import 'package:flutter/material.dart';
+// import '../../screen/home_screen.dart';
+// import 'pageMesure.dart'; // Assure-toi d'importer la bonne page ici
+//
+// class CustomerInformationPage extends StatefulWidget {
+//   @override
+//   _CustomerInformationPageState createState() =>
+//       _CustomerInformationPageState();
+// }
+//
+// class _CustomerInformationPageState extends State<CustomerInformationPage> {
+//   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+//   String customerName = "";
+//   double measurements = 0.0;
+//   String preferences = "";
+//   String contactInfo = "";
+//   List<String> savedMeasurements = [
+//     'Tour de poitrine: 90 cm',
+//     'Tour de taille: 75 cm',
+//     'Tour de hanche: 95 cm',
+//     'Longueur des manches: 60 cm',
+//     // Ajoute d'autres mesures par défaut ici
+//   ]; // Liste pour stocker les mesures
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text("Gestion des Informations Clients"),
+//         backgroundColor: const Color(0xFF09126C),
+//         leading: IconButton(
+//           icon: Icon(
+//             Icons.arrow_back_ios_new,
+//             color: Colors.grey,
+//           ),
+//           onPressed: () {
+//             Navigator.pushReplacement(
+//               context,
+//               MaterialPageRoute(
+//                 builder: (context) => HomeScreen(),
+//               ),
+//             );
+//           },
+//         ),
+//       ),
+//       body: SingleChildScrollView(
+//         padding: const EdgeInsets.all(16.0),
+//         child: Column(
+//           children: <Widget>[
+//             // ... Tes TextFormField existants
+//             // Affichage des mesures enregistrées
+//             ListView.builder(
+//               shrinkWrap: true,
+//               itemCount: savedMeasurements.length,
+//               itemBuilder: (context, index) {
+//                 return Card(
+//                   margin: EdgeInsets.all(10),
+//                   child: ListTile(
+//                     leading: Container(
+//                       width: 40,
+//                       height: 40,
+//                       decoration: BoxDecoration(
+//                         shape: BoxShape.rectangle,
+//                         color: Colors.grey,
+//                         image: DecorationImage(
+//                           image: AssetImage('assets/ton_image.png'), // Chemin de l'image
+//                           fit: BoxFit.cover,
+//                         ),
+//                       ),
+//                     ),
+//                     title: Text('Mesure $index'),
+//                     subtitle: Text(savedMeasurements[index]),
+//                     trailing: Icon(Icons.edit), // Icône pour modifier la mesure
+//                     onTap: () {
+//                       // Action à effectuer lors du tap sur la mesure
+//                       // Par exemple, ouvrir une page pour éditer la mesure
+//                     },
+//                   ),
+//                 );
+//               },
+//             ),
+//           ],
+//         ),
+//       ),
+//       floatingActionButton: FloatingActionButton(
+//         backgroundColor: Color(0xFF09126C),
+//         onPressed: () {
+//           Navigator.pushReplacement(
+//             context,
+//             MaterialPageRoute(
+//               builder: (context) => MesuresPage(),
+//             ),
+//           );
+//           // Ouvre une nouvelle page pour ajouter des mesures si nécessaire
+//         },
+//         child: Icon(Icons.add),
+//       ),
+//     );
+//   }
+// }
 
 
 

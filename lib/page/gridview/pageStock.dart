@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../firestore.dart';
 import '../../screen/home_screen.dart';
-
 
 class StockManagementPage extends StatefulWidget {
   @override
@@ -9,6 +10,7 @@ class StockManagementPage extends StatefulWidget {
 }
 
 class _StockManagementPageState extends State<StockManagementPage> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   List<StockItem> stockItems = [
     StockItem("Tissus", 100, 5.0, "Fournisseur A"),
     StockItem("Fils", 50, 3.0, "Fournisseur B"),
@@ -44,12 +46,14 @@ class _StockManagementPageState extends State<StockManagementPage> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
-            color: item.quantity < 50 ? Colors.red.withOpacity(0.2) : Colors.white,
+            color:
+                item.quantity < 50 ? Colors.red.withOpacity(0.2) : Colors.white,
             child: ListTile(
               title: Text(
                 item.name,
                 style: TextStyle(
-                  fontWeight: item.quantity < 50 ? FontWeight.bold : FontWeight.normal,
+                  fontWeight:
+                      item.quantity < 50 ? FontWeight.bold : FontWeight.normal,
                   color: item.quantity < 50 ? Colors.red : Colors.black,
                 ),
               ),
@@ -158,5 +162,3 @@ class StockItem {
 
   StockItem(this.name, this.quantity, this.unitPrice, this.supplier);
 }
-
-

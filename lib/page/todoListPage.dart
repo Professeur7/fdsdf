@@ -1,10 +1,6 @@
+import 'package:fashion2/firestore.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MaterialApp(
-    home: ToDoListPage(),
-  ));
-}
+import 'package:get/get.dart';
 
 class ToDoListPage extends StatefulWidget {
   @override
@@ -12,6 +8,7 @@ class ToDoListPage extends StatefulWidget {
 }
 
 class _ToDoListPageState extends State<ToDoListPage> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   List<Task> tasks = [];
 
   @override
@@ -26,7 +23,8 @@ class _ToDoListPageState extends State<ToDoListPage> {
             color: Colors.grey,
           ),
           onPressed: () {
-            Navigator.pop(context); // Revenir à la liste des demandes de commande
+            Navigator.pop(
+                context); // Revenir à la liste des demandes de commande
           },
         ),
       ),
@@ -161,7 +159,8 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                 Expanded(
                   child: TextField(
                     controller: subTaskController,
-                    decoration: InputDecoration(labelText: 'Ajouter une sous-tâche'),
+                    decoration:
+                        InputDecoration(labelText: 'Ajouter une sous-tâche'),
                   ),
                 ),
                 IconButton(

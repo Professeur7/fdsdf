@@ -1,7 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/albums.dart';
 import 'package:fashion2/models/atelier.dart';
+import 'package:fashion2/models/mesClients.dart';
 import 'package:fashion2/models/models.dart';
+import 'package:fashion2/models/paiement.dart';
+import 'package:fashion2/models/rendez_vous.dart';
+import 'package:fashion2/models/soustaches.dart';
+import 'package:fashion2/models/stock.dart';
+import 'package:fashion2/models/tache.dart';
+
+import 'mesure.dart';
 
 class Tailleurs {
   String? token;
@@ -13,12 +21,23 @@ class Tailleurs {
   String email;
   String genre;
   String password;
+  List<RDV>? rdv;
   Atelier? atelier;
   List<Models>? model;
+  List<Stock>? stock;
+  List<Paiement>? paiement;
   List<Albums>? albums;
+  List<Taches>? taches;
+  List<Mesures>? mesure;
+  List<MesClients>? mesClients;
   Tailleurs(
       {required this.password,
+      this.paiement,
+      this.stock,
       this.nom,
+      this.rdv,
+      this.mesure,
+      this.mesClients,
       this.prenom,
       this.image,
       this.albums,
@@ -28,12 +47,60 @@ class Tailleurs {
       required this.email,
       required this.genre,
       this.telephone,
+      this.taches,
       this.token});
   factory Tailleurs.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final modelData = file!["Model"];
     final albumsData = file["Albums"];
     final atelierData = file["Atelier"];
+    final tacheData = file["Tache"];
+    final rdvData = file["RDV"];
+    final mesureData = file["Mesures"];
+    final mesClientsData = file["MesClients"];
+    final stockData = file["Stock"];
+    final PaiementData = file["Paiement"];
+
+    List<Paiement> listPaiement;
+    if (PaiementData != null) {
+      listPaiement = PaiementData.map((e) => Stock.fromSnapshot(e));
+    } else {
+      listPaiement = [];
+    }
+
+    List<Stock> listStock;
+    if (stockData != null) {
+      listStock = stockData.map((e) => Stock.fromSnapshot(e));
+    } else {
+      listStock = [];
+    }
+
+    List<MesClients> listMesClients;
+    if (mesClientsData != null) {
+      listMesClients = mesClientsData.map((e) => MesClients.fromSnapshot(e));
+    } else {
+      listMesClients = [];
+    }
+
+    List<Mesures> listMesures;
+    if (tacheData != null) {
+      listMesures = mesureData.map((e) => Mesures.fromSnapshot(e));
+    } else {
+      listMesures = [];
+    }
+
+    List<Taches> listTaches;
+    if (tacheData != null) {
+      listTaches = tacheData.map((e) => Taches.fromSnapshot(e));
+    } else {
+      listTaches = [];
+    }
+    List<RDV> listRDV;
+    if (rdvData != null) {
+      listRDV = rdvData.map((e) => RDV.fromSnapshot(e));
+    } else {
+      listRDV = [];
+    }
     List<Models> listModel;
     if (modelData != null) {
       listModel = List<Models>.from(
@@ -57,11 +124,17 @@ class Tailleurs {
       atelier = null;
     }
     return Tailleurs(
+        rdv: listRDV,
+        paiement: listPaiement,
+        stock: listStock,
+        mesClients: listMesClients,
         albums: listAlbums,
+        mesure: listMesures,
         username: file['username'],
         image: file['image'] ?? "",
         model: listModel,
         atelier: atelier,
+        taches: listTaches,
         token: data.id,
         password: file["password"],
         nom: file["nom"] ?? "",

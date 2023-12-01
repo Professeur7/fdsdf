@@ -1,3 +1,4 @@
+import 'package:fashion2/page/client/pagePublication.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multiple_images_picker/multiple_images_picker.dart';
@@ -55,6 +56,20 @@ class _NewPostPageState extends State<NewPostPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Nouveau Post'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.article_outlined),
+            onPressed: () {
+              // Implémentez ici la logique pour voir les publications
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Publications(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),

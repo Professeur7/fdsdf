@@ -47,7 +47,7 @@ class _DashboardState extends State<Dashboard> {
     StockManagementPage(),
     InvoiceAndAccountingPage(),
     AppointmentAndSchedulingPage(),
-    Publications(),
+    NewPostPage(),
     ClientsScreen(),
   ];
 

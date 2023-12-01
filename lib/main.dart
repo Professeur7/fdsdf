@@ -6,7 +6,6 @@ import 'package:fashion2/screen/notification_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:provider/provider.dart';
 
 final navigatorkey = GlobalKey<NavigatorState>();
 

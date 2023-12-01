@@ -2,24 +2,35 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/albums.dart';
 import 'package:fashion2/models/atelier.dart';
 import 'package:fashion2/models/client.dart';
+import 'package:fashion2/models/habit.dart';
 import 'package:fashion2/models/image_model.dart';
+import 'package:fashion2/models/mesClients.dart';
 import 'package:fashion2/models/models.dart';
+import 'package:fashion2/models/paiement.dart';
+import 'package:fashion2/models/soustaches.dart';
+import 'package:fashion2/models/stock.dart';
+import 'package:fashion2/models/tache.dart';
 import 'package:fashion2/models/tailleurs.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
+
+import 'models/mesure.dart';
+import 'models/rendez_vous.dart';
 
 class FirebaseManagement extends GetxController {
   //create firebase Firestore database instance
   List<Tailleurs> tailleurs = <Tailleurs>[].obs;
   List<Client> clients = <Client>[].obs;
   List<Albums> albums = <Albums>[].obs;
+  List<Stock> stock = <Stock>[].obs;
+  List<Taches> taches = <Taches>[].obs;
+  List<Paiement> paiement = <Paiement>[].obs;
+  List<RDV> rdv = <RDV>[].obs;
+  List<MesClients> mesClients = <MesClients>[].obs;
+  List<Mesures> mesures = <Mesures>[].obs;
   Atelier atelier = Atelier(nom: "nom", lieu: "lieu");
   final _db = FirebaseFirestore.instance;
 
   //create firebase Storage database instance
-  final _refs = FirebaseStorage.instance;
 //function to login a user
 
   //Cette fonction permet de mettre a jour l'utilisatuer dont les information seront passer en argument
@@ -77,6 +88,23 @@ class FirebaseManagement extends GetxController {
         .collection("Albums")
         .get();
     final albums = all.docs.map((e) => Albums.fromSnapshot(e)).toList();
+    for (final al in albums) {
+      final img = await _db
+          .collection("tailleurs")
+          .doc(tailleur.token)
+          .collection("Albums")
+          .doc(al.token)
+          .collection("Images")
+          .get();
+      final imgList = img.docs.map((e) => Images.fromSnapshot(e)).toList();
+      al.images = imgList;
+    }
+    tailleur.mesClients = await getMesClient(tailleur.token!);
+    tailleur.mesure = await getMesures(tailleur.token!);
+    tailleur.rdv = await getRDV(tailleur.token!);
+    tailleur.taches = await getTaches(tailleur.token!);
+    tailleur.paiement = await getPaiement(tailleur.token!);
+    tailleur.stock = await getStock(tailleur.token!);
     tailleur.albums = albums;
     tailleurs.isEmpty
         ? tailleurs.add(tailleur)
@@ -108,6 +136,212 @@ class FirebaseManagement extends GetxController {
     return client;
   }
 
+  CreerMesures(Mesures mesure, String tailleurToken) async {
+    final ref = await _db
+        .collection("tailleurs")
+        .doc(tailleurToken)
+        .collection("Mesures")
+        .add({
+      "avance": mesure.avance,
+      "reste": mesure.reste,
+      "image": mesure.habit.first.image,
+      "descriptionHabit": mesure.habit.first.descriptionHabit,
+      "tourPoitrine": mesure.tourPoitrine,
+      "tourDos": mesure.tourDos,
+      "tourHanche": mesure.tourHanche,
+      "longueurManches": mesure.longueurManches,
+      "largeursEpaules": mesure.largeursEpaules,
+      "longueurJambes": mesure.longueurJambes,
+      "hauteurEntreJambes": mesure.hauteurEntrejambe,
+      "longueurOurlet": mesure.longueurOurlet,
+      "tourBras": mesure.tourBras,
+      "tourPoignet": mesure.tourPoignet,
+      "HauteurTotale": mesure.hauteurTotale,
+      "tourCou": mesure.tourCou,
+    });
+
+    await _db
+        .collection("tailleurs")
+        .doc(tailleurToken)
+        .collection("Mesures")
+        .doc(ref.id)
+        .collection("MesClients")
+        .add({
+      "nom": mesure.client.first.nom,
+      "gender": mesure.client.first.genre,
+      "prenom": mesure.client.first.prenom,
+      "telephone": mesure.client.first.telephone,
+      "trancheAge": mesure.client.first.trancheAge
+    });
+
+    await _db
+        .collection("tailleurs")
+        .doc(tailleurToken)
+        .collection("Mesures")
+        .doc(ref.id)
+        .collection("Habit")
+        .add({
+      "image": mesure.habit.first.image,
+      "description": mesure.habit.first.descriptionHabit
+    });
+
+    final ref2 = await _db
+        .collection("tailleurs")
+        .doc(tailleurToken)
+        .collection("Mesures")
+        .doc(ref.id)
+        .collection("Model")
+        .add({
+      "description": mesure.models.first.description,
+      "prix": mesure.models.first.prix,
+      "nom": mesure.models.first.nom
+    });
+    for (final i in mesure.models.first.images!) {
+      await _db
+          .collection("tailleurs")
+          .doc(tailleurToken)
+          .collection("Mesures")
+          .doc(ref.id)
+          .collection("Model")
+          .doc(ref2.id)
+          .collection("Image")
+          .add({"image": i.image});
+    }
+
+    mesures.add(mesure);
+    tailleurs.first.mesure = mesures;
+  }
+
+  Future<List<Mesures>> getMesures(String tailleursToken) async {
+    final mess = await _db
+        .collection("tailleurs")
+        .doc(tailleursToken)
+        .collection("Mesures")
+        .get();
+    final mesureList =
+        await mess.docs.map((e) => Mesures.fromSnapshot(e)).toList();
+    for (final i in mesureList) {
+      final mesclientss = await _db
+          .collection("tailleurs")
+          .doc(tailleursToken)
+          .collection("Mesures")
+          .doc(i.token)
+          .collection("MesClients")
+          .get();
+      final mesclientList = await mesclientss.docs
+          .map((e) => MesClients.fromSnapshot(e))
+          .toList();
+      final hab = await _db
+          .collection("tailleurs")
+          .doc(tailleursToken)
+          .collection("Mesures")
+          .doc(i.token)
+          .collection("Habit")
+          .get();
+      final habitList =
+          await hab.docs.map((e) => Habit.fromSnapshot(e)).toList();
+      final mode = await _db
+          .collection("tailleurs")
+          .doc(tailleursToken)
+          .collection("Mesures")
+          .doc(i.token)
+          .collection("Model")
+          .get();
+      final modeList =
+          await mode.docs.map((e) => Models.fromSnapshot(e)).toList();
+      for (final k in modeList) {
+        final img = await _db
+            .collection("tailleurs")
+            .doc(tailleursToken)
+            .collection("Mesures")
+            .doc(i.token)
+            .collection("Model")
+            .doc(k.token)
+            .collection("Image")
+            .get();
+        final imgList =
+            await img.docs.map((e) => Images.fromSnapshot(e)).toList();
+        k.images = imgList;
+      }
+      i.client = mesclientList;
+      i.habit = habitList;
+      i.models = modeList;
+    }
+    mesures = mesureList;
+    return mesureList;
+  }
+
+  Future<List<Paiement>> getPaiement(String tailleursToken) async {
+    final paie = await _db
+        .collection("tailleurs")
+        .doc(tailleursToken)
+        .collection("Paiement")
+        .get();
+    final paiementList =
+        await paie.docs.map((e) => Paiement.fromSnapshot(e)).toList();
+    for (final i in paiementList) {
+      final mesclientss = await _db
+          .collection("tailleurs")
+          .doc(tailleursToken)
+          .collection("Paiement")
+          .doc(i.token)
+          .collection("MesClients")
+          .get();
+      final mesclientList = await mesclientss.docs
+          .map((e) => MesClients.fromSnapshot(e))
+          .toList();
+      final habi = await _db
+          .collection("tailleurs")
+          .doc(tailleursToken)
+          .collection("Paiement")
+          .doc(i.token)
+          .collection("Habit")
+          .get();
+      final habitList =
+          await habi.docs.map((e) => Habit.fromSnapshot(e)).toList();
+      i.client = mesclientList;
+      i.habit = habitList;
+    }
+    paiement = paiementList;
+    return paiementList;
+  }
+
+  PaiementManage(Paiement p, String t) async {
+    final ref =
+        await _db.collection("tailleurs").doc(t).collection("Paiement").add({
+      "montantPaye": p.datePaiement,
+      "datePaiement": p.datePaiement,
+    });
+    await _db
+        .collection("tailleurs")
+        .doc(t)
+        .collection("Paiement")
+        .doc(ref.id)
+        .collection("MesClients")
+        .add({
+      "nom": p.client.first.nom,
+      "gender": p.client.first.genre,
+      "prenom": p.client.first.prenom,
+      "telephone": p.client.first.telephone,
+      "trancheAge": p.client.first.trancheAge
+    });
+
+    await _db
+        .collection("tailleurs")
+        .doc(t)
+        .collection("Paiement")
+        .doc(ref.id)
+        .collection("Habit")
+        .add({
+      "image": p.habit.first.image,
+      "description": p.habit.first.descriptionHabit
+    });
+    await _db.collection("tailleurs").doc(t).collection("Paiement").doc();
+
+    paiement.add(p);
+    tailleurs.first.paiement = paiement;
+  }
+
   creerModel(Models mode, String userToken) async {
     await _db.collection("tailleurs").doc(userToken).collection("Moldels").add(
         {"nom": mode.nom, "prix": mode.prix, "description": mode.description});
@@ -133,21 +367,79 @@ class FirebaseManagement extends GetxController {
     tailleurs.first.albums!.add(mode);
   }
 
-  createAtelier(Atelier ateliers, String userToken) async {
-    final monatelier = await _db
+  creerRDV(RDV desc, String userToken) async {
+    await _db.collection("tailleurs").doc(userToken).collection("RDV").add({
+      "motif": desc.motif,
+      "client_name": desc.client,
+      "dateRDV": desc.date,
+      "client_image": desc.client_image ?? ""
+    });
+    rdv.add(desc);
+    tailleurs.first.rdv = rdv;
+  }
+
+  Future<List<RDV>> getRDV(String usertoken) async {
+    final rd = await _db
+        .collection("tailleurs")
+        .doc(usertoken)
+        .collection("RDV")
+        .get();
+    final lisRDV = await rd.docs.map((e) => RDV.fromSnapshot(e)).toList();
+    rdv = lisRDV;
+    return lisRDV;
+  }
+
+  manageStock(Stock stoc, String userToken) async {
+    await _db.collection("tailleurs").doc(userToken).collection("Stock").add({
+      "produitName": stoc.produitName,
+      "produitPrix": stoc.produitPrix,
+      "qteStock": stoc.qteStock,
+    });
+    stock.add(stoc);
+    tailleurs.first.stock = stock;
+  }
+
+  Future<List<Stock>> getStock(String usertoken) async {
+    final st = await _db
+        .collection("tailleurs")
+        .doc(usertoken)
+        .collection("Stock")
+        .get();
+    final listStock = await st.docs.map((e) => Stock.fromSnapshot(e)).toList();
+    stock = listStock;
+    return listStock;
+  }
+
+  creerMesClients(MesClients mesClientss, String userToken) async {
+    await _db
         .collection("tailleurs")
         .doc(userToken)
-        .collection("ateliers")
+        .collection("MesClients")
         .add({
-      "nom": ateliers.nom,
-      "slogan": ateliers.slogan,
-      "image": ateliers.imageUrl,
-      "lieu": ateliers.lieu,
-      "logo": ateliers.logo
-    }).then((value) async {
-      atelier = Atelier.fromSnapshot(await value.get());
+      "nom": mesClientss.nom,
+      "prenom": mesClientss.prenom,
+      "telephone": mesClientss.telephone,
+      "email": mesClientss.email,
+      "genre": mesClientss.genre,
+      "trancheAge": mesClientss.trancheAge
     });
+    mesClients.add(mesClientss);
+    tailleurs.first.mesClients!.add(mesClientss);
   }
+
+  Future<List<MesClients>> getMesClient(String token) async {
+    final mes = await _db
+        .collection("tailleurs")
+        .doc(token)
+        .collection("MesClients")
+        .get();
+    final mesList = mes.docs.map((e) => MesClients.fromSnapshot(e)).toList();
+    mesClients = mesList;
+    //tailleurs.first.mesClients = mesList;
+    return mesList;
+  }
+
+  createAtelier(Atelier ateliers, String userToken) async {}
 
   getAtelier(String userToken) async {
     final monatelier = await _db
@@ -167,6 +459,11 @@ class FirebaseManagement extends GetxController {
         .doc(modelToken)
         .collection("Images")
         .add({"image": image});
+    tailleurs.first.albums!
+        .where((element) => element.token == modelToken)
+        .first
+        .images!
+        .add(Images(image: image!));
   }
 
   updateModel(Models mode, String userToken) async {
@@ -199,6 +496,54 @@ class FirebaseManagement extends GetxController {
   //function to delete client instance
   deleteTailleurs(Tailleurs client) async {
     await _db.collection("tailleurs").doc(client.token).delete();
+  }
+
+  createTache(Taches tache, String userToken) async {
+    await _db.collection("tailleurs").doc(userToken).collection("Taches").add({
+      "nom": tache.nom,
+    });
+    taches.add(tache);
+    tailleurs.first.taches = taches;
+  }
+
+  createSousTache(
+      SousTaches soustache, String userToken, String tacheToken) async {
+    await _db
+        .collection("tailleurs")
+        .doc(userToken)
+        .collection("Taches")
+        .doc(tacheToken)
+        .collection("SousTaches")
+        .add({});
+    for (final i in taches) {
+      if (i.token == tacheToken) {
+        i.sousTaches!.add(soustache);
+      }
+    }
+    tailleurs.first.taches = taches;
+  }
+
+  Future<List<Taches>> getTaches(String usertoken) async {
+    final tc = await _db
+        .collection("tailleurs")
+        .doc(usertoken)
+        .collection("Taches")
+        .get();
+    final lisTaches = await tc.docs.map((e) => Taches.fromSnapshot(e)).toList();
+    for (final i in lisTaches) {
+      final tcs = await _db
+          .collection("tailleurs")
+          .doc(usertoken)
+          .collection("Taches")
+          .doc(i.token)
+          .collection("SousTaches")
+          .get();
+      final soustaches =
+          tcs.docs.map((e) => SousTaches.fromSnapshot(e)).toList();
+      i.sousTaches = soustaches;
+    }
+    taches = lisTaches;
+    return lisTaches;
   }
 
   // //function to get All client

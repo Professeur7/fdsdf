@@ -642,13 +642,6 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                         ],
                       ),
                     ));
-            // showDialog(
-            //   context: context,
-            //   barrierDismissible: false,
-            //   builder: (context) {
-            //     return
-            //   },
-            // );
           },
           child: Container(
             height: 90,
