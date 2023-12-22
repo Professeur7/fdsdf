@@ -5,6 +5,7 @@ import 'package:fashion2/models/mesure.dart';
 import 'package:fashion2/models/models.dart';
 import 'package:fashion2/page/client.dart';
 import 'package:fashion2/page/gridview/pageClient.dart';
+import 'package:fashion2/page/mesureEnregistrer.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -14,6 +15,8 @@ import 'dart:io';
 import '../firestore.dart';
 
 class MesuresPage extends StatefulWidget {
+  Mesures? mesure;
+  MesuresPage({this.mesure});
   @override
   _MesuresPageState createState() => _MesuresPageState();
 }
@@ -63,6 +66,73 @@ class _MesuresPageState extends State<MesuresPage> {
     } catch (e) {
       print('Erreur lors du chargement de l\'image : $e');
       return null;
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if (widget.mesure != null) {
+      widget.mesure!.habit.length != 0
+          ? descriptionController1.text =
+              widget.mesure!.habit.first.descriptionHabit!
+          : "";
+      widget.mesure!.models.length != 0
+          ? descriptionController2.text =
+              widget.mesure!.models.first.description!
+          : "";
+      widget.mesure!.client.length != 0
+          ? clientNameController.text = widget.mesure!.client.first.nom!
+          : "";
+      widget.mesure!.models.length != 0
+          ? prixController.text = widget.mesure!.models.first.prix
+          : "";
+      widget.mesure!.avance != null
+          ? avanceController.text = widget.mesure!.avance!
+          : "";
+      widget.mesure!.reste != null
+          ? resteController.text = widget.mesure!.reste!
+          : "";
+      widget.mesure!.hauteurEntrejambe != null
+          ? HauteurEntrejambe.text = widget.mesure!.hauteurEntrejambe!
+          : "";
+      widget.mesure!.hauteurTotale != null
+          ? HauteurTotale.text = widget.mesure!.hauteurTotale!
+          : "";
+      widget.mesure!.largeursEpaules != null
+          ? LargeurEpaules.text = widget.mesure!.largeursEpaules!
+          : "";
+      widget.mesure!.longueurJambes != null
+          ? LongueurJambes.text = widget.mesure!.longueurJambes!
+          : "";
+      widget.mesure!.longueurManches != null
+          ? LongueurManches.text = widget.mesure!.longueurManches!
+          : "";
+      widget.mesure!.longueurOurlet != null
+          ? LongueurOurlet.text = widget.mesure!.longueurOurlet!
+          : "";
+      widget.mesure!.tourBras != null
+          ? TourBras.text = widget.mesure!.tourBras!
+          : "";
+      widget.mesure!.tourCou != null
+          ? TourCou.text = widget.mesure!.tourCou!
+          : "";
+      widget.mesure!.tourDos != null
+          ? TourDos.text = widget.mesure!.tourDos!
+          : "";
+      widget.mesure!.tourHanche != null
+          ? TourHanche.text = widget.mesure!.tourHanche!
+          : "";
+      widget.mesure!.tourPoignet != null
+          ? TourPoignet.text = widget.mesure!.tourPoignet!
+          : "";
+      widget.mesure!.tourPoitrine != null
+          ? tourPoitrine.text = widget.mesure!.tourPoitrine!
+          : "";
+      widget.mesure!.tourTaille != null
+          ? TourTaille.text = widget.mesure!.tourTaille!
+          : "";
     }
   }
 
@@ -139,48 +209,84 @@ class _MesuresPageState extends State<MesuresPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text('Prix'),
-                        SizedBox(height: 4),
+                        Text('Prix',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
                         Container(
                           width: 100,
-                          child: TextFormField(
-                            controller: prixController,
-                            keyboardType: TextInputType.number,
-                            // Other properties for your text field
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: TextFormField(
+                              controller: prixController,
+                              keyboardType: TextInputType.number,
+                              style: TextStyle(fontSize: 16),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 14),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Avance'),
-                        SizedBox(height: 4),
+                        Text('Avance',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
                         Container(
                           width: 100,
-                          child: TextFormField(
-                            controller: avanceController,
-                            keyboardType: TextInputType.number,
-                            // Other properties for your text field
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: TextFormField(
+                              controller: avanceController,
+                              keyboardType: TextInputType.number,
+                              style: TextStyle(fontSize: 16),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    SizedBox(width: 8),
+                    SizedBox(width: 14),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Reste'),
-                        SizedBox(height: 4),
+                        Text('Reste',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
                         Container(
                           width: 100,
-                          child: TextFormField(
-                            controller: resteController,
-                            keyboardType: TextInputType.number,
-                            // Other properties for your text field
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey),
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: TextFormField(
+                              controller: resteController,
+                              keyboardType: TextInputType.number,
+                              style: TextStyle(fontSize: 16),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                              ),
+                            ),
                           ),
                         ),
                       ],
@@ -190,7 +296,14 @@ class _MesuresPageState extends State<MesuresPage> {
                 SizedBox(height: 15),
                 TextFormField(
                   controller: clientNameController,
-                  decoration: InputDecoration(labelText: 'Nom du client'),
+                  decoration: InputDecoration(
+                    labelText: 'Nom du client',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
                 SizedBox(height: 15),
                 Row(
@@ -229,19 +342,40 @@ class _MesuresPageState extends State<MesuresPage> {
                                         fit: BoxFit.cover,
                                       ),
                                     )
-                                  : Icon(
-                                      Icons.add_a_photo,
-                                      size: 70,
-                                      color: Colors.white,
-                                    ),
+                                  : widget.mesure != null
+                                      ? widget.mesure!.habit.length == 0
+                                          ? Icon(
+                                              Icons.add_a_photo,
+                                              size: 70,
+                                              color: Colors.white,
+                                            )
+                                          : Image.network(
+                                              widget.mesure!.habit.first.image)
+                                      : Icon(
+                                          Icons.add_a_photo,
+                                          size: 70,
+                                          color: Colors.white,
+                                        ),
                             ),
                           ),
                           SizedBox(height: 16),
+                          // TextFormField(
+                          //   controller: descriptionController1,
+                          //   decoration: InputDecoration(
+                          //       labelText: 'Description de la mesure (Habit)'),
+                          // ),
                           TextFormField(
                             controller: descriptionController1,
                             decoration: InputDecoration(
-                                labelText: 'Description de la mesure (Habit)'),
+                              labelText: 'Description habit',
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue),
+                              ),
+                              labelStyle: TextStyle(color: Colors.blue),
+                            ),
                           ),
+                          SizedBox(height: 15),
                         ],
                       ),
                     ),
@@ -291,67 +425,155 @@ class _MesuresPageState extends State<MesuresPage> {
                           TextFormField(
                             controller: descriptionController2,
                             decoration: InputDecoration(
-                                labelText: 'Description de la mesure (Modèle)'),
+                              labelText: 'Description du model',
+                              border: OutlineInputBorder(),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.blue),
+                              ),
+                              labelStyle: TextStyle(color: Colors.blue),
+                            ),
                           ),
+                          SizedBox(height: 15),
                         ],
                       ),
                     ),
                   ],
                 ),
+                // TextFormField(
+                //   controller: tourPoitrine,
+                //   decoration:
+                //       InputDecoration(labelText: 'tour Poitrine (optionnel)'),
+                // ),
                 TextFormField(
                   controller: tourPoitrine,
-                  decoration:
-                      InputDecoration(labelText: 'tour Poitrine (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'TP: Tour Poitrine',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: TourBras,
-                  decoration:
-                      InputDecoration(labelText: 'tour bras (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'TM: Tour Manche',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: TourCou,
-                  decoration:
-                      InputDecoration(labelText: 'tour cou (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'C: Cuisse',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: TourDos,
-                  decoration:
-                      InputDecoration(labelText: 'tour dos (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'LB: Longueurs Boubou',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: TourHanche,
-                  decoration:
-                      InputDecoration(labelText: 'tour hanche (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'E: Epaules ',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: TourPoignet,
-                  decoration:
-                      InputDecoration(labelText: 'tour poignet (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'F: Fesse ',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: TourTaille,
-                  decoration:
-                      InputDecoration(labelText: 'tour taille (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'T: Taille',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: LongueurJambes,
-                  decoration:
-                      InputDecoration(labelText: 'longueur jambe (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'LJ: Longueur  jupe ',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: LongueurManches,
-                  decoration:
-                      InputDecoration(labelText: 'longueur manche (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'LP: Longueur patalon',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: LongueurOurlet,
-                  decoration:
-                      InputDecoration(labelText: 'longueur ourlet (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'P: Poitrine',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
+                SizedBox(height: 15),
                 TextFormField(
                   controller: LargeurEpaules,
-                  decoration:
-                      InputDecoration(labelText: 'largeur epaules (optionnel)'),
+                  decoration: InputDecoration(
+                    labelText: 'C: Cou ',
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.blue),
+                    ),
+                    labelStyle: TextStyle(color: Colors.blue),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {

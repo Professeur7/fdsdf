@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.fashion2.application"
 >
+<uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="fashion2"
         android:name="${applicationName}"

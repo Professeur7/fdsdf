@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 import '../../firestore.dart';
@@ -23,6 +26,19 @@ class _AppointmentAndSchedulingPageState
   FirebaseManagement _management = Get.put(FirebaseManagement());
   // Dans votre classe _AppointmentAndSchedulingPageState :
 
+  final ImagePicker _picker = ImagePicker();
+  File? _imageFile;
+
+  Future<void> _pickImage() async {
+    final pickedImage = await _picker.pickImage(source: ImageSource.gallery);
+
+    setState(() {
+      if (pickedImage != null) {
+        _imageFile = File(pickedImage.path);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _calendarController.dispose();
@@ -37,13 +53,6 @@ class _AppointmentAndSchedulingPageState
   void initState() {
     super.initState();
     _calendarController = CalendarController();
-    // events = [
-    //   Event("Client A", DateTime.now().add(Duration(days: 2)), DateTime.now(),
-    //       DateTime.now(), "Motif 1"),
-    //   Event("Client B", DateTime.now().add(Duration(days: 7)), DateTime.now(),
-    //       DateTime.now(), "Motif 2"),
-    //   // Ajoutez ici vos rendez-vous existants avec les détails corrects
-    // ];
   }
 
   void _selectDate(BuildContext context) async {
@@ -102,13 +111,17 @@ class _AppointmentAndSchedulingPageState
               itemBuilder: (context, index) {
                 final event = _management.rdv[index];
                 return ListTile(
-                  leading: CircleAvatar(
-                    // Afficher l'image du client ici
-                    // Exemple : AssetImage('assets/images/client_image.jpg')
-                    // Remplacez AssetImage par la méthode que vous utilisez pour charger l'image
-                    // Utilisez event.clientImage pour obtenir l'image du client associée à l'événement
-                    backgroundImage: AssetImage('assets/images/about.png'),
-                  ),
+                  leading: _imageFile != null
+                      ? CircleAvatar(
+                          radius: 50,
+                          backgroundImage: FileImage(
+                              _imageFile!) // Utiliser une image par défaut
+                          )
+                      : CircleAvatar(
+                          radius: 50,
+                          backgroundImage: AssetImage(
+                              'assets/images/about.png') // Utiliser une image par défaut
+                          ),
                   title: Text(event.client),
                   subtitle: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -151,11 +164,21 @@ class _AppointmentAndSchedulingPageState
                   decoration: InputDecoration(labelText: 'Nom du client'),
                 ),
                 SizedBox(height: 10),
-                // TextFormField(
-                //   controller: _dateController,
-                //   decoration: InputDecoration(labelText: 'Date du rendez-vous'),
-                //   keyboardType: TextInputType.datetime,
-                // )
+                ElevatedButton(
+                  onPressed: () {
+                    _pickImage();
+                  },
+                  child: Text('Sélectionner une image'),
+                ),
+                SizedBox(height: 20),
+                _imageFile != null
+                    ? Image.file(
+                        File(_imageFile!.path),
+                        width: 100,
+                        height: 100,
+                        fit: BoxFit.cover,
+                      )
+                    : SizedBox.shrink(),
                 TextFormField(
                   controller: _dateController,
                   decoration: InputDecoration(

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion2/models/client.dart';
 
 class Habit {
   String? token;
@@ -16,4 +15,3 @@ class Habit {
     );
   }
 }
-

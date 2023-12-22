@@ -1,4 +1,5 @@
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/page/mesureEnregistrer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../screen/home_screen.dart';
@@ -18,20 +19,6 @@ class _CustomerInformationPageState extends State<CustomerInformationPage> {
   void initState() {
     super.initState();
     // Exemples de formulaires enregistrés (peuvent être des données fictives pour l'exemple)
-    savedForms = [
-      {
-        'customerName': 'Alice',
-        // ... autres détails du formulaire
-      },
-      {
-        'customerName': 'Bob',
-        // ... autres détails du formulaire
-      },
-      {
-        'customerName': 'Eve',
-        // ... autres détails du formulaire
-      },
-    ];
   }
 
   @override
@@ -55,50 +42,75 @@ class _CustomerInformationPageState extends State<CustomerInformationPage> {
           },
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        padding: const EdgeInsets.only(bottom: 1),
         child: Column(
-          children: <Widget>[
+          children: [
             // Affichage des formulaires enregistrés
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: c.mesures.length,
-              itemBuilder: (context, index) {
-                final form = c.mesures[index];
-                return Card(
-                  margin: EdgeInsets.all(10),
-                  child: ListTile(
-                    leading: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        color: Colors
-                            .grey, // Ici, tu peux afficher l'image de l'habit
-                        child: Image.network(form.habit.first.image),
-                      ),
+            Container(
+              height: MediaQuery.of(context).size.height *
+                  0.79, // Hauteur ajustable
+              child: ListView.builder(
+                physics: AlwaysScrollableScrollPhysics(),
+                shrinkWrap: true,
+                itemCount: c.mesures.length,
+                itemBuilder: (context, index) {
+                  final form = c.mesures[index];
+                  return Card(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    title: Text('Nom du client: ${form.client.first.nom}'),
-                    // trailing: Checkbox(
-                    //   value: form['isChecked'] ?? false,
-                    //   onChanged: (bool? value) {
-                    //     setState(() {
-                    //       form['isChecked'] = value;
-                    //     });
-                    //   },
-                    // ),
-                    onTap: () {
-                      //  Navigator.push(
-                      //    context,
-                      //    MaterialPageRoute(
-                      //      builder: (context) => FormDetailsPage(form),
-                      //   ),
-                      //  );
-                    },
-                  ),
-                );
-              },
+                    child: ListTile(
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          color: Colors.grey,
+                          child: form.habit.isEmpty
+                              ? Center(
+                                  child: Icon(Icons.image, color: Colors.white),
+                                )
+                              : Image.network(
+                                  form.habit.first.image,
+                                  fit: BoxFit.cover,
+                                ), // Afficher la première image de chaque élément habit
+                        ),
+                      ),
+                      title: form.client.isEmpty
+                          ? Text("Pas de client")
+                          : Text(
+                              'Nom du client: ${form.client.first.nom}',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 4),
+                          Text(
+                            'Informations supplémentaires...',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                          // Ajoutez ici d'autres informations si nécessaire
+                        ],
+                      ),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MesuresPage(mesure: form),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
             ),
+            // Autres éléments de votre Column
           ],
         ),
       ),

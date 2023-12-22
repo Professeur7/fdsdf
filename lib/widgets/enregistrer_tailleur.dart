@@ -2,6 +2,7 @@ import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/screen/home_screen.dart';
 import 'package:fashion2/widgets/atelierRegisterScreen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,11 +23,29 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
   final TextEditingController codeController = TextEditingController();
   final TextEditingController atelierController = TextEditingController();
   File? selectedImage;
+  FirebaseStorage storage = FirebaseStorage.instance;
+  String? imageUrl;
+
+  Future<String?> uploadImage(File imageFile, String fileName) async {
+    try {
+      Reference ref = storage.ref().child('images/$fileName');
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Erreur lors du chargement de l\'image : $e');
+      return null;
+    }
+  }
 
   Future<void> pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
-
+    imageUrl = await uploadImage(File(pickedFile!.path), pickedFile.name);
     if (pickedFile != null) {
       setState(() {
         selectedImage = File(pickedFile.path);
@@ -216,6 +235,7 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                     onPressed: () async {
                       Tailleurs newTailleuirs = Tailleurs(
                           password: codeController.text,
+                          image: imageUrl ?? "",
                           nom: nomController.text,
                           token: _management.tailleurs.first.token,
                           username: _management.tailleurs.first.username,

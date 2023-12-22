@@ -1,5 +1,14 @@
+import 'dart:io';
+
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/image_model.dart';
+import 'package:fashion2/models/poste.dart';
+import 'package:fashion2/models/postevideo.dart';
+import 'package:fashion2/models/video_model.dart';
 import 'package:fashion2/page/client/pagePublication.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:multiple_images_picker/multiple_images_picker.dart';
 import 'package:video_player/video_player.dart';
@@ -11,33 +20,96 @@ class NewPostPage extends StatefulWidget {
 
 class _NewPostPageState extends State<NewPostPage> {
   List<Asset> images = <Asset>[];
-  Future<void> loadAssets() async {
-    List<Asset> resultList = <Asset>[];
-    try {
-      var MultiImagePicker;
-      resultList = await MultiImagePicker.pickImages(
-        maxImages: 10,
-        enableCamera: true,
-        selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
-        materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
-          actionBarTitle: "Sélectionner des médias",
-          allViewTitle: "Tous les médias",
-          useDetailsView: false,
-          selectCircleStrokeColor: "#000000",
-        ),
-      );
-    } on Exception catch (e) {
-      // Gérer les exceptions liées à la sélection d'images ici
-      print(e);
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+  final _description = TextEditingController();
+  FirebaseStorage _storage = FirebaseStorage.instance;
+  List<Images> listImages = [];
+  List<Video> listVideos = [];
+  // Future<void> loadAssets() async {
+  //   List<Asset> resultList = <Asset>[];
+  //   try {
+  //     var MultiImagePicker;
+  //     resultList = await MultiImagePicker.pickImages(
+  //       maxImages: 10,
+  //       enableCamera: true,
+  //       selectedAssets: images,
+  //       cupertinoOptions: CupertinoOptions(takePhotoIcon: "chat"),
+  //       materialOptions: MaterialOptions(
+  //         actionBarColor: "#abcdef",
+  //         actionBarTitle: "Sélectionner des médias",
+  //         allViewTitle: "Tous les médias",
+  //         useDetailsView: false,
+  //         selectCircleStrokeColor: "#000000",
+  //       ),
+  //     );
+  //   } on Exception catch (e) {
+  //     // Gérer les exceptions liées à la sélection d'images ici
+  //     print(e);
+  //   }
+
+  //   if (!mounted) return;
+
+  //   setState(() {
+  //     images = resultList;
+  //   });
+  // }
+
+  void _importImage() async {
+    final pickedFile = await ImagePicker().pickMultiImage();
+    for (final f in pickedFile) {
+      if (f != []) {
+        File file = File(f.path);
+        listImages.add(Images(image: await uploadImage(file, f.name) ?? ""));
+        //setState(() {});
+      }
     }
 
-    if (!mounted) return;
+    //_management.postPublication(Poste(description: description), _management.tailleurs.first.token!);
+  }
 
-    setState(() {
-      images = resultList;
-    });
+  void _importVideo() async {
+    final pickedFile = await ImagePicker().pickMultipleMedia();
+    for (final f in pickedFile) {
+      if (f != []) {
+        File file = File(f.path);
+        listVideos.add(Video(video: await uploadVideo(file, f.name) ?? ""));
+        //setState(() {});
+      }
+    }
+
+    //_management.postPublication(Poste(description: description), _management.tailleurs.first.token!);
+  }
+
+  Future<String?> uploadImage(File imageFile, String fileName) async {
+    try {
+      Reference ref = _storage.ref().child('images/$fileName');
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Erreur lors du chargement de l\'image : $e');
+      return null;
+    }
+  }
+
+  Future<String?> uploadVideo(File imageFile, String fileName) async {
+    try {
+      Reference ref = _storage.ref().child('videos/$fileName');
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Erreur lors du chargement de l\'image : $e');
+      return null;
+    }
   }
 
   // Future<void> getVideo() async {
@@ -78,6 +150,7 @@ class _NewPostPageState extends State<NewPostPage> {
           children: [
             // Zone de saisie pour le texte du post
             TextFormField(
+              controller: _description,
               maxLines: 4,
               decoration: InputDecoration(
                 hintText: 'Que voulez-vous partager ?',
@@ -87,7 +160,7 @@ class _NewPostPageState extends State<NewPostPage> {
             SizedBox(height: 20),
             // Bouton pour télécharger des images
             ElevatedButton.icon(
-              onPressed: loadAssets,
+              onPressed: _importImage,
               icon: Icon(Icons.photo_camera),
               label: Text('Télécharger des photos'),
             ),
@@ -108,7 +181,7 @@ class _NewPostPageState extends State<NewPostPage> {
             SizedBox(height: 20),
             // Bouton pour télécharger une vidéo
             ElevatedButton.icon(
-              onPressed: getVideo,
+              onPressed: _importVideo,
               icon: Icon(Icons.video_call),
               label: Text('Télécharger une vidéo'),
             ),
@@ -124,7 +197,22 @@ class _NewPostPageState extends State<NewPostPage> {
             // Bouton pour publier le post
             ElevatedButton(
               onPressed: () {
-                // Logique pour publier le post avec les images/vidéos sélectionnées
+                if (listImages.isNotEmpty) {
+                  _management.postPublication(
+                      Poste(
+                          date: DateTime.now(),
+                          description: _description.text,
+                          images: listImages),
+                      _management.tailleurs.first.token!);
+                } else if (listVideos.isNotEmpty) {
+                  _management.postVideoPublication(
+                      PosteVideo(
+                          date: DateTime.now(),
+                          description: _description.text,
+                          videos: listVideos),
+                      _management.tailleurs.first.token!);
+                }
+                Navigator.pop(context);
               },
               child: Text('Publier'),
             ),

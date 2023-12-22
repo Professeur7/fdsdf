@@ -4,6 +4,8 @@ import 'package:fashion2/models/atelier.dart';
 import 'package:fashion2/models/mesClients.dart';
 import 'package:fashion2/models/models.dart';
 import 'package:fashion2/models/paiement.dart';
+import 'package:fashion2/models/poste.dart';
+import 'package:fashion2/models/postevideo.dart';
 import 'package:fashion2/models/rendez_vous.dart';
 import 'package:fashion2/models/soustaches.dart';
 import 'package:fashion2/models/stock.dart';
@@ -22,18 +24,24 @@ class Tailleurs {
   String genre;
   String password;
   List<RDV>? rdv;
-  Atelier? atelier;
+  List<Atelier>? atelier;
   List<Models>? model;
   List<Stock>? stock;
   List<Paiement>? paiement;
   List<Albums>? albums;
+
   List<Taches>? taches;
   List<Mesures>? mesure;
   List<MesClients>? mesClients;
+
+  List<Poste>? postes;
+  List<PosteVideo>? posteVideos;
+
   Tailleurs(
       {required this.password,
       this.paiement,
       this.stock,
+      this.postes,
       this.nom,
       this.rdv,
       this.mesure,
@@ -47,6 +55,7 @@ class Tailleurs {
       required this.email,
       required this.genre,
       this.telephone,
+      this.posteVideos,
       this.taches,
       this.token});
   factory Tailleurs.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
@@ -54,6 +63,7 @@ class Tailleurs {
     final modelData = file!["Model"];
     final albumsData = file["Albums"];
     final atelierData = file["Atelier"];
+
     final tacheData = file["Tache"];
     final rdvData = file["RDV"];
     final mesureData = file["Mesures"];
@@ -101,6 +111,8 @@ class Tailleurs {
     } else {
       listRDV = [];
     }
+    final posteData = file['Poste'];
+    final posteVideoData = file['PosteVideos'];
     List<Models> listModel;
     if (modelData != null) {
       listModel = List<Models>.from(
@@ -116,24 +128,40 @@ class Tailleurs {
       listAlbums = [];
     }
 
-    Atelier? atelier;
+    List<Atelier> listAtelier;
     if (atelierData != null) {
-      atelier =
-          atelierData.map((element) => Atelier.fromSnapshot(element)).first;
+      listAtelier = atelierData.map((element) => Atelier.fromSnapshot(element));
     } else {
-      atelier = null;
+      listAtelier = [];
+    }
+
+    List<Poste>? listpsote;
+    if (posteData != null) {
+      listpsote = List<Poste>.from(
+          posteData.map((element) => Poste.fromSnapshot(element)));
+    } else {
+      listpsote = [];
+    }
+
+    List<PosteVideo>? listvideopsote;
+    if (posteVideoData != null) {
+      listvideopsote = List<PosteVideo>.from(
+          posteVideoData.map((element) => PosteVideo.fromSnapshot(element)));
+    } else {
+      listvideopsote = [];
     }
     return Tailleurs(
         rdv: listRDV,
         paiement: listPaiement,
         stock: listStock,
+        postes: listpsote,
         mesClients: listMesClients,
         albums: listAlbums,
         mesure: listMesures,
         username: file['username'],
         image: file['image'] ?? "",
         model: listModel,
-        atelier: atelier,
+        atelier: listAtelier,
         taches: listTaches,
         token: data.id,
         password: file["password"],
@@ -141,6 +169,7 @@ class Tailleurs {
         prenom: file["prenom"] ?? "",
         email: file["email"],
         genre: file["gender"],
+        posteVideos: listvideopsote,
         telephone: file["telephone"] ?? "");
   }
 }

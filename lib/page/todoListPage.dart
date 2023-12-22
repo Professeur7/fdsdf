@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/soustaches.dart';
+import 'package:fashion2/models/tache.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -9,10 +12,21 @@ class ToDoListPage extends StatefulWidget {
 
 class _ToDoListPageState extends State<ToDoListPage> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
-  List<Task> tasks = [];
+  List<Taches> tasks = [];
+  function() async {
+    tasks = await _management.getTaches(_management.tailleurs.first.token!);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: implement initState
+    function();
+  }
 
   @override
   Widget build(BuildContext context) {
+    function();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF09126C),
@@ -32,7 +46,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
         itemCount: tasks.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(tasks[index].name),
+            title: Text(tasks[index].nom),
             onTap: () {
               navigateToTaskDetails(tasks[index]);
             },
@@ -62,7 +76,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
             },
             decoration: InputDecoration(labelText: 'Nom de la tâche'),
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
@@ -84,12 +98,13 @@ class _ToDoListPageState extends State<ToDoListPage> {
 
   void addTask(String taskName) {
     setState(() {
-      Task newTask = Task(taskName);
+      Taches newTask = Taches(nom: taskName);
+      _management.createTache(newTask, _management.tailleurs.first.token!);
       tasks.add(newTask);
     });
   }
 
-  void navigateToTaskDetails(Task task) {
+  void navigateToTaskDetails(Taches task) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -99,22 +114,8 @@ class _ToDoListPageState extends State<ToDoListPage> {
   }
 }
 
-class Task {
-  String name;
-  List<SubTask> subTasks;
-
-  Task(this.name, {this.subTasks = const []});
-}
-
-class SubTask {
-  String name;
-  bool isCompleted;
-
-  SubTask(this.name, {this.isCompleted = false});
-}
-
 class TaskDetailsPage extends StatefulWidget {
-  final Task task;
+  final Taches task;
 
   TaskDetailsPage({required this.task});
 
@@ -123,67 +124,201 @@ class TaskDetailsPage extends StatefulWidget {
 }
 
 class _TaskDetailsPageState extends State<TaskDetailsPage> {
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+
+// Contrôleurs pour les champs
+  final subTaskController1 = TextEditingController();
+  final subTaskController2 = TextEditingController();
   TextEditingController subTaskController = TextEditingController();
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+  // Méthode pour afficher le sélecteur de date
+  void _selectDate(BuildContext context) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (pickedDate != null && pickedDate != selectedDate) {
+      setState(() {
+        selectedDate = pickedDate;
+        // Mettre à jour le contrôleur avec la date sélectionnée
+        subTaskController1.text = selectedDate!.toString();
+      });
+    }
+  }
+
+// Méthode pour afficher le sélecteur d'heure
+  void _selectTime(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null && pickedTime != selectedTime) {
+      setState(() {
+        selectedTime = pickedTime;
+        // Mettre à jour le contrôleur avec l'heure sélectionnée
+        subTaskController2.text = selectedTime!.format(context);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.task.name),
+        title: Text(widget.task.nom),
       ),
       body: Column(
-        children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              itemCount: widget.task.subTasks.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(widget.task.subTasks[index].name),
-                  trailing: Checkbox(
-                    value: widget.task.subTasks[index].isCompleted,
-                    onChanged: (value) {
-                      setState(() {
-                        widget.task.subTasks[index].isCompleted = value!;
-                      });
+        children: [
+          widget.task.sousTaches == null
+              ? Container()
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: widget.task.sousTaches?.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(widget.task.sousTaches![index].description),
+                        trailing: Checkbox(
+                          value: widget.task.sousTaches![index].valide,
+                          onChanged: (value) {
+                            setState(() {
+                              widget.task.sousTaches![index].valide = value!;
+                            });
+                          },
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
-          ),
-          Divider(),
+                ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: subTaskController,
-                    decoration:
-                        InputDecoration(labelText: 'Ajouter une sous-tâche'),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.add),
+              children: [
+                FloatingActionButton(
                   onPressed: () {
-                    addSubTask();
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Ajouter une sous-tâche'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                controller: subTaskController,
+                                decoration: InputDecoration(
+                                  labelText: 'Description',
+                                ),
+                              ),
+                              TextField(
+                                controller: subTaskController1,
+                                readOnly:
+                                    true, // Rendre le champ de texte en lecture seule
+                                onTap: () {
+                                  _selectDate(
+                                      context); // Afficher le sélecteur de date au clic
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Date',
+                                ),
+                              ),
+                              SizedBox(
+                                  height: 16), // Espacement entre les champs
+                              TextField(
+                                controller: subTaskController2,
+                                readOnly:
+                                    true, // Rendre le champ de texte en lecture seule
+                                onTap: () {
+                                  _selectTime(
+                                      context); // Afficher le sélecteur d'heure au clic
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Heure',
+                                ),
+                              ),
+                              // Autres champs pour debut, fin, valide, etc.
+                              // Utilisez les widgets appropriés pour ces champs
+                            ],
+                          ),
+                          actions: [
+                            Row(
+                              children: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (selectedDate != null &&
+                                        selectedTime != null) {
+                                      // Utiliser les valeurs sélectionnées
+                                      // ...
+                                      final s = SousTaches(
+                                        date: Timestamp.fromDate(selectedDate!),
+                                        debut: selectedTime!,
+                                        fin: selectedTime!,
+                                        valide: false,
+                                        description: subTaskController.text,
+                                      );
+                                      _management.createSousTache(
+                                          s,
+                                          _management.tailleurs.first.token!,
+                                          widget.task.token!);
+                                      widget.task.sousTaches!.add(s);
+                                    }
+
+                                    subTaskController.text = '';
+                                    Navigator.of(context)
+                                        .pop(); // Fermer le dialogue après ajout
+                                  },
+                                  child: Text('Enregistrer'),
+                                ),
+                                SizedBox(
+                                    width: 8), // Espacement entre les boutons
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context)
+                                        .pop(); // Fermer le dialogue sans enregistrer
+                                  },
+                                  child: Text('Annuler'),
+                                ),
+                              ],
+                              mainAxisAlignment: MainAxisAlignment.end,
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
+                  child: Icon(Icons.add),
+                  tooltip: 'Ajouter une sous-tâche',
                 ),
               ],
+              // children: [
+              //   Expanded(
+              //     child: TextField(
+              //       controller: subTaskController,
+              //       decoration:
+              //           InputDecoration(labelText: 'Ajouter une sous-tâche'),
+              //     ),
+              //   ),
+              //   IconButton(
+              //     icon: Icon(Icons.add),
+              //     onPressed: () {
+              //       final s = SousTaches(
+              //           debut: DateTime.now(),
+              //           fin: DateTime.now(),
+              //           valide: false,
+              //           description: subTaskController.text);
+              //       _management.createSousTache(s, widget.task.token!,
+              //           _management.tailleurs.first.token!);
+              //       widget.task.sousTaches!.add(s);
+              //       subTaskController.text = "";
+              //     },
+              //   ),
+              // ],
             ),
           ),
         ],
       ),
     );
-  }
-
-  void addSubTask() {
-    String subTaskName = subTaskController.text;
-    if (subTaskName.isNotEmpty) {
-      setState(() {
-        widget.task.subTasks.add(SubTask(subTaskName));
-        subTaskController.clear();
-      });
-    }
   }
 }

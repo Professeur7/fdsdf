@@ -52,32 +52,32 @@ class Mesures {
     final dataModels = file["Models"];
     final dataHabit = file["Habit"];
 
-    Habit habit;
+    List<Habit> habit;
     if (dataHabit != null) {
       habit = dataHabit.map((element) => Habit.fromSnapshot(element));
     } else {
-      habit = [] as Habit;
+      habit = [];
     }
 
-    MesClients client;
+    List<MesClients> client;
     if (dataClient != null) {
       client = dataClient.map((element) => MesClients.fromSnapshot(element));
     } else {
-      client = [] as MesClients;
+      client = [];
     }
 
-    Models models;
+    List<Models> models;
     if (dataModels != null) {
       models = dataModels.map((element) => Models.fromSnapshot(element));
     } else {
-      models = [] as Models;
+      models = [];
     }
 
     return Mesures(
       token: data.id,
-      client: [client],
-      habit: [habit],
-      models: [models],
+      client: client,
+      habit: habit,
+      models: models,
       tourBras: file["tourBras"],
       tourDos: file["tourDos"],
       tourCou: file["tourCou"],

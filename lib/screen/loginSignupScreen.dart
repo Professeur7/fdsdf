@@ -48,11 +48,14 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
       }
 
       Future<void> registerUser(User) async {
-        UserCredential userCredential =
-            await auth.createUserWithEmailAndPassword(
+        await _management.auth.value.createUserWithEmailAndPassword(
           email: User.email,
           password: User.password,
         );
+
+        _management.auth.value.signInWithEmailAndPassword(
+            email: User.email, password: User.password);
+
         print(User.runtimeType);
         userRef;
         User.runtimeType == Tailleurs
@@ -86,8 +89,17 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
 
         var listT = <Tailleurs>[];
         var listC = <Client>[];
-        listT = await _management.getAllTailleurs();
-        listC = await _management.getAllClient();
+        try {
+          listT = await _management.getAllTailleurs();
+        } catch (e) {
+          print("errrrrrrrrrrrrr11111111111111111111111111111111");
+        }
+
+        try {
+          listC = await _management.getAllClient();
+        } catch (e) {
+          print("errrrrrrrrrrrrroooooooooooooooooooooooo");
+        }
 
         if (listT
             .where((element) =>
@@ -111,23 +123,10 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
             MaterialPageRoute(builder: (context) => ClientHomeScreen()),
           );
         }
-        // User.runtimeType == Tailleurs ? {list = await _management.getAllTailleurs(),
-        // _management.getTailleur(list
-        //     .where((t) => t.email == email && t.password == password)
-        //     .first),
-        // print(userCredential.user),
-        // print(userCredential.additionalUserInfo),
-        // // Naviguer vers HomeScreen après la connexion réussie
-
-        //   list = await _management.getAllClient(),
-
-        // };
       }
 
       Future<bool> checkEmailExists(String email) async {
         try {
-          // Use Firebase or your preferred method to check if the email exists
-          // For example, using Firebase Authentication:
           final userCredential =
               await FirebaseAuth.instance.createUserWithEmailAndPassword(
             email: email,
@@ -627,21 +626,24 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
       child: Center(
         child: GestureDetector(
           onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: 16.0),
+                      Text(isSignupScreen
+                          ? 'Inscription en cours...'
+                          : 'Connexion en cours...'),
+                    ],
+                  ),
+                );
+              },
+            );
             login(context, isSignupScreen);
-            showAdaptiveDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          CircularProgressIndicator(),
-                          SizedBox(height: 16.0),
-                          Text(isSignupScreen
-                              ? 'Inscription en cours...' // Message de connexion
-                              : 'Connexion en cours...'), // Message d'inscription
-                        ],
-                      ),
-                    ));
           },
           child: Container(
             height: 90,

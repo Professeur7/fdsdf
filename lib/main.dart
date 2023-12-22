@@ -1,6 +1,6 @@
 import 'package:fashion2/api/firebase_api.dart';
 import 'package:fashion2/firebase_options.dart';
-import 'package:fashion2/firestore.dart';
+import 'package:fashion2/widgets/splashPage.dart';
 import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:fashion2/screen/notification_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,9 +21,6 @@ void main() async {
       home: MyApp(),
     ),
   );
-  // runApp(MultiProvider(
-  //     providers: [ChangeNotifierProvider(create: (_) => FirebaseManagement())],
-  //     child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,7 +32,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Fashion',
-      home: const LoginSignupScreen(),
+      home: SplashPage(),
       navigatorKey: navigatorkey,
       routes: {
         '/notificationScreen': (context) => const NotificationScreen(),

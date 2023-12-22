@@ -1,16 +1,16 @@
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/screen/loginSignupScreen.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/atelier.dart';
 import 'package:fashion2/widgets/enregistrer_tailleur.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 import 'dart:io';
 
 import '../screen/home_screen.dart';
 
+// ignore: must_be_immutable
 class AtelierRegistrationPage extends StatefulWidget {
   final Atelier? existingAtelier;
   File? selectedImage;
@@ -27,6 +27,8 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
   final TextEditingController nomController = TextEditingController();
   final TextEditingController lieuController = TextEditingController();
   final TextEditingController sloganController = TextEditingController();
+  FirebaseStorage storage = FirebaseStorage.instance;
+  String? imageUrl;
 
   @override
   void initState() {
@@ -40,15 +42,34 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
     }
   }
 
+  Future<String?> uploadImage(File imageFile, String fileName) async {
+    try {
+      Reference ref = storage.ref().child('images/$fileName');
+      UploadTask uploadTask = ref.putFile(imageFile);
+
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+
+      return imageUrl;
+    } catch (e) {
+      print('Erreur lors du chargement de l\'image : $e');
+      return null;
+    }
+  }
+//  void pickImage(Function(File?) onImagePicked) async {
+//     final picker = ImagePicker();
+//     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+//     if (pickedFile != null) {
+//       onImagePicked(File(pickedFile.path));
+//     }
+//   }
+
   Future<void> pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
-
-    if (pickedFile != null) {
-      setState(() {
-        widget.selectedImage = File(pickedFile.path);
-      });
-    }
+    imageUrl = await uploadImage(File(pickedFile!.path), pickedFile.name);
   }
 
   final FirebaseManagement c = Get.put(FirebaseManagement());
@@ -172,23 +193,12 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                         slogan: sloganController.text.isNotEmpty
                             ? sloganController.text
                             : null,
-                        imageUrl: widget.selectedImage != null
-                            ? 'chemin_de_l_image' // Remplacez cela par la logique réelle de téléchargement d'image vers Firebase
-                            : null,
+                        imageUrl: imageUrl != null
+                            ? imageUrl // Remplacez cela par la logique réelle de téléchargement d'image vers Firebase
+                            : "",
                       );
                       try {
-                        final ateliersCollection =
-                            FirebaseFirestore.instance.collection('ateliers');
                         if (widget.existingAtelier != null) {
-                          // await ateliersCollection
-                          //     .doc(widget.existingAtelier!.token)
-                          //     .set({
-                          //   'nom': newAtelier.nom,
-                          //   'lieu': newAtelier.lieu,
-                          //   'slogan': newAtelier.slogan,
-                          //   'imageUrl': newAtelier.imageUrl,
-                          //   // ... autres champs si nécessaire
-                          // });
                           c.createAtelier(
                               Atelier(
                                   nom: newAtelier.nom,
@@ -204,13 +214,6 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                             ),
                           );
                         } else {
-                          // await ateliersCollection.add({
-                          //   'nom': newAtelier.nom,
-                          //   'lieu': newAtelier.lieu,
-                          //   'slogan': newAtelier.slogan,
-                          //   'imageUrl': newAtelier.imageUrl,
-                          //   // ... autres champs si nécessaire
-                          // });
                           c.createAtelier(
                               Atelier(
                                   nom: newAtelier.nom,

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion2/models/commande.dart';
 import 'package:fashion2/models/habit.dart';
 import 'package:fashion2/models/mesClients.dart';
 

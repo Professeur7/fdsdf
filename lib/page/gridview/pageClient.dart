@@ -17,6 +17,7 @@ class _ClientsScreenState extends State<ClientsScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Méthode pour ajouter un client par défaut
+  final FirebaseManagement c = Get.put(FirebaseManagement());
 
   @override
   void initState() {
@@ -35,7 +36,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController genreController = TextEditingController();
   final TextEditingController trancheAgeController = TextEditingController();
-  final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -64,8 +64,12 @@ class _ClientsScreenState extends State<ClientsScreen> {
           final client = c.mesClients[index];
           return ListTile(
             leading: Icon(Icons.person),
-            title: Text('${client.prenom} ${client.nom}'),
-            subtitle: Text(client.telephone!),
+            title: c.mesClients.length == 0
+                ? Text("data")
+                : Text('${client.prenom} ${client.nom}'),
+            subtitle: c.mesClients.length == 0
+                ? Text("data")
+                : Text(client.telephone!),
             trailing: IconButton(
               icon: Icon(Icons.show_chart),
               onPressed: () {

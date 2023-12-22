@@ -1,5 +1,10 @@
 import 'package:dart_extensions/dart_extensions.dart';
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/page/client/pageCommentaire.dart';
+import 'package:fashion2/page/gridview/pagePromotion.dart';
+import 'package:fashion2/screen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:video_player/video_player.dart';
 
@@ -12,20 +17,56 @@ class Publications extends StatefulWidget {
   _PublicationsState createState() => _PublicationsState();
 }
 
-class _PublicationsState extends State<Publications> with TickerProviderStateMixin {
+class _PublicationsState extends State<Publications>
+    with TickerProviderStateMixin {
+  //FirebaseManagement _management = Get.put(FirebaseManagement());
   TabController? _tabController;
-  bool isAddedToCart = false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isAddedToCart =
+      false; // Exemple de variable pour savoir si l'article est ajouté au panier
   bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
-  bool isDisliked = false; // Exemple de variable pour savoir si l'article n'est pas aimé
-  bool isFavorite = false; // Exemple de variable pour savoir si l'article est favori
-
+  bool isDisliked =
+      false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite =
+      false; // Exemple de variable pour savoir si l'article est favori
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    c.getPublication(c.tailleurs.first.token!);
+    c.getVideoPublication(c.tailleurs.first.token!);
+    print("it is");
+    if (c.tailleurs.first.postes == []) {
+    } else {
+      for (final i in c.tailleurs.first.postes!) {
+        for (final c in i.images!) {
+          imageLinks.add(c.image);
+        }
+      }
+      for (final i in c.tailleurs.first.postes!) {
+        comment.add(i.description);
+      }
+    }
+    if (c.tailleurs.first.posteVideos == []) {
+    } else {
+      for (final i in c.tailleurs.first.posteVideos!) {
+        for (final c in i.videos!) {
+          imageLinksvideo.add(c.video);
+        }
+      }
+      for (final i in c.tailleurs.first.posteVideos!) {
+        comment.add(i.description);
+      }
+    }
   }
 
+  List<String> imageLinks = [];
+  List<String> comment = [];
+
+  List<String> imageLinksvideo = [];
+  List<String> commentvideo = [];
+
+  final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +82,7 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ClientHomeScreen(),
+                builder: (context) => HomeScreen(),
               ),
             );
           },
@@ -53,7 +94,7 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
               // Naviguez vers la page Favoris
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FavoritesPage()),
+                MaterialPageRoute(builder: (context) => NewPostPage()),
               );
             },
           ),
@@ -64,6 +105,13 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
             Tab(text: "Photos"),
             Tab(text: "Vidéos"),
           ],
+          indicator: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                  25), // Ajustez le rayon selon votre besoin
+            ),
+            color: Colors.blue, // Couleur de l'indicateur
+          ),
         ),
       ),
       body: TabBarView(
@@ -71,33 +119,13 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
         children: [
           PublicationList(
             type: "Photos",
-            photos: [
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              // Ajoutez d'autres URLs de photos ici
-            ],
-            comments: [
-              "Contenu de la publication 1...",
-              "Contenu de la publication 2...",
-              "Contenu de la publication 3...",
-              // Ajoutez d'autres commentaires ici
-            ],
+            photos: imageLinks,
+            comments: comment,
           ),
           PublicationList(
             type: "Vidéos",
-            photos: [
-              "https://www.facebook.com/watch/?v=368740601302632.mp4",
-              "https://www.facebook.com/watch/?v=368740601302632.mp4",
-              "https://www.facebook.com/watch/?v=368740601302632.mp4",
-              // Ajoutez d'autres URLs de vidéos ici
-            ],
-            comments: [
-              "Contenu de la vidéo 1...",
-              "Contenu de la vidéo 2...",
-              "Contenu de la vidéo 3...",
-              // Ajoutez d'autres commentaires ici
-            ],
+            photos: imageLinksvideo,
+            comments: commentvideo,
           ),
         ],
       ),
@@ -120,11 +148,13 @@ class FavoritesPage extends StatelessWidget {
 }
 
 class PublicationList extends StatelessWidget {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   final String type;
   final List<String> photos;
   final List<String> comments;
 
-  PublicationList({required this.type, required this.photos, required this.comments});
+  PublicationList(
+      {required this.type, required this.photos, required this.comments});
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +164,12 @@ class PublicationList extends StatelessWidget {
         return PublicationTile(
           photoUrl: photos[index],
           comment: comments[index],
-          type: type, workshopName: 'Naf Couture', workshopProfile: '', workshopLocation: 'Garantibougou',
+          type: type,
+          workshopName:
+              '${_management.atelier.length != 0 ? _management.atelier.first.nom : ""}',
+          workshopProfile: '',
+          workshopLocation:
+              '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
         );
       },
     );
@@ -163,18 +198,26 @@ class PublicationTile extends StatefulWidget {
 }
 
 class _PublicationTileState extends State<PublicationTile> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   late VideoPlayerController _controller;
   bool _isVideoPlaying = false;
-  bool isAddedToCart = false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isAddedToCart =
+      false; // Exemple de variable pour savoir si l'article est ajouté au panier
   bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
-  bool isDisliked = false; // Exemple de variable pour savoir si l'article n'est pas aimé
-  bool isFavorite = false; // Exemple de variable pour savoir si l'article est favori
-
+  bool isDisliked =
+      false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite =
+      false; // Exemple de variable pour savoir si l'article est favori
+  int likeCount = 0;
+  int dislikeCount = 0;
+  int cartCount = 0;
+  int favoriteCount = 0;
 
   @override
   void initState() {
     super.initState();
     if (widget.photoUrl.endsWith('.mp4')) {
+      // ignore: deprecated_member_use
       _controller = VideoPlayerController.network(widget.photoUrl)
         ..initialize().then((_) {
           setState(() {});
@@ -203,32 +246,68 @@ class _PublicationTileState extends State<PublicationTile> {
               children: [
                 InkWell(
                   onTap: () {
-                    var location ="Garantibougou";
-                    var imageUrl ="https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(
-                          name: ModalRoute.of(context)!.settings.arguments.toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
-                          location: location ="",
-                          imageUrl: imageUrl,
-                        )
-                      ),
+                          builder: (context) => ProfilePage(
+                                name: ModalRoute.of(context)!
+                                    .settings
+                                    .arguments
+                                    .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
+                                location:
+                                    '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
+                                imageUrl: _management.atelier.first.imageUrl,
+                              )),
                     );
-                    // Votre logique de navigation pour le profil de l'atelier ici
+                    // Naviguer vers la nouvelle page de profil ici
+                    // Vous devez définir votre propre logique de navigation
+                    // Par exemple, vous pouvez utiliser Navigator pour naviguer vers la nouvelle page.
                   },
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(widget.workshopProfile),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white,
+                    ),
+                    child: _management.atelier.length == 0
+                        ? Container()
+                        : FittedBox(
+                            fit: BoxFit.cover,
+                            child: Image.network(
+                              _management.atelier.first.imageUrl,
+                            ),
+                          ),
                   ),
                 ),
+                // InkWell(
+                //   onTap: () {
+                //     var location = "Garantibougou";
+                //     var imageUrl =
+                //         "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //           builder: (context) => ProfilePage(
+                //                 name: ModalRoute.of(context)!
+                //                     .settings
+                //                     .arguments
+                //                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
+                //                 location: location = "",
+                //                 imageUrl: imageUrl,
+                //               )),
+                //     );
+                //     // Votre logique de navigation pour le profil de l'atelier ici
+                //   },
+                // ),
                 SizedBox(width: 14.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       " ${widget.workshopName}",
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       " ${widget.workshopLocation}",
@@ -239,7 +318,8 @@ class _PublicationTileState extends State<PublicationTile> {
               ],
             ),
           ),
-          if (widget.photoUrl.endsWith('.mp4') && _controller.value.isInitialized)
+          if (widget.photoUrl.endsWith('.mp4') &&
+              _controller.value.isInitialized)
             AspectRatio(
               aspectRatio: _controller.value.aspectRatio,
               child: Stack(
@@ -263,7 +343,8 @@ class _PublicationTileState extends State<PublicationTile> {
                 ],
               ),
             ),
-          if (!widget.photoUrl.endsWith('.mp4')) // Si ce n'est pas une vidéo, afficher une image
+          if (!widget.photoUrl.endsWith(
+              '.mp4')) // Si ce n'est pas une vidéo, afficher une image
             Image.network(widget.photoUrl),
           Padding(
             padding: EdgeInsets.all(16.0),
@@ -281,59 +362,85 @@ class _PublicationTileState extends State<PublicationTile> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.add_shopping_cart,
-                    color: isAddedToCart ? Colors.green : null, // Couleur verte si ajouté au panier
-                  ),
-                  onPressed: () {
-                    // Logique pour ajouter dans le panier
-                    setState(() {
-                      isAddedToCart = !isAddedToCart; // Inverse l'état lorsque l'icône est pressée
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.add_shopping_cart,
+                        color: cartCount > 0 ? Colors.green : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          cartCount += isAddedToCart ? -1 : 1;
+                          isAddedToCart = !isAddedToCart;
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$cartCount'),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.favorite,
-                    color: isFavorite ? Colors.red : null, // Couleur rouge si favori
-                  ),
-                  onPressed: () {
-                    // Logique pour ajouter aux favoris
-                    setState(() {
-                      isFavorite = !isFavorite; // Inverse l'état lorsque l'icône est pressée
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.favorite,
+                        color: favoriteCount > 0 ? Colors.red : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          favoriteCount += isFavorite ? -1 : 1;
+                          isFavorite = !isFavorite;
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$favoriteCount'),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.thumb_up,
-                    color: isLiked ? Colors.blue : null, // Couleur bleue si aimé
-                  ),
-                  onPressed: () {
-                    // Logique pour aimer
-                    setState(() {
-                      isLiked = !isLiked; // Inverse l'état lorsque l'icône est pressée
-                      if (isDisliked) {
-                        isDisliked = false; // Si "Je n'aime pas" est sélectionné, décocher
-                      }
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: likeCount > 0 ? Colors.blue : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          likeCount += isLiked ? -1 : 1;
+                          isLiked = !isLiked;
+                          if (isDisliked) {
+                            isDisliked = false;
+                            dislikeCount--;
+                          }
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$likeCount'),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.thumb_down,
-                    color: isDisliked ? Colors.orange : null, // Couleur orange si "Je n'aime pas"
-                  ),
-                  onPressed: () {
-                    // Logique pour ne pas aimer
-                    setState(() {
-                      isDisliked = !isDisliked; // Inverse l'état lorsque l'icône est pressée
-                      if (isLiked) {
-                        isLiked = false; // Si "J'aime" est sélectionné, décocher
-                      }
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.thumb_down,
+                        color: dislikeCount > 0 ? Colors.orange : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          dislikeCount += isDisliked ? -1 : 1;
+                          isDisliked = !isDisliked;
+                          if (isLiked) {
+                            isLiked = false;
+                            likeCount--;
+                          }
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$dislikeCount'),
+                  ],
                 ),
               ],
             ),
@@ -343,21 +450,29 @@ class _PublicationTileState extends State<PublicationTile> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: ElevatedButton(
-                  onPressed: () {
-                    // Ajoutez ici la logique pour laisser un commentaire
-                  },
-                  child: Text("Laisser un commentaire"),
-                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CommentPage(),
+                        ),
+                      );
+                      // Ajoutez ici la logique pour laisser un commentaire
+                    },
+                    child: Text("Laisser un commentaire"),
+                  ),
                 ),
                 SizedBox(width: 15),
-                Expanded(child: ElevatedButton(
-                  onPressed: () {
-                    // Ajoutez ici la logique pour laisser un commentaire
-                  },
-                  child: Text("Contactez-nous"),
-                ),)
-
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Ajoutez ici la logique pour laisser un commentaire
+                    },
+                    child: Text("Contactez-nous"),
+                  ),
+                )
               ],
             ),
           ),
@@ -366,8 +481,3 @@ class _PublicationTileState extends State<PublicationTile> {
     );
   }
 }
-
-
-
-
-
