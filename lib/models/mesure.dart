@@ -18,14 +18,14 @@ class Mesures {
   String? tourPoignet;
   String? hauteurTotale;
   String? tourCou;
-  Tailleurs tailleurs;
-  Models models;
-  Client client;
+  Tailleurs? tailleurs;
+  Models? models;
+  Client? client;
 
   Mesures(
-      {required this.tailleurs,
-      required this.client,
-      required this.models,
+      {this.tailleurs,
+      this.client,
+      this.models,
       this.tourPoitrine,
       this.tourTaille,
       this.tourDos,
@@ -69,6 +69,23 @@ class Mesures {
     }
 
     return Mesures(
-        token: data.id, client: client, tailleurs: tailleurs, models: models);
+      token: data.id,
+      client: client,
+      tailleurs: tailleurs,
+      models: models,
+      tourPoitrine: file['poitrine'],
+      tourTaille: file['taille'],
+      tourDos: file['dos'],
+      tourHanche: file['hanche'],
+      longueurManches: file['manche'],
+      largeursEpaules: file['epaule'],
+      longueurJambes: file['jambe'],
+      hauteurEntrejambe: file['entreJambe'],
+      longueurOurlet: file['ourlet'],
+      tourBras: file['bras'],
+      tourPoignet: file['poignet'],
+      hauteurTotale: file['totale'],
+      tourCou: file['cou'],
+    );
   }
 }

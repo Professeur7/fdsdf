@@ -1,5 +1,3 @@
-
-
 import 'package:fashion2/page/client.dart';
 import 'package:fashion2/page/commande.dart';
 import 'package:fashion2/page/dashboard.dart';
@@ -38,131 +36,148 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: const Color(0xFF09126C),
         child: Icon(Icons.cut),
         onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MesuresPage(), // Remplacez PageDefault par votre widget de page par défaut
-              ),
-            );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  MesuresPage(), // Remplacez PageDefault par votre widget de page par défaut
+            ),
+          );
         },
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          shape: CircularNotchedRectangle(),
-          notchMargin: 10,
-          child: Container(
-            height: 60,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              children: <Widget>[
-                Expanded(
-                  child: MaterialButton(
-                    minWidth: 30,
-                    onPressed: () {
-                      setState(() {
-                        currentScreen = Dashboard();
-                        currentTab = 0;
-                      });
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.dashboard,
-                          color: currentTab == 0 ? const Color(0xFF3b5999) : Colors.grey,
+      bottomNavigationBar: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 10,
+        child: Container(
+          height: 60,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: <Widget>[
+              Expanded(
+                child: MaterialButton(
+                  minWidth: 30,
+                  onPressed: () {
+                    setState(() {
+                      currentScreen = Dashboard();
+                      currentTab = 0;
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.dashboard,
+                        color: currentTab == 0
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
+                      ),
+                      Text(
+                        'Accueil',
+                        style: TextStyle(
+                          color: currentTab == 0
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
-                        Text(
-                          'Accueil',
-                          style: TextStyle(
-                            color: currentTab == 0 ? const Color(0xFF3b5999) : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: MaterialButton(
-                    minWidth: 30,
-                    onPressed: () {
-                      setState(() {
-                        currentScreen = CustomerInformationPage();
-                        currentTab = 1;
-                      });
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.person,
-                          color: currentTab == 1 ? const Color(0xFF3b5999) : Colors.grey,
+              ),
+              Expanded(
+                child: MaterialButton(
+                  minWidth: 30,
+                  onPressed: () {
+                    setState(() {
+                      currentScreen = CustomerInformationPage();
+                      currentTab = 1;
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.person,
+                        color: currentTab == 1
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
+                      ),
+                      Text(
+                        'Mesure',
+                        style: TextStyle(
+                          color: currentTab == 1
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
-                        Text(
-                          'Mesure',
-                          style: TextStyle(
-                            color: currentTab == 1 ? const Color(0xFF3b5999) : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: MaterialButton(
-                    minWidth: 30,
-                    onPressed: () {
-                      setState(() {
-                        currentScreen = Transaction();
-                        currentTab = 2;
-                      });
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_cart,
-                          color: currentTab == 2 ? const Color(0xFF3b5999) : Colors.grey,
+              ),
+              Expanded(
+                child: MaterialButton(
+                  minWidth: 30,
+                  onPressed: () {
+                    setState(() {
+                      currentScreen = Transaction();
+                      currentTab = 2;
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.shopping_cart,
+                        color: currentTab == 2
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
+                      ),
+                      Text(
+                        'Commande',
+                        style: TextStyle(
+                          color: currentTab == 2
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
-                        Text(
-                          'Commande',
-                          style: TextStyle(
-                            color: currentTab == 2 ? const Color(0xFF3b5999) : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-                Expanded(
-                  child: MaterialButton(
-                    minWidth: 25,
-                    onPressed: () {
-                      setState(() {
-                        currentScreen = ToDoListPage();
-                        currentTab = 3;
-                      });
-                    },
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.task_rounded,
-                          color: currentTab == 3 ? const Color(0xFF3b5999) : Colors.grey,
+              ),
+              Expanded(
+                child: MaterialButton(
+                  minWidth: 25,
+                  onPressed: () {
+                    setState(() {
+                      currentScreen = ToDoListPage();
+                      currentTab = 3;
+                    });
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.task_rounded,
+                        color: currentTab == 3
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
+                      ),
+                      Text(
+                        'Taches',
+                        style: TextStyle(
+                          color: currentTab == 3
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
-                        Text(
-                          'Taches',
-                          style: TextStyle(
-                            color: currentTab == 3 ? const Color(0xFF3b5999) : Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
+      ),
     );
   }
 }

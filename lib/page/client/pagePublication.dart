@@ -1,5 +1,9 @@
 import 'package:dart_extensions/dart_extensions.dart';
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/page/gridview/pagePromotion.dart';
+import 'package:fashion2/screen/home_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'package:video_player/video_player.dart';
 
@@ -12,20 +16,39 @@ class Publications extends StatefulWidget {
   _PublicationsState createState() => _PublicationsState();
 }
 
-class _PublicationsState extends State<Publications> with TickerProviderStateMixin {
+class _PublicationsState extends State<Publications>
+    with TickerProviderStateMixin {
   TabController? _tabController;
-  bool isAddedToCart = false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isAddedToCart =
+      false; // Exemple de variable pour savoir si l'article est ajouté au panier
   bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
-  bool isDisliked = false; // Exemple de variable pour savoir si l'article n'est pas aimé
-  bool isFavorite = false; // Exemple de variable pour savoir si l'article est favori
-
+  bool isDisliked =
+      false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite =
+      false; // Exemple de variable pour savoir si l'article est favori
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    c.getPublication(c.tailleurs.first.token!);
+    if (c.tailleurs.first.postes == null) {
+    } else {
+      for (final i in c.tailleurs.first.postes!) {
+        for (final c in i.images!) {
+          imageLinks.add(c.image);
+        }
+      }
+      for (final i in c.tailleurs.first.postes!) {
+        comment.add(i.description);
+      }
+    }
   }
 
+  List<String> imageLinks = [];
+  List<String> comment = [];
+
+  final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +64,7 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ClientHomeScreen(),
+                builder: (context) => HomeScreen(),
               ),
             );
           },
@@ -53,7 +76,7 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
               // Naviguez vers la page Favoris
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => FavoritesPage()),
+                MaterialPageRoute(builder: (context) => NewPostPage()),
               );
             },
           ),
@@ -71,18 +94,8 @@ class _PublicationsState extends State<Publications> with TickerProviderStateMix
         children: [
           PublicationList(
             type: "Photos",
-            photos: [
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png",
-              // Ajoutez d'autres URLs de photos ici
-            ],
-            comments: [
-              "Contenu de la publication 1...",
-              "Contenu de la publication 2...",
-              "Contenu de la publication 3...",
-              // Ajoutez d'autres commentaires ici
-            ],
+            photos: imageLinks,
+            comments: comment,
           ),
           PublicationList(
             type: "Vidéos",
@@ -124,7 +137,8 @@ class PublicationList extends StatelessWidget {
   final List<String> photos;
   final List<String> comments;
 
-  PublicationList({required this.type, required this.photos, required this.comments});
+  PublicationList(
+      {required this.type, required this.photos, required this.comments});
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +148,10 @@ class PublicationList extends StatelessWidget {
         return PublicationTile(
           photoUrl: photos[index],
           comment: comments[index],
-          type: type, workshopName: 'Naf Couture', workshopProfile: '', workshopLocation: 'Garantibougou',
+          type: type,
+          workshopName: 'Naf Couture',
+          workshopProfile: '',
+          workshopLocation: 'Garantibougou',
         );
       },
     );
@@ -165,11 +182,13 @@ class PublicationTile extends StatefulWidget {
 class _PublicationTileState extends State<PublicationTile> {
   late VideoPlayerController _controller;
   bool _isVideoPlaying = false;
-  bool isAddedToCart = false; // Exemple de variable pour savoir si l'article est ajouté au panier
+  bool isAddedToCart =
+      false; // Exemple de variable pour savoir si l'article est ajouté au panier
   bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
-  bool isDisliked = false; // Exemple de variable pour savoir si l'article n'est pas aimé
-  bool isFavorite = false; // Exemple de variable pour savoir si l'article est favori
-
+  bool isDisliked =
+      false; // Exemple de variable pour savoir si l'article n'est pas aimé
+  bool isFavorite =
+      false; // Exemple de variable pour savoir si l'article est favori
 
   @override
   void initState() {
@@ -203,17 +222,20 @@ class _PublicationTileState extends State<PublicationTile> {
               children: [
                 InkWell(
                   onTap: () {
-                    var location ="Garantibougou";
-                    var imageUrl ="https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
+                    var location = "Garantibougou";
+                    var imageUrl =
+                        "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ProfilePage(
-                          name: ModalRoute.of(context)!.settings.arguments.toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
-                          location: location ="",
-                          imageUrl: imageUrl,
-                        )
-                      ),
+                          builder: (context) => ProfilePage(
+                                name: ModalRoute.of(context)!
+                                    .settings
+                                    .arguments
+                                    .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
+                                location: location = "",
+                                imageUrl: imageUrl,
+                              )),
                     );
                     // Votre logique de navigation pour le profil de l'atelier ici
                   },
@@ -228,7 +250,8 @@ class _PublicationTileState extends State<PublicationTile> {
                   children: [
                     Text(
                       " ${widget.workshopName}",
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                     Text(
                       " ${widget.workshopLocation}",
@@ -239,7 +262,8 @@ class _PublicationTileState extends State<PublicationTile> {
               ],
             ),
           ),
-          if (widget.photoUrl.endsWith('.mp4') && _controller.value.isInitialized)
+          if (widget.photoUrl.endsWith('.mp4') &&
+              _controller.value.isInitialized)
             AspectRatio(
               aspectRatio: _controller.value.aspectRatio,
               child: Stack(
@@ -263,7 +287,8 @@ class _PublicationTileState extends State<PublicationTile> {
                 ],
               ),
             ),
-          if (!widget.photoUrl.endsWith('.mp4')) // Si ce n'est pas une vidéo, afficher une image
+          if (!widget.photoUrl.endsWith(
+              '.mp4')) // Si ce n'est pas une vidéo, afficher une image
             Image.network(widget.photoUrl),
           Padding(
             padding: EdgeInsets.all(16.0),
@@ -284,38 +309,47 @@ class _PublicationTileState extends State<PublicationTile> {
                 IconButton(
                   icon: Icon(
                     Icons.add_shopping_cart,
-                    color: isAddedToCart ? Colors.green : null, // Couleur verte si ajouté au panier
+                    color: isAddedToCart
+                        ? Colors.green
+                        : null, // Couleur verte si ajouté au panier
                   ),
                   onPressed: () {
                     // Logique pour ajouter dans le panier
                     setState(() {
-                      isAddedToCart = !isAddedToCart; // Inverse l'état lorsque l'icône est pressée
+                      isAddedToCart =
+                          !isAddedToCart; // Inverse l'état lorsque l'icône est pressée
                     });
                   },
                 ),
                 IconButton(
                   icon: Icon(
                     Icons.favorite,
-                    color: isFavorite ? Colors.red : null, // Couleur rouge si favori
+                    color: isFavorite
+                        ? Colors.red
+                        : null, // Couleur rouge si favori
                   ),
                   onPressed: () {
                     // Logique pour ajouter aux favoris
                     setState(() {
-                      isFavorite = !isFavorite; // Inverse l'état lorsque l'icône est pressée
+                      isFavorite =
+                          !isFavorite; // Inverse l'état lorsque l'icône est pressée
                     });
                   },
                 ),
                 IconButton(
                   icon: Icon(
                     Icons.thumb_up,
-                    color: isLiked ? Colors.blue : null, // Couleur bleue si aimé
+                    color:
+                        isLiked ? Colors.blue : null, // Couleur bleue si aimé
                   ),
                   onPressed: () {
                     // Logique pour aimer
                     setState(() {
-                      isLiked = !isLiked; // Inverse l'état lorsque l'icône est pressée
+                      isLiked =
+                          !isLiked; // Inverse l'état lorsque l'icône est pressée
                       if (isDisliked) {
-                        isDisliked = false; // Si "Je n'aime pas" est sélectionné, décocher
+                        isDisliked =
+                            false; // Si "Je n'aime pas" est sélectionné, décocher
                       }
                     });
                   },
@@ -323,14 +357,18 @@ class _PublicationTileState extends State<PublicationTile> {
                 IconButton(
                   icon: Icon(
                     Icons.thumb_down,
-                    color: isDisliked ? Colors.orange : null, // Couleur orange si "Je n'aime pas"
+                    color: isDisliked
+                        ? Colors.orange
+                        : null, // Couleur orange si "Je n'aime pas"
                   ),
                   onPressed: () {
                     // Logique pour ne pas aimer
                     setState(() {
-                      isDisliked = !isDisliked; // Inverse l'état lorsque l'icône est pressée
+                      isDisliked =
+                          !isDisliked; // Inverse l'état lorsque l'icône est pressée
                       if (isLiked) {
-                        isLiked = false; // Si "J'aime" est sélectionné, décocher
+                        isLiked =
+                            false; // Si "J'aime" est sélectionné, décocher
                       }
                     });
                   },
@@ -343,21 +381,23 @@ class _PublicationTileState extends State<PublicationTile> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Expanded(child: ElevatedButton(
-                  onPressed: () {
-                    // Ajoutez ici la logique pour laisser un commentaire
-                  },
-                  child: Text("Laisser un commentaire"),
-                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Ajoutez ici la logique pour laisser un commentaire
+                    },
+                    child: Text("Laisser un commentaire"),
+                  ),
                 ),
                 SizedBox(width: 15),
-                Expanded(child: ElevatedButton(
-                  onPressed: () {
-                    // Ajoutez ici la logique pour laisser un commentaire
-                  },
-                  child: Text("Contactez-nous"),
-                ),)
-
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      // Ajoutez ici la logique pour laisser un commentaire
+                    },
+                    child: Text("Contactez-nous"),
+                  ),
+                )
               ],
             ),
           ),
@@ -366,8 +406,3 @@ class _PublicationTileState extends State<PublicationTile> {
     );
   }
 }
-
-
-
-
-

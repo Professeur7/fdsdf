@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:fashion2/firestore.dart';
 import 'package:fashion2/page/gridview/pageClient.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
 import 'package:fashion2/page/gridview/pagePaiement.dart';
@@ -7,6 +8,7 @@ import 'package:fashion2/page/pageDrawer.dart';
 import 'package:fashion2/page/profileAtelierPage.dart';
 import 'package:fashion2/page/search.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import 'client/pagePublication.dart';
 import 'gridview/pageModels.dart';
@@ -23,6 +25,7 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   var height, width;
+  FirebaseManagement _management = Get.put(FirebaseManagement());
 
   List imgData = [
     "assets/images/models.png",
@@ -92,7 +95,9 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ),
                           Text(
-                            "Dashboard",
+                            _management.atelier.length == 0
+                                ? "Dashboard"
+                                : _management.atelier.first.nom,
                             style: TextStyle(
                               fontSize: 20,
                               color: Colors.white,
@@ -114,16 +119,13 @@ class _DashboardState extends State<Dashboard> {
                               child: Container(
                                 height: 40,
                                 width: 40,
+                                child: _management.atelier.length == 0
+                                    ? Container()
+                                    : Image.network(
+                                        _management.atelier.first.imageUrl),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(15),
                                   color: Colors.white,
-                                  image: widget.selectedImage != null
-                                      ? DecorationImage(
-                                          image:
-                                              FileImage(widget.selectedImage!),
-                                          fit: BoxFit.cover,
-                                        )
-                                      : null,
                                 ),
                               ))
                         ],

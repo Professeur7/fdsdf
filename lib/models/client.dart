@@ -38,16 +38,16 @@ class Client {
     }
 
     return Client(
-      password: file['password'],
-      username: file['username'],
+      password: file['password'] ?? "",
+      username: file['username'] ?? "",
       model: listModel,
       token: data.id,
-      trancheAge: file["trancheAge"],
-      nom: file["nom"],
-      prenom: file["prenom"],
-      email: file["email"],
-      genre: file["gender"],
-      telephone: file["telephone"],
+      trancheAge: file["trancheAge"] ?? "",
+      nom: file["nom"] ?? "",
+      prenom: file["prenom"] ?? "",
+      email: file["email"] ?? "",
+      genre: file["genre"] ?? "",
+      telephone: file["telephone"] ?? "",
     );
   }
 }

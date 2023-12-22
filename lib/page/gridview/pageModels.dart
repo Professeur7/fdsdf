@@ -1,8 +1,6 @@
 import 'package:camera/camera.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/albums.dart';
-import 'package:fashion2/models/image_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -294,7 +292,7 @@ class _GalleryPageState extends State<GalleryPage> {
       File file = File(pickedFile.path);
       c.addImageToAlbums(await uploadImage(file, pickedFile.name),
           c.tailleurs.first.token!, widget.galerieToken);
-      setState(() {});
+      //setState(() {});
     }
   }
 
@@ -327,6 +325,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   @override
   Widget build(BuildContext context) {
+    _loadGalleryPhotos(widget.galerieToken);
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.galleryButton!.title),
