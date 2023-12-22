@@ -180,8 +180,7 @@ class _DashboardState extends State<Dashboard> {
                               child: Center(
                                 child: Text(
                                   "Recherche",
-                                  style: TextStyle(color: Colors.white),
-                                ),
+                                  style: TextStyle(color: Colors.white),                                ),
                               ),
                             )
                           ],

@@ -28,6 +28,7 @@ class FirebaseManagement extends GetxController {
   //create firebase Firestore database instance
   List<Tailleurs> tailleurs = <Tailleurs>[].obs;
   List<Client> clients = <Client>[].obs;
+  List<Mesures> mesures = <Mesures>[].obs;
   List<Albums> albums = <Albums>[].obs;
   List<Stock> stock = <Stock>[].obs;
   List<Taches> taches = <Taches>[].obs;
@@ -56,6 +57,47 @@ class FirebaseManagement extends GetxController {
     final tailleur = await _db.collection("tailleurs").doc(ref.id).get();
     tailleurs.add(Tailleurs.fromSnapshot(tailleur));
     print("${tailleurs.length} est la taille de tailleurs");
+  }
+
+  postPublication(Poste poste, String token) async {
+    final ref = await _db
+        .collection("tailleurs")
+        .doc(token)
+        .collection("Poste")
+        .add({"description": poste.description});
+
+    for (final image in poste.images!) {
+      await _db
+          .collection("tailleurs")
+          .doc(token)
+          .collection("Poste")
+          .doc(ref.id)
+          .collection("Images")
+          .add({"image": image.image});
+    }
+    Postes.add(poste);
+    tailleurs.first.postes = Postes;
+  }
+
+  Future<List<Poste>> getPublication(String token) async {
+    final poste =
+        await _db.collection("tailleurs").doc(token).collection("Poste").get();
+    final posteList =
+        await poste.docs.map((e) => Poste.fromSnapshot(e)).toList();
+    for (final p in posteList) {
+      final imgs = await _db
+          .collection("tailleurs")
+          .doc(token)
+          .collection("Poste")
+          .doc(p.token)
+          .collection("Images")
+          .get();
+      final img = await imgs.docs.map((e) => Images.fromSnapshot(e)).toList();
+      p.images = img;
+    }
+    Postes = posteList;
+    tailleurs.first.postes = posteList;
+    return posteList;
   }
 
   createClient(Client User) async {
@@ -95,6 +137,13 @@ class FirebaseManagement extends GetxController {
   }
 
   getTailleur(Tailleurs tailleur) async {
+    final atelie = await _db
+        .collection("tailleurs")
+        .doc(tailleur.token)
+        .collection("ateliers")
+        .get();
+    final listaltelier =
+        atelie.docs.map((e) => Atelier.fromSnapshot(e)).toList();
     final all = await _db
         .collection("tailleurs")
         .doc(tailleur.token)
@@ -587,7 +636,7 @@ class FirebaseManagement extends GetxController {
   }
 
   addImageToAlbums(String? image, String userToken, String modelToken) async {
-    await _db
+    final f = await _db
         .collection("tailleurs")
         .doc(userToken)
         .collection("Albums")
@@ -599,6 +648,120 @@ class FirebaseManagement extends GetxController {
         .first
         .images!
         .add(Images(image: image!));
+  }
+
+  createMesure(String tokenTailleur, Mesures mesure) async {
+    final ref = await _db
+        .collection("tailleurs")
+        .doc(tokenTailleur)
+        .collection("Mesures")
+        .add({
+      "entreJambe": mesure.hauteurEntrejambe,
+      "totale": mesure.hauteurTotale,
+      "epaule": mesure.largeursEpaules,
+      "jambe": mesure.longueurJambes,
+      "manche": mesure.longueurManches,
+      "ourlet": mesure.longueurOurlet,
+      "bras": mesure.tourBras,
+      "cou": mesure.tourCou,
+      "dos": mesure.tourDos,
+      "hanche": mesure.tourHanche,
+      "poignet": mesure.tourPoignet,
+      "poitrine": mesure.tourPoitrine,
+      "taille": mesure.tourTaille
+    });
+    await _db
+        .collection("tailleurs")
+        .doc(tokenTailleur)
+        .collection("Mesures")
+        .doc(ref.id)
+        .collection("Clients")
+        .add({
+      "username": mesure.client!.username,
+      "trancheAge": mesure.client!.trancheAge,
+      "telephone": mesure.client!.telephone,
+      "prenom": mesure.client!.prenom,
+      "password": mesure.client!.password,
+      "nom": mesure.client!.nom,
+      "gender": mesure.client!.genre,
+      "email": mesure.client!.email
+    });
+    final refmode = await _db
+        .collection("tailleurs")
+        .doc(tokenTailleur)
+        .collection("Mesures")
+        .doc(ref.id)
+        .collection("Models")
+        .add({
+      "prix": mesure.models!.prix,
+      "nom": mesure.models!.nom,
+      "description": mesure.models!.description
+    });
+    for (final c in mesure.models!.images!) {
+      await _db
+          .collection("tailleurs")
+          .doc(tokenTailleur)
+          .collection("Mesures")
+          .doc(ref.id)
+          .collection("Models")
+          .doc(refmode.id)
+          .collection("Images")
+          .add({"image": c.image});
+    }
+    mesures.add(mesure);
+  }
+
+  UpdateMesure(String tokenTailleur, Mesures mesure, String mesureToken) async {
+    await _db
+        .collection("tailleurs")
+        .doc(tokenTailleur)
+        .collection("Mesures")
+        .doc(mesureToken)
+        .update({
+      "entreJambe": mesure.hauteurEntrejambe,
+      "totale": mesure.hauteurTotale,
+      "epaule": mesure.largeursEpaules,
+      "jambe": mesure.longueurJambes,
+      "manche": mesure.longueurManches,
+      "ourlet": mesure.longueurOurlet,
+      "bras": mesure.tourBras,
+      "cou": mesure.tourCou,
+      "dos": mesure.tourDos,
+      "hanche": mesure.tourHanche,
+      "poignet": mesure.tourPoignet,
+      "poitrine": mesure.tourPoitrine,
+      "taille": mesure.tourTaille
+    });
+    await _db
+        .collection("tailleurs")
+        .doc(tokenTailleur)
+        .collection("Mesures")
+        .doc(mesureToken)
+        .collection("Clients")
+        .doc(mesure.client!.token)
+        .update({
+      "username": mesure.client!.username,
+      "trancheAge": mesure.client!.trancheAge,
+      "telephone": mesure.client!.telephone,
+      "prenom": mesure.client!.prenom,
+      "password": mesure.client!.password,
+      "nom": mesure.client!.nom,
+      "gender": mesure.client!.genre,
+      "email": mesure.client!.email
+    });
+    final refmode = await _db
+        .collection("tailleurs")
+        .doc(tokenTailleur)
+        .collection("Mesures")
+        .doc(mesureToken)
+        .collection("Models")
+        .doc(mesure.models!.token)
+        .update({
+      "prix": mesure.models!.prix,
+      "nom": mesure.models!.nom,
+      "description": mesure.models!.description
+    });
+    mesures.add(mesure);
   }
 
   updateModel(Models mode, String userToken) async {

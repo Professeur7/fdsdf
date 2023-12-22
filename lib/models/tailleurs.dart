@@ -63,7 +63,6 @@ class Tailleurs {
     final modelData = file!["Model"];
     final albumsData = file["Albums"];
     final atelierData = file["Atelier"];
-
     final tacheData = file["Tache"];
     final rdvData = file["RDV"];
     final mesureData = file["Mesures"];
@@ -149,6 +148,14 @@ class Tailleurs {
           posteVideoData.map((element) => PosteVideo.fromSnapshot(element)));
     } else {
       listvideopsote = [];
+    }
+
+    List<Poste>? listpsote;
+    if (posteData != null) {
+      listpsote = List<Poste>.from(
+          albumsData.map((element) => Poste.fromSnapshot(element)));
+    } else {
+      listpsote = [];
     }
     return Tailleurs(
         rdv: listRDV,
