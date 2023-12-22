@@ -1,8 +1,9 @@
-
-
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/mesClients.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/client.dart';
+import 'package:get/get.dart';
 
 import '../../screen/home_screen.dart';
 
@@ -16,40 +17,13 @@ class _ClientsScreenState extends State<ClientsScreen> {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   // Méthode pour ajouter un client par défaut
-  void addDefaultClient() {
-    final defaultClient = Client(
-      password: "fdsf",
-      username: "ssdf",
-      nom: 'DJIRE',
-      prenom: 'Hamidou',
-      telephone: '74469970',
-      email: 'email@example.com',
-      genre: 'Homme',
-      trancheAge: '20-25',
-    );
-
-    // Ajoutez le client à Firebase Firestore
-    firestore.collection('clients').add({
-      'nom': defaultClient.nom,
-      'prenom': defaultClient.prenom,
-      'telephone': defaultClient.telephone,
-      'email': defaultClient.email,
-      'genre': defaultClient.genre,
-      'trancheAge': defaultClient.trancheAge,
-    }).then((docRef) {
-      // Utilisez le document ID généré par Firebase Firestore
-      defaultClient.token = docRef.id;
-      clients.add(defaultClient);
-    }).catchError((error) {
-      // Gérez les erreurs ici, par exemple, affichez un message d'erreur à l'utilisateur.
-    });
-  }
+  final FirebaseManagement c = Get.put(FirebaseManagement());
 
   @override
   void initState() {
     super.initState();
     // Ajoutez le client par défaut lors de l'initialisation de l'écran
-    addDefaultClient();
+    c.getMesClient(c.tailleurs.first.token!);
   }
 
   // Boolean pour afficher ou masquer le formulaire d'ajout de client
@@ -62,38 +36,6 @@ class _ClientsScreenState extends State<ClientsScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController genreController = TextEditingController();
   final TextEditingController trancheAgeController = TextEditingController();
-
-  void addClient(Client client) {
-    // Ajoutez le client à Firebase Firestore
-    firestore.collection('clients').add({
-      'nom': client.nom,
-      'prenom': client.prenom,
-      'telephone': client.telephone,
-      'email': client.email,
-      'genre': client.genre,
-      'trancheAge': client.trancheAge,
-    }).then((docRef) {
-      // Utilisez le document ID généré par Firebase Firestore
-      client.token = docRef.id;
-      clients.add(client);
-
-      // Réinitialisez les contrôleurs de formulaire
-      nomController.clear();
-      prenomController.clear();
-      telephoneController.clear();
-      emailController.clear();
-      genreController.clear();
-      trancheAgeController.clear();
-
-      // Masquez le formulaire d'ajout de client
-      setState(() {
-        showAddClientForm = false;
-      });
-    }).catchError((error) {
-      // Gérez les erreurs ici, par exemple, affichez un message d'erreur à l'utilisateur.
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,13 +59,17 @@ class _ClientsScreenState extends State<ClientsScreen> {
         ),
       ),
       body: ListView.builder(
-        itemCount: clients.length,
+        itemCount: c.mesClients.length,
         itemBuilder: (context, index) {
-          final client = clients[index];
+          final client = c.mesClients[index];
           return ListTile(
             leading: Icon(Icons.person),
-            title: Text('${client.prenom} ${client.nom}'),
-            subtitle: Text(client.telephone!),
+            title: c.mesClients.length == 0
+                ? Text("data")
+                : Text('${client.prenom} ${client.nom}'),
+            subtitle: c.mesClients.length == 0
+                ? Text("data")
+                : Text(client.telephone!),
             trailing: IconButton(
               icon: Icon(Icons.show_chart),
               onPressed: () {
@@ -137,24 +83,21 @@ class _ClientsScreenState extends State<ClientsScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFF09126C),
         onPressed: () {
-          setState(() {
-            showAddClientForm = !showAddClientForm;
-          });
+          showAdaptiveDialog(
+              context: context, builder: (context) => AddClientForm());
         },
         child: Icon(showAddClientForm ? Icons.close : Icons.person_add),
       ),
       // Affichez le formulaire d'ajout de client lorsque showAddClientForm est vrai, sinon, affichez null
-      bottomSheet:
-      showAddClientForm ? AddClientForm(addClient: addClient) : null,
+      //bottomSheet: showAddClientForm ? AddClientForm() : null,
     );
   }
 }
 
 class ClientDetailsScreen extends StatelessWidget {
-  final Client client;
-
+  MesClients client;
   ClientDetailsScreen({required this.client});
-
+  final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,12 +124,12 @@ class ClientDetailsScreen extends StatelessWidget {
           ),
           ListTile(
             title: Text('Email'),
-            subtitle: Text(client.email),
+            subtitle: Text(client.email!),
             leading: Icon(Icons.email),
           ),
           ListTile(
             title: Text('Genre'),
-            subtitle: Text(client.genre),
+            subtitle: Text(client.genre!),
             leading: Icon(Icons.person),
           ),
           ListTile(
@@ -201,10 +144,6 @@ class ClientDetailsScreen extends StatelessWidget {
 }
 
 class AddClientForm extends StatefulWidget {
-  final void Function(Client) addClient;
-
-  AddClientForm({required this.addClient});
-
   @override
   _AddClientFormState createState() => _AddClientFormState();
 }
@@ -217,47 +156,55 @@ class _AddClientFormState extends State<AddClientForm> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController genreController = TextEditingController();
   final TextEditingController trancheAgeController = TextEditingController();
+  final FirebaseManagement c = Get.put(FirebaseManagement());
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text('Ajouter un Client'),
       content: SingleChildScrollView(
-        child: Column(
-          children: [
-            TextField(
-              controller: nomController,
-              decoration: InputDecoration(labelText: 'Nom'),
-            ),
-            TextField(
-              controller: prenomController,
-              decoration: InputDecoration(labelText: 'Prénom'),
-            ),
-            TextField(
-              controller: telephoneController,
-              decoration: InputDecoration(labelText: 'Téléphone'),
-            ),
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: genreController,
-              decoration: InputDecoration(labelText: 'Genre'),
-            ),
-            TextField(
-              controller: trancheAgeController,
-              decoration: InputDecoration(labelText: 'Tranche d\'âge'),
-            ),
-          ],
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.8, // Largeur du dialogue
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nomController,
+                decoration: InputDecoration(labelText: 'Nom'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: prenomController,
+                decoration: InputDecoration(labelText: 'Prénom'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: telephoneController,
+                decoration: InputDecoration(labelText: 'Téléphone'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: 'Email'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: genreController,
+                decoration: InputDecoration(labelText: 'Genre'),
+              ),
+              SizedBox(height: 10),
+              TextField(
+                controller: trancheAgeController,
+                decoration: InputDecoration(labelText: 'Tranche d\'âge'),
+              ),
+            ],
+          ),
         ),
       ),
       actions: [
         ElevatedButton(
           onPressed: () {
-            final newClient = Client(
-              password: "fdsf",
-              username: "dsfsd",
+            final newClient = MesClients(
               nom: nomController.text,
               prenom: prenomController.text,
               telephone: telephoneController.text,
@@ -265,16 +212,17 @@ class _AddClientFormState extends State<AddClientForm> {
               genre: genreController.text,
               trancheAge: trancheAgeController.text,
             );
-            // Ajoutez le client à la liste
-            widget.addClient(newClient);
-            Navigator.of(context).pop();
+            // Ajouter le client
+            setState(() {
+              c.creerMesClients(newClient, c.tailleurs.first.token!);
+              Navigator.of(context).pop();
+            });
           },
           child: Text('Ajouter Client'),
         ),
         TextButton(
           onPressed: () {
-            // Fermez le formulaire d'ajout de client sans ajouter le client
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(); // Fermer le dialogue
           },
           child: Text('Annuler'),
         ),

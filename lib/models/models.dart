@@ -3,12 +3,12 @@ import 'package:fashion2/models/image_model.dart';
 
 class Models {
   String? token;
-  String nom;
+  String? nom;
   String? description;
   String prix;
   List<Images>? images;
   Models(
-      {required this.nom,
+      {this.nom,
       this.token,
       this.description,
       required this.prix,

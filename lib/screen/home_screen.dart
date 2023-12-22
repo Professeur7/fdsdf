@@ -1,13 +1,16 @@
+
+import 'package:fashion2/firestore.dart';
 import 'package:fashion2/page/client.dart';
 import 'package:fashion2/page/commande.dart';
 import 'package:fashion2/page/dashboard.dart';
 import 'package:fashion2/page/pageMesure.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../page/todoListPage.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key});
+  HomeScreen({Key? key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -22,9 +25,15 @@ class _HomeScreenState extends State<HomeScreen> {
     ToDoListPage(),
   ];
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseManagement.isnotIn = true.obs;
+  }
+
   final PageStorageBucket bucket = PageStorageBucket();
   Widget currentScreen = Dashboard();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

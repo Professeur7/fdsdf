@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/client.dart';
+import 'package:fashion2/models/habit.dart';
+import 'package:fashion2/models/mesClients.dart';
 import 'package:fashion2/models/models.dart';
 import 'package:fashion2/models/tailleurs.dart';
 
@@ -18,14 +20,18 @@ class Mesures {
   String? tourPoignet;
   String? hauteurTotale;
   String? tourCou;
-  Tailleurs? tailleurs;
-  Models? models;
-  Client? client;
+  List<Models> models;
+  List<MesClients> client;
+  List<Habit> habit;
+  String? avance;
+  String? reste;
 
   Mesures(
-      {this.tailleurs,
-      this.client,
-      this.models,
+      {required this.client,
+      required this.models,
+      required this.habit,
+      this.avance,
+      this.reste,
       this.tourPoitrine,
       this.tourTaille,
       this.tourDos,
@@ -43,49 +49,49 @@ class Mesures {
   factory Mesures.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final dataClient = file!["Client"];
-    final dataTailleur = file["Tailleur"];
     final dataModels = file["Models"];
+    final dataHabit = file["Habit"];
 
-    Tailleurs tailleurs;
-    if (dataTailleur != null) {
-      tailleurs =
-          dataTailleur.map((element) => Tailleurs.fromSnapshot(element));
+    List<Habit> habit;
+    if (dataHabit != null) {
+      habit = dataHabit.map((element) => Habit.fromSnapshot(element));
     } else {
-      tailleurs = [] as Tailleurs;
+      habit = [];
     }
 
-    Client client;
+    List<MesClients> client;
     if (dataClient != null) {
-      client = dataClient.map((element) => Client.fromSnapshot(element));
+      client = dataClient.map((element) => MesClients.fromSnapshot(element));
     } else {
-      client = [] as Client;
+      client = [];
     }
 
-    Models models;
+    List<Models> models;
     if (dataModels != null) {
       models = dataModels.map((element) => Models.fromSnapshot(element));
     } else {
-      models = [] as Models;
+      models = [];
     }
 
     return Mesures(
       token: data.id,
       client: client,
-      tailleurs: tailleurs,
+      habit: habit,
       models: models,
-      tourPoitrine: file['poitrine'],
-      tourTaille: file['taille'],
-      tourDos: file['dos'],
-      tourHanche: file['hanche'],
-      longueurManches: file['manche'],
-      largeursEpaules: file['epaule'],
-      longueurJambes: file['jambe'],
-      hauteurEntrejambe: file['entreJambe'],
-      longueurOurlet: file['ourlet'],
-      tourBras: file['bras'],
-      tourPoignet: file['poignet'],
-      hauteurTotale: file['totale'],
-      tourCou: file['cou'],
+      tourBras: file["tourBras"],
+      tourDos: file["tourDos"],
+      tourCou: file["tourCou"],
+      tourHanche: file["tourHanche"],
+      tourPoignet: file["tourPoignet"],
+      tourPoitrine: file["tourPoignet"],
+      tourTaille: file["tourTaille"],
+      longueurJambes: file["longueurJambes"],
+      longueurManches: file["longueurManches"],
+      longueurOurlet: file["longueurOurlet"],
+      largeursEpaules: file["largeursEpaules"],
+      hauteurTotale: file["hauteurTotale"],
+      reste: file["reste"],
+      avance: file["avance"],
     );
   }
 }

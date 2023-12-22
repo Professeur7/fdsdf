@@ -1,44 +1,32 @@
-import 'package:fashion2/models/tailleurs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fashion2/models/client.dart';
 
 class RDV {
   String? token;
-  String? motif;
-  DateTime dateRDV;
-  Client client;
-  Tailleurs tailleurs;
-  RDV(
-      {required this.dateRDV,
-      this.motif,
-      required this.client,
-      required this.tailleurs,
-      token});
+  String? motif; // Ajout de la variable pour le nom du client
+  DateTime
+      date; // Changement de dateRDV en date, car vous utilisez déjà ce nom dans le constructeur
+  String client;
+  String? client_image;
+
+  RDV({
+    this.client_image,
+    required this.date,
+    this.token,
+    required this.client,
+    this.motif,
+  });
+
   factory RDV.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
-    final dataClient = file!["Client"];
-    final dataTailleur = file["Tailleur"];
-
-    Client client;
-    if (dataClient != null) {
-      client = dataClient.map((element) => Client.fromSnapshot(element));
-    } else {
-      client = [] as Client;
-    }
-
-    Tailleurs tailleurs;
-    if (dataTailleur != null) {
-      tailleurs =
-          dataTailleur.map((element) => Tailleurs.fromSnapshot(element));
-    } else {
-      tailleurs = [] as Tailleurs;
-    }
 
     return RDV(
+      client_image: file!['client_image'],
       token: data.id,
-      dateRDV: file["dateRDV"],
-      client: client,
-      tailleurs: tailleurs,
+      client: file['client_name'],
+      motif: file[
+          "motif"], // Assurez-vous que le champ dans Firestore est nommé correctement
+      date: file["dateRDV"]
+          .toDate(), // Utilisation de toDate() pour convertir en DateTime
     );
   }
 }

@@ -66,8 +66,22 @@ class _ProfileAtelierPageState extends State<ProfileAtelierPage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                'Description : ${_management.atelier.length != 0 ? _management.atelier.first.slogan : ""}',
-                style: TextStyle(fontSize: 16),
+                'Responsable : ${_management.tailleurs.length != 0 ? _management.tailleurs.first.username : ""}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Lieu : ${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Slogan : ${_management.atelier.length != 0 ? _management.atelier.first.slogan : ""}',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             // Ajoutez d'autres informations sur l'atelier de couture ici

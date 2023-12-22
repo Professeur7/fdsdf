@@ -1,6 +1,11 @@
+import 'package:fashion2/firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 
 class ProfilePage extends StatelessWidget {
+  String profileImage = 'assets/default_profile_image.png';
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   final String name;
   final String location;
   final double? rating;
@@ -27,29 +32,31 @@ class ProfilePage extends StatelessWidget {
             Stack(
               alignment: Alignment.center,
               children: [
-                Container(
-                  height: 150,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    image: DecorationImage(
-                      image: NetworkImage(imageUrl),
-                      fit: BoxFit.cover,
-                    ),
+                Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      // Gérer la mise à jour de la photo de profil ici
+                    },
+                    child: _management.tailleurs.length == 0
+                        ? Container(
+                            child: Image.asset(profileImage),
+                          )
+                        : CircleAvatar(
+                            radius: 50,
+                            backgroundImage: NetworkImage(
+                                _management.atelier.first.imageUrl),
+                          ),
                   ),
-                ),
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: NetworkImage("https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png"),
                 ),
               ],
             ),
             SizedBox(height: 20),
             Text(
-              name,
+              '${_management.atelier.length != 0 ? _management.atelier.first.nom : ""}',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             Text(
-              location,
+              '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
             SizedBox(height: 20),

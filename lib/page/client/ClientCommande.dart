@@ -35,11 +35,6 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Liste de mes commandes",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 20),
             Expanded(
               child: ListView.builder(
                 itemCount: 5, // Remplacez par le nombre réel de commandes du client

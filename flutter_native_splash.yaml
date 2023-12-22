@@ -1,8 +1,8 @@
-flutter_native_splash:
-  image: "assets/images/Fashion.png"
-  color: "#09126C"  # Remplacez 0xFF par #
-  fill: true
-  android: true
-  ios: true
-  click: true
-  fullscreen: true
+# flutter_native_splash:
+#   image: "assets/images/Fashion.png"
+#   color: "#09126C"  # Remplacez 0xFF par #
+#   fill: true
+#   android: true
+#   ios: true
+#   click: true
+#   fullscreen: true

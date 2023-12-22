@@ -1,5 +1,6 @@
 import 'package:dart_extensions/dart_extensions.dart';
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/page/client/pageCommentaire.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
 import 'package:fashion2/screen/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class Publications extends StatefulWidget {
 
 class _PublicationsState extends State<Publications>
     with TickerProviderStateMixin {
+  //FirebaseManagement _management = Get.put(FirebaseManagement());
   TabController? _tabController;
   bool isAddedToCart =
       false; // Exemple de variable pour savoir si l'article est ajouté au panier
@@ -32,7 +34,9 @@ class _PublicationsState extends State<Publications>
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     c.getPublication(c.tailleurs.first.token!);
-    if (c.tailleurs.first.postes == null) {
+    c.getVideoPublication(c.tailleurs.first.token!);
+    print("it is");
+    if (c.tailleurs.first.postes == []) {
     } else {
       for (final i in c.tailleurs.first.postes!) {
         for (final c in i.images!) {
@@ -43,10 +47,24 @@ class _PublicationsState extends State<Publications>
         comment.add(i.description);
       }
     }
+    if (c.tailleurs.first.posteVideos == []) {
+    } else {
+      for (final i in c.tailleurs.first.posteVideos!) {
+        for (final c in i.videos!) {
+          imageLinksvideo.add(c.video);
+        }
+      }
+      for (final i in c.tailleurs.first.posteVideos!) {
+        comment.add(i.description);
+      }
+    }
   }
 
   List<String> imageLinks = [];
   List<String> comment = [];
+
+  List<String> imageLinksvideo = [];
+  List<String> commentvideo = [];
 
   final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
@@ -87,6 +105,13 @@ class _PublicationsState extends State<Publications>
             Tab(text: "Photos"),
             Tab(text: "Vidéos"),
           ],
+          indicator: ShapeDecoration(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                  25), // Ajustez le rayon selon votre besoin
+            ),
+            color: Colors.blue, // Couleur de l'indicateur
+          ),
         ),
       ),
       body: TabBarView(
@@ -99,18 +124,8 @@ class _PublicationsState extends State<Publications>
           ),
           PublicationList(
             type: "Vidéos",
-            photos: [
-              "https://www.facebook.com/watch/?v=368740601302632.mp4",
-              "https://www.facebook.com/watch/?v=368740601302632.mp4",
-              "https://www.facebook.com/watch/?v=368740601302632.mp4",
-              // Ajoutez d'autres URLs de vidéos ici
-            ],
-            comments: [
-              "Contenu de la vidéo 1...",
-              "Contenu de la vidéo 2...",
-              "Contenu de la vidéo 3...",
-              // Ajoutez d'autres commentaires ici
-            ],
+            photos: imageLinksvideo,
+            comments: commentvideo,
           ),
         ],
       ),
@@ -133,6 +148,7 @@ class FavoritesPage extends StatelessWidget {
 }
 
 class PublicationList extends StatelessWidget {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   final String type;
   final List<String> photos;
   final List<String> comments;
@@ -149,9 +165,11 @@ class PublicationList extends StatelessWidget {
           photoUrl: photos[index],
           comment: comments[index],
           type: type,
-          workshopName: 'Naf Couture',
+          workshopName:
+              '${_management.atelier.length != 0 ? _management.atelier.first.nom : ""}',
           workshopProfile: '',
-          workshopLocation: 'Garantibougou',
+          workshopLocation:
+              '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
         );
       },
     );
@@ -180,6 +198,7 @@ class PublicationTile extends StatefulWidget {
 }
 
 class _PublicationTileState extends State<PublicationTile> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   late VideoPlayerController _controller;
   bool _isVideoPlaying = false;
   bool isAddedToCart =
@@ -189,11 +208,16 @@ class _PublicationTileState extends State<PublicationTile> {
       false; // Exemple de variable pour savoir si l'article n'est pas aimé
   bool isFavorite =
       false; // Exemple de variable pour savoir si l'article est favori
+  int likeCount = 0;
+  int dislikeCount = 0;
+  int cartCount = 0;
+  int favoriteCount = 0;
 
   @override
   void initState() {
     super.initState();
     if (widget.photoUrl.endsWith('.mp4')) {
+      // ignore: deprecated_member_use
       _controller = VideoPlayerController.network(widget.photoUrl)
         ..initialize().then((_) {
           setState(() {});
@@ -222,9 +246,6 @@ class _PublicationTileState extends State<PublicationTile> {
               children: [
                 InkWell(
                   onTap: () {
-                    var location = "Garantibougou";
-                    var imageUrl =
-                        "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -233,17 +254,52 @@ class _PublicationTileState extends State<PublicationTile> {
                                     .settings
                                     .arguments
                                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
-                                location: location = "",
-                                imageUrl: imageUrl,
+                                location:
+                                    '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
+                                imageUrl: _management.atelier.first.imageUrl,
                               )),
                     );
-                    // Votre logique de navigation pour le profil de l'atelier ici
+                    // Naviguer vers la nouvelle page de profil ici
+                    // Vous devez définir votre propre logique de navigation
+                    // Par exemple, vous pouvez utiliser Navigator pour naviguer vers la nouvelle page.
                   },
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: NetworkImage(widget.workshopProfile),
+                  child: Container(
+                    height: 40,
+                    width: 40,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(15),
+                      color: Colors.white,
+                    ),
+                    child: _management.atelier.length == 0
+                        ? Container()
+                        : FittedBox(
+                            fit: BoxFit.cover,
+                            child: Image.network(
+                              _management.atelier.first.imageUrl,
+                            ),
+                          ),
                   ),
                 ),
+                // InkWell(
+                //   onTap: () {
+                //     var location = "Garantibougou";
+                //     var imageUrl =
+                //         "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
+                //     Navigator.push(
+                //       context,
+                //       MaterialPageRoute(
+                //           builder: (context) => ProfilePage(
+                //                 name: ModalRoute.of(context)!
+                //                     .settings
+                //                     .arguments
+                //                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
+                //                 location: location = "",
+                //                 imageUrl: imageUrl,
+                //               )),
+                //     );
+                //     // Votre logique de navigation pour le profil de l'atelier ici
+                //   },
+                // ),
                 SizedBox(width: 14.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,72 +362,85 @@ class _PublicationTileState extends State<PublicationTile> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.add_shopping_cart,
-                    color: isAddedToCart
-                        ? Colors.green
-                        : null, // Couleur verte si ajouté au panier
-                  ),
-                  onPressed: () {
-                    // Logique pour ajouter dans le panier
-                    setState(() {
-                      isAddedToCart =
-                          !isAddedToCart; // Inverse l'état lorsque l'icône est pressée
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.add_shopping_cart,
+                        color: cartCount > 0 ? Colors.green : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          cartCount += isAddedToCart ? -1 : 1;
+                          isAddedToCart = !isAddedToCart;
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$cartCount'),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.favorite,
-                    color: isFavorite
-                        ? Colors.red
-                        : null, // Couleur rouge si favori
-                  ),
-                  onPressed: () {
-                    // Logique pour ajouter aux favoris
-                    setState(() {
-                      isFavorite =
-                          !isFavorite; // Inverse l'état lorsque l'icône est pressée
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.favorite,
+                        color: favoriteCount > 0 ? Colors.red : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          favoriteCount += isFavorite ? -1 : 1;
+                          isFavorite = !isFavorite;
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$favoriteCount'),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.thumb_up,
-                    color:
-                        isLiked ? Colors.blue : null, // Couleur bleue si aimé
-                  ),
-                  onPressed: () {
-                    // Logique pour aimer
-                    setState(() {
-                      isLiked =
-                          !isLiked; // Inverse l'état lorsque l'icône est pressée
-                      if (isDisliked) {
-                        isDisliked =
-                            false; // Si "Je n'aime pas" est sélectionné, décocher
-                      }
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: likeCount > 0 ? Colors.blue : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          likeCount += isLiked ? -1 : 1;
+                          isLiked = !isLiked;
+                          if (isDisliked) {
+                            isDisliked = false;
+                            dislikeCount--;
+                          }
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$likeCount'),
+                  ],
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.thumb_down,
-                    color: isDisliked
-                        ? Colors.orange
-                        : null, // Couleur orange si "Je n'aime pas"
-                  ),
-                  onPressed: () {
-                    // Logique pour ne pas aimer
-                    setState(() {
-                      isDisliked =
-                          !isDisliked; // Inverse l'état lorsque l'icône est pressée
-                      if (isLiked) {
-                        isLiked =
-                            false; // Si "J'aime" est sélectionné, décocher
-                      }
-                    });
-                  },
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.thumb_down,
+                        color: dislikeCount > 0 ? Colors.orange : null,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          dislikeCount += isDisliked ? -1 : 1;
+                          isDisliked = !isDisliked;
+                          if (isLiked) {
+                            isLiked = false;
+                            likeCount--;
+                          }
+                        });
+                      },
+                    ),
+                    SizedBox(width: 4),
+                    Text('$dislikeCount'),
+                  ],
                 ),
               ],
             ),
@@ -384,6 +453,12 @@ class _PublicationTileState extends State<PublicationTile> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CommentPage(),
+                        ),
+                      );
                       // Ajoutez ici la logique pour laisser un commentaire
                     },
                     child: Text("Laisser un commentaire"),

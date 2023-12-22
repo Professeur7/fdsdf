@@ -4,8 +4,10 @@ import 'package:fashion2/models/image_model.dart';
 class Poste {
   String? token;
   String description;
+  DateTime date;
   List<Images>? images;
-  Poste({required this.description, this.images, this.token});
+  Poste(
+      {required this.description, this.images, this.token, required this.date});
   factory Poste.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final listImageData = file!['Images'];
@@ -17,6 +19,9 @@ class Poste {
       listImage = [];
     }
     return Poste(
-        token: data.id, description: file['description'], images: listImage);
+        date: file['date'],
+        token: data.id,
+        description: file['description'],
+        images: listImage);
   }
 }
