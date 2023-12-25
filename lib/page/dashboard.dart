@@ -9,8 +9,6 @@ import 'package:fashion2/page/profileAtelierPage.dart';
 import 'package:fashion2/page/search.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
-import 'client/pagePublication.dart';
 import 'gridview/pageModels.dart';
 import 'gridview/pageRDV.dart';
 import 'gridview/pageStock.dart';
@@ -119,10 +117,6 @@ class _DashboardState extends State<Dashboard> {
                           child: Container(
                             height: 40,
                             width: 40,
-                            child: _management.clients.length == 0
-                                ? Container()
-                                : Image.network(
-                                    _management.clients.first.imageURL),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(15),
                               color: Colors.white,

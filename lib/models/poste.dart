@@ -19,7 +19,7 @@ class Poste {
       listImage = [];
     }
     return Poste(
-        date: file['date'],
+        date: file['date'].toDate(),
         token: data.id,
         description: file['description'],
         images: listImage);

@@ -1,12 +1,13 @@
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fashion2/models/image_model.dart';
 import 'package:fashion2/models/models.dart';
 
 class Client {
   String? token;
   String username;
-  String? imageURL;
+  Images? profil;
   String? nom;
   String? prenom;
   String? telephone;
@@ -14,6 +15,7 @@ class Client {
   String genre;
   String? trancheAge;
   String password;
+  var imageURL;
   List<Models>? model;
 
   Client(
@@ -27,12 +29,24 @@ class Client {
       required this.genre,
       this.telephone,
       this.token,
+      this.profil,
       this.imageURL // Utilisez "this.token" pour initialiser la propriété
       });
 
   factory Client.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final modelData = file!["Model"];
+    final imageProfil = file["Profil"];
+
+    Images? profil; // Déclarez logo comme une variable Images nullable
+
+    if (imageProfil != null) {
+      // Si imageLogo n'est pas null, créez une instance d'Images à partir des données
+      profil = Images.fromSnapshot(imageProfil);
+    } else {
+      profil = null; // Si imageLogo est null, affectez null à logo
+    }
+
     List<Models> listModel;
     if (modelData != null) {
       listModel = List<Models>.from(
@@ -42,7 +56,8 @@ class Client {
     }
 
     return Client(
-      imageURL: file['image'],
+      imageURL: file["image"],
+      profil: profil,
       password: file['password'] ?? "",
       username: file['username'] ?? "",
       model: listModel,

@@ -18,8 +18,9 @@ class PosteVideo {
     } else {
       listImage = [];
     }
+
     return PosteVideo(
-        date: file['date'],
+        date: file['date'].toDate(),
         token: data.id,
         description: file['description'],
         videos: listImage);

@@ -1,4 +1,3 @@
-import 'package:dart_extensions/dart_extensions.dart';
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/page/client/pageCommentaire.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
@@ -8,16 +7,14 @@ import 'package:get/get.dart';
 
 import 'package:video_player/video_player.dart';
 
-import '../../screen/clientHomeScreen.dart';
-import '../profileAtelierPage.dart';
 import 'ProfilePublication.dart';
 
-class Publications extends StatefulWidget {
+class PublicationsClient extends StatefulWidget {
   @override
-  _PublicationsState createState() => _PublicationsState();
+  _PublicationsClientState createState() => _PublicationsClientState();
 }
 
-class _PublicationsState extends State<Publications>
+class _PublicationsClientState extends State<PublicationsClient>
     with TickerProviderStateMixin {
   //FirebaseManagement _management = Get.put(FirebaseManagement());
   TabController? _tabController;
@@ -33,35 +30,49 @@ class _PublicationsState extends State<Publications>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    //c.getPublication(c.tailleurs.first.token!);
-    //c.getVideoPublication(c.tailleurs.first.token!);
-    print("it is");
-    if (c.tailleurs.first.postes == []) {
+    if (c.allPoste == []) {
     } else {
-      for (final i in c.tailleurs.first.postes!) {
-        for (final c in i.images!) {
+      for (final i in c.allPoste) {
+        atelierLieux.add(i.lieux);
+        atelierLogo.add(i.photAtelier);
+        atelierName.add(i.atelierNAme);
+        for (final c in i.pub.first.images!) {
           imageLinks.add(c.image);
         }
       }
-      for (final i in c.tailleurs.first.postes!) {
-        comment.add(i.description);
+      if (c.allPoste.isNotEmpty) {
+        for (final i in c.allPoste.first.pub) {
+          comment.add(i.description);
+        }
       }
     }
-    if (c.tailleurs.first.posteVideos == []) {
+    if (c.allVideoPostes == []) {
     } else {
-      for (final i in c.tailleurs.first.posteVideos!) {
-        for (final c in i.videos!) {
+      for (final i in c.allVideoPostes) {
+        atelierLieuxVideo.add(i.lieux);
+        atelierLogoVideo.add(i.photAtelier);
+        atelierNameVideo.add(i.atelierNAme);
+        for (final c in i.pub.first.videos!) {
           imageLinksvideo.add(c.video);
         }
       }
-      for (final i in c.tailleurs.first.posteVideos!) {
-        commentvideo.add(i.description);
+      if (c.allVideoPostes.isNotEmpty) {
+        for (final i in c.allVideoPostes.first.pub) {
+          commentvideo.add(i.description);
+        }
       }
     }
   }
 
   List<String> imageLinks = [];
   List<String> comment = [];
+  List<String> atelierName = [];
+  List<String> atelierLieux = [];
+  List<String> atelierLogo = [];
+
+  List<String> atelierNameVideo = [];
+  List<String> atelierLieuxVideo = [];
+  List<String> atelierLogoVideo = [];
 
   List<String> imageLinksvideo = [];
   List<String> commentvideo = [];
@@ -122,8 +133,14 @@ class _PublicationsState extends State<Publications>
             type: "Photos",
             photos: imageLinks,
             comments: comment,
+            atelierLieux: atelierLieux,
+            atelierLogo: atelierLogo,
+            atelierName: atelierName,
           ),
           PublicationListVideo(
+            atelierLieux: atelierLieuxVideo,
+            atelierLogo: atelierLogoVideo,
+            atelierName: atelierNameVideo,
             type: "Vidéos",
             photos: imageLinksvideo,
             comments: commentvideo,
@@ -153,9 +170,17 @@ class PublicationList extends StatelessWidget {
   final String type;
   final List<String> photos;
   final List<String> comments;
+  List<String> atelierName;
+  List<String> atelierLieux;
+  List<String> atelierLogo;
 
   PublicationList(
-      {required this.type, required this.photos, required this.comments});
+      {required this.type,
+      required this.atelierLieux,
+      required this.atelierName,
+      required this.atelierLogo,
+      required this.photos,
+      required this.comments});
 
   @override
   Widget build(BuildContext context) {
@@ -165,12 +190,10 @@ class PublicationList extends StatelessWidget {
         return PublicationTile(
           photoUrl: photos[index],
           comment: comments[index],
+          workshopProfile: atelierLogo[index],
           type: type,
-          workshopName:
-              '${_management.atelier.length != 0 ? _management.atelier.first.nom : ""}',
-          workshopProfile: '',
-          workshopLocation:
-              '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
+          workshopName: atelierName[index],
+          workshopLocation: atelierLieux[index],
         );
       },
     );
@@ -182,9 +205,17 @@ class PublicationListVideo extends StatelessWidget {
   final String type;
   final List<String> photos;
   final List<String> comments;
+  List<String> atelierName;
+  List<String> atelierLieux;
+  List<String> atelierLogo;
 
   PublicationListVideo(
-      {required this.type, required this.photos, required this.comments});
+      {required this.type,
+      required this.atelierLieux,
+      required this.atelierName,
+      required this.atelierLogo,
+      required this.photos,
+      required this.comments});
 
   @override
   Widget build(BuildContext context) {
@@ -195,11 +226,9 @@ class PublicationListVideo extends StatelessWidget {
           photoUrl: photos[index],
           comment: comments[index],
           type: type,
-          workshopName:
-              '${_management.atelier.length != 0 ? _management.atelier.first.nom : ""}',
-          workshopProfile: '',
-          workshopLocation:
-              '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
+          workshopName: atelierName[index],
+          workshopProfile: atelierLogo[index],
+          workshopLocation: atelierLieux[index],
         );
       },
     );

@@ -45,7 +45,7 @@ class Mesures {
       this.tourPoignet,
       this.hauteurTotale,
       this.tourCou,
-      token});
+      this.token});
   factory Mesures.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final dataClient = file!["Client"];

@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:fashion2/firestore.dart';
 import 'package:fashion2/screen/clientHomeScreen.dart';
 import 'package:fashion2/screen/introductionScreen.dart';
 import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fashion2/models/models.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../models/client.dart';
@@ -29,7 +31,8 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
 
   File? selectedImage;
   FirebaseStorage storage = FirebaseStorage.instance;
-  String? imageUrl;
+  String? imageURL;
+  FirebaseManagement _management = Get.put(FirebaseManagement());
 
   Future<String?> uploadImage(File imageFile, String fileName) async {
     try {
@@ -38,9 +41,9 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
 
       TaskSnapshot taskSnapshot = await uploadTask;
 
-      String imageUrl = await taskSnapshot.ref.getDownloadURL();
+      String imageURL = await taskSnapshot.ref.getDownloadURL();
 
-      return imageUrl;
+      return imageURL;
     } catch (e) {
       print('Erreur lors du chargement de l\'image : $e');
       return null;
@@ -50,7 +53,7 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
   Future<void> pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
-    imageUrl = await uploadImage(File(pickedFile!.path), pickedFile.name);
+    imageURL = await uploadImage(File(pickedFile!.path), pickedFile.name);
     if (pickedFile != null) {
       setState(() {
         selectedImage = File(pickedFile.path);
@@ -262,14 +265,14 @@ class _ClientRegistrationPageState extends State<ClientRegistrationPage> {
                       trancheAge: _trancheAgeController.text,
                       telephone: _telephoneController.text,
                       password: _passwordController.text,
+                      imageURL: imageURL != null ? imageURL : "",
                     );
 
-                    // Enregistrez le client dans la base de données
-                    // (vous devrez implémenter cette logique en fonction de votre base de données)
-                    // Par exemple : client.saveToFirestore();
-
-                    // Affichez un message de succès ou redirigez l'utilisateur vers une autre page
-                    // après l'inscription réussie.
+                    _management.updateClientInformation(
+                        client, _management.clients.first.token);
+                    setState(() {
+                      _management.clients.first = client;
+                    });
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(

@@ -1,5 +1,8 @@
 import 'dart:io';
+import 'package:fashion2/firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../screen/clientHomeScreen.dart';
@@ -10,7 +13,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File? _profileImage;
+  FirebaseManagement _management = Get.put(FirebaseManagement());
 
   @override
   Widget build(BuildContext context) {
@@ -56,18 +59,16 @@ class _ProfilePageState extends State<ProfilePage> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         GestureDetector(
-          onTap: _pickProfileImage,
           child: CircleAvatar(
-            radius: 50,
-            // backgroundImage: _profileImage != null
-            //     ? FileImage(_profileImage!)
-            //     : AssetImage('assets/images/woman.png'), // Image par défaut
-          ),
+              radius: 50,
+              backgroundImage: NetworkImage(
+                  _management.clients.first.imageURL) // Image par défaut
+              ),
         ),
         SizedBox(height: 10),
         Center(
           child: Text(
-            'Nom du Client',
+            'Nom: ${_management.clients.first.nom}',
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
@@ -77,7 +78,7 @@ class _ProfilePageState extends State<ProfilePage> {
         SizedBox(height: 5),
         Center(
           child: Text(
-            'Adresse Email du Client',
+            'Email: ${_management.clients.first.email}',
             style: TextStyle(
               fontSize: 16,
             ),
@@ -139,22 +140,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
-  Future<void> _pickProfileImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.gallery);
-
-    if (pickedImage != null) {
-      setState(() {
-        _profileImage = File(pickedImage.path);
-      });
-    }
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: ProfilePage(),
-  ));
 }

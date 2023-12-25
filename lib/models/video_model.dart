@@ -9,6 +9,6 @@ class Video {
   factory Video.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) =>
       Video(
         token: data.id,
-        video: data['image'] as String,
+        video: data['video'] as String,
       );
 }

@@ -12,7 +12,6 @@ class ProfileAtelierPage extends StatefulWidget {
 class _ProfileAtelierPageState extends State<ProfileAtelierPage> {
   String workshopName = 'Mon Atelier de Couture';
   String description = 'Atelier de couture de haute qualité';
-  String profileImage = 'assets/default_profile_image.png';
   FirebaseManagement _management = Get.put(FirebaseManagement());
 
   @override
@@ -45,15 +44,11 @@ class _ProfileAtelierPageState extends State<ProfileAtelierPage> {
                 onTap: () {
                   // Gérer la mise à jour de la photo de profil ici
                 },
-                child: _management.tailleurs.length == 0
-                    ? Container(
-                        child: Image.asset(profileImage),
-                      )
-                    : CircleAvatar(
-                        radius: 50,
-                        backgroundImage:
-                            NetworkImage(_management.atelier.first.imageUrl),
-                      ),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage:
+                      NetworkImage(_management.atelier.first.imageUrl),
+                ),
               ),
             ),
             Padding(

@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dart_extensions/emum.dart';
 import 'package:fashion2/models/ClientModel.dart';
@@ -10,6 +12,7 @@ import 'package:fashion2/models/mesClients.dart';
 import 'package:fashion2/models/models.dart';
 import 'package:fashion2/models/paiement.dart';
 import 'package:fashion2/models/poste.dart';
+import 'package:fashion2/models/posteAtelier.dart';
 import 'package:fashion2/models/postevideo.dart';
 import 'package:fashion2/models/soustaches.dart';
 import 'package:fashion2/models/stock.dart';
@@ -30,6 +33,8 @@ class FirebaseManagement extends GetxController {
   List<Client> clients = <Client>[].obs;
   List<Albums> albums = <Albums>[].obs;
   List<Stock> stock = <Stock>[].obs;
+  List<PostAtelierVideo> allVideoPostes = <PostAtelierVideo>[].obs;
+  List<PostAtelier> allPoste = <PostAtelier>[].obs;
   List<Taches> taches = <Taches>[].obs;
   List<Paiement> paiement = <Paiement>[].obs;
   List<RDV> rdv = <RDV>[].obs;
@@ -94,6 +99,29 @@ class FirebaseManagement extends GetxController {
     }
   }
 
+  updateClientInformation(Client client, clientoken) async {
+    try {
+      await _db.collection("Clients").doc(clientoken).update({
+        "image": client.imageURL,
+        "nom": client.nom,
+        "prenom": client.prenom,
+        "username": client.username,
+        "email": client.email,
+        "gender": client.genre,
+        "password": client.password,
+        "telephone": client.telephone,
+      }).then((value) async {
+        await auth.value.currentUser!.updateEmail(client.email);
+        auth.value.currentUser!.updatePassword(client.password);
+        final Clien = await _db.collection("Clients").doc(client.token).get();
+        clients = [Client.fromSnapshot(await Clien)];
+      });
+      print("updateClientInformation finish");
+    } catch (e) {
+      print(e);
+    }
+  }
+
   getTailleur(Tailleurs tailleur) async {
     final all = await _db
         .collection("tailleurs")
@@ -122,10 +150,11 @@ class FirebaseManagement extends GetxController {
     tailleur.stock = await getStock(tailleur.token!);
     tailleur.albums = albums;
     tailleur.postes = await getPublication(tailleur.token!);
-    posteVideos = await getVideoPublication(tailleur.token!);
+    tailleur.posteVideos = await getVideoPublication(tailleur.token!);
     tailleurs.isEmpty
         ? tailleurs.add(tailleur)
         : {tailleurs.clear(), tailleurs.add(tailleur)};
+    getAllTailleurs();
   }
 
   getClient(Client c) async {
@@ -143,6 +172,26 @@ class FirebaseManagement extends GetxController {
     final tailleurs = all.docs.map((e) => Tailleurs.fromSnapshot(e)).toList();
     print(tailleurs);
     print(tailleurs.first.token);
+    try {
+      for (final i in tailleurs) {
+        final listPost = await getPublication(i.token!);
+        final listPostVideo = await getVideoPublication(i.token!);
+        i.atelier = await getAtelier(i.token!);
+        allPoste.add(PostAtelier(
+            atelierNAme: i.atelier!.first.nom,
+            lieux: i.atelier!.first.lieu,
+            photAtelier: i.atelier!.first.imageUrl,
+            pub: listPost));
+        allVideoPostes.add(PostAtelierVideo(
+            atelierNAme: i.atelier!.first.nom,
+            lieux: i.atelier!.first.lieu,
+            photAtelier: i.atelier!.first.imageUrl,
+            pub: listPostVideo));
+      }
+    } catch (e) {
+      print("this the post error $e");
+    }
+
     return tailleurs;
   }
 
@@ -286,6 +335,7 @@ class FirebaseManagement extends GetxController {
       p.images = img;
     }
     Postes = posteList;
+    print("end publication");
     // tailleurs.first.postes = posteList;
     return posteList;
   }

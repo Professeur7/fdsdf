@@ -1,3 +1,4 @@
+import 'package:fashion2/page/client/clienViewPubPage.dart';
 import 'package:flutter/material.dart';
 import 'package:fashion2/page/client.dart';
 import 'package:fashion2/page/dashboard.dart';
@@ -21,7 +22,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
   int currentTab = 0;
   final List<Widget> screens = [
     HomePageClient(),
-    Publications(), // Remplacez par votre widget de publications
+    PublicationsClient(), // Remplacez par votre widget de publications
     ClientOrderPage(),
     ProfilePage(),
   ];
@@ -43,7 +44,8 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => PanierPage(), // Remplacez par votre page de panier
+              builder: (context) =>
+                  PanierPage(), // Remplacez par votre page de panier
             ),
           );
         },
@@ -71,12 +73,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     children: [
                       Icon(
                         Icons.dashboard,
-                        color: currentTab == 0 ? const Color(0xFF3b5999) : Colors.grey,
+                        color: currentTab == 0
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
                       ),
                       Text(
                         'Accueil',
                         style: TextStyle(
-                          color: currentTab == 0 ? const Color(0xFF3b5999) : Colors.grey,
+                          color: currentTab == 0
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
                       ),
                     ],
@@ -88,7 +94,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   minWidth: 30,
                   onPressed: () {
                     setState(() {
-                      currentScreen = Publications();
+                      currentScreen = PublicationsClient();
                       currentTab = 1;
                     });
                   },
@@ -97,12 +103,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     children: [
                       Icon(
                         Icons.public,
-                        color: currentTab == 1 ? const Color(0xFF3b5999) : Colors.grey,
+                        color: currentTab == 1
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
                       ),
                       Text(
                         '   Post  ',
                         style: TextStyle(
-                          color: currentTab == 1 ? const Color(0xFF3b5999) : Colors.grey,
+                          color: currentTab == 1
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
                       ),
                     ],
@@ -123,12 +133,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     children: [
                       Icon(
                         Icons.shopping_cart,
-                        color: currentTab == 2 ? const Color(0xFF3b5999) : Colors.grey,
+                        color: currentTab == 2
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
                       ),
                       Text(
                         'Commande',
                         style: TextStyle(
-                          color: currentTab == 2 ? const Color(0xFF3b5999) : Colors.grey,
+                          color: currentTab == 2
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
                       ),
                     ],
@@ -149,12 +163,16 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                     children: [
                       Icon(
                         Icons.account_box_rounded,
-                        color: currentTab == 3 ? const Color(0xFF3b5999) : Colors.grey,
+                        color: currentTab == 3
+                            ? const Color(0xFF3b5999)
+                            : Colors.grey,
                       ),
                       Text(
                         'Profil',
                         style: TextStyle(
-                          color: currentTab == 3 ? const Color(0xFF3b5999) : Colors.grey,
+                          color: currentTab == 3
+                              ? const Color(0xFF3b5999)
+                              : Colors.grey,
                         ),
                       ),
                     ],
