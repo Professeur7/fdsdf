@@ -20,26 +20,26 @@ class Paiement {
     final dataHabit = file!["Habit"];
     final dataClient = file["Client"];
 
-    Habit habit;
+    List<Habit> habit;
     if (dataHabit != null) {
       habit = dataHabit.map((element) => Habit.fromSnapshot(element));
     } else {
-      habit = [] as Habit;
+      habit = [];
     }
 
-    MesClients client;
+    List<MesClients> client;
     if (dataClient != null) {
       client = dataClient.map((element) => MesClients.fromSnapshot(element));
     } else {
-      client = [] as MesClients;
+      client = [];
     }
 
     return Paiement(
       token: data.id,
-      client: [client],
-      habit: [habit],
-      montantPaye: file["Montant"],
-      datePaiement: file["Date paiement"],
+      client: client,
+      habit: habit,
+      montantPaye: file["montantPaye"],
+      datePaiement: file["datePaiement"].toDate(),
     );
   }
 }

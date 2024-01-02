@@ -52,13 +52,17 @@ class _PublicationsClientState extends State<PublicationsClient>
         atelierLieuxVideo.add(i.lieux);
         atelierLogoVideo.add(i.photAtelier);
         atelierNameVideo.add(i.atelierNAme);
-        for (final c in i.pub.first.videos!) {
-          imageLinksvideo.add(c.video);
+        if (i.pub.isNotEmpty) {
+          for (final c in i.pub.first.videos!) {
+            imageLinksvideo.add(c.video);
+          }
         }
       }
       if (c.allVideoPostes.isNotEmpty) {
-        for (final i in c.allVideoPostes.first.pub) {
-          commentvideo.add(i.description);
+        if (c.allVideoPostes.isNotEmpty) {
+          for (final i in c.allVideoPostes.first.pub) {
+            commentvideo.add(i.description);
+          }
         }
       }
     }

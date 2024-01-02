@@ -11,7 +11,8 @@ class Habit {
 
     return Habit(
       token: data.id,
-      image: file!["image"],
+      descriptionHabit: file!["description"],
+      image: file["image"],
     );
   }
 }

@@ -461,7 +461,7 @@ class FirebaseManagement extends GetxController {
   PaiementManage(Paiement p, String t) async {
     final ref =
         await _db.collection("tailleurs").doc(t).collection("Paiement").add({
-      "montantPaye": p.datePaiement,
+      "montantPaye": p.montantPaye,
       "datePaiement": p.datePaiement,
     });
     await _db
@@ -526,6 +526,7 @@ class FirebaseManagement extends GetxController {
       "dateRDV": desc.date,
       "client_image": desc.client_image ?? ""
     });
+
     rdv.add(desc);
     tailleurs.first.rdv = rdv;
   }
@@ -703,8 +704,8 @@ class FirebaseManagement extends GetxController {
       "description": soustache.description,
       "valide": soustache.valide,
       'date': soustache.date,
-      "Debut": soustache.debut.toString(),
-      "Fin": soustache.fin.toString()
+      "Debut": soustache.debut,
+      "Fin": soustache.fin
     });
     for (final i in taches) {
       if (i.token == tacheToken) {

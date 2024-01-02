@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:fashion2/models/habit.dart';
+import 'package:fashion2/models/mesClients.dart';
 import 'package:fashion2/models/paiement.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -27,10 +30,12 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
   TextEditingController clientNumController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   List<Paiement> invoices = []; // Mettre à jour le type de liste
-
+  List<MesClients> items = [];
   String? clientName;
+  late MesClients clients;
   String? invoiceAmount;
   DateTime? invoiceDate;
+  String? selectedValue;
 
   FirebaseStorage storage = FirebaseStorage.instance;
   FirebaseManagement _management = Get.put(FirebaseManagement());
@@ -57,6 +62,8 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    print("object");
+    items = _management.mesClients;
     invoices = _management.tailleurs.first.paiement!;
   }
 
@@ -104,42 +111,131 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
           child: Form(
             key: _formKey,
             child: Column(
-              children: <Widget>[
-                TextFormField(
-                  controller: clientNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Nom du client',
-                    prefixIcon: Icon(Icons.person),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ce champ est requis';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    clientName = value;
-                  },
-                ),
+              children: [
+                // TextFormField(
+                //   controller: clientNameController,
+                //   decoration: InputDecoration(
+                //     labelText: 'Nom du client',
+                //     prefixIcon: Icon(Icons.person),
+                //   ),
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return 'Ce champ est requis';
+                //     }
+                //     return null;
+                //   },
+                //   onSaved: (value) {
+                //     clientName = value;
+                //   },
+                // ),
                 SizedBox(
                   height: 5,
                 ),
-                TextFormField(
-                  controller: clientNumController,
-                  decoration: InputDecoration(
-                    labelText: 'Numero du Client',
-                    prefixIcon: Icon(Icons.numbers),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton2<String>(
+                    isExpanded: true,
+                    hint: const Row(
+                      children: [
+                        Icon(
+                          Icons.list,
+                          size: 16,
+                          color: Colors.yellow,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Clients',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.yellow,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    items: items
+                        .map((MesClients item) => DropdownMenuItem<String>(
+                              value: item.telephone,
+                              child: Text(
+                                "${item.nom!}",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ))
+                        .toList(),
+                    value: selectedValue,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedValue = value;
+                        clients = items.firstWhere(
+                            (element) => element.telephone == value);
+                      });
+                    },
+                    buttonStyleData: ButtonStyleData(
+                      height: 50,
+                      width: 160,
+                      padding: const EdgeInsets.only(left: 14, right: 14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.black26,
+                        ),
+                        color: Colors.redAccent,
+                      ),
+                      elevation: 2,
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_forward_ios_outlined,
+                      ),
+                      iconSize: 14,
+                      iconEnabledColor: Colors.yellow,
+                      iconDisabledColor: Colors.grey,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      maxHeight: 200,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.redAccent,
+                      ),
+                      offset: const Offset(-20, 0),
+                      scrollbarTheme: ScrollbarThemeData(
+                        radius: const Radius.circular(40),
+                        thickness: MaterialStateProperty.all<double>(6),
+                        thumbVisibility: MaterialStateProperty.all<bool>(true),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      height: 40,
+                      padding: EdgeInsets.only(left: 14, right: 14),
+                    ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Ce champ est requis';
-                    }
-                    return null;
-                  },
-                  onSaved: (value) {
-                    clientName = value;
-                  },
                 ),
+                // TextFormField(
+                //   controller: clientNumController,
+                //   decoration: InputDecoration(
+                //     labelText: 'Numero du Client',
+                //     prefixIcon: Icon(Icons.numbers),
+                //   ),
+                //   validator: (value) {
+                //     if (value == null || value.isEmpty) {
+                //       return 'Ce champ est requis';
+                //     }
+                //     return null;
+                //   },
+                //   onSaved: (value) {
+                //     clientName = value;
+                //   },
+                // ),
                 SizedBox(height: 16),
                 Row(
                   children: [
@@ -233,9 +329,15 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
                       _formKey.currentState!.save();
-                      // final invoice = Paiement(montantPaye: _amountController.text, client: clientNameController.text, habit: habit, datePaiement: dateController.DateTime.now);
+                      final payement = Paiement(
+                          montantPaye: _amountController.text,
+                          client: [clients],
+                          habit: [Habit(image: habitImageUrls!)],
+                          datePaiement: invoiceDate!);
                       setState(() {
-                        // invoices.add(invoice);
+                        _management.PaiementManage(
+                            payement, _management.tailleurs.first.token!);
+                        invoices.add(payement);
                       });
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         content: Text('Facture créée avec succès!'),

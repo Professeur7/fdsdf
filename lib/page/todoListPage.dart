@@ -14,7 +14,8 @@ class _ToDoListPageState extends State<ToDoListPage> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
   List<Taches> tasks = [];
   function() async {
-    tasks = await _management.getTaches(_management.tailleurs.first.token!);
+    tasks = _management.tailleurs.first.taches!;
+    // tasks = await _management.getTaches(_management.tailleurs.first.token!);
   }
 
   @override
@@ -253,16 +254,18 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                       // ...
                                       final s = SousTaches(
                                         date: Timestamp.fromDate(selectedDate!),
-                                        debut: selectedTime!,
-                                        fin: selectedTime!,
+                                        debut: selectedTime!.toString(),
+                                        fin: selectedTime!.toString(),
                                         valide: false,
                                         description: subTaskController.text,
                                       );
-                                      _management.createSousTache(
-                                          s,
-                                          _management.tailleurs.first.token!,
-                                          widget.task.token!);
-                                      widget.task.sousTaches!.add(s);
+                                      setState(() {
+                                        _management.createSousTache(
+                                            s,
+                                            _management.tailleurs.first.token!,
+                                            widget.task.token!);
+                                        widget.task.sousTaches!.add(s);
+                                      });
                                     }
 
                                     subTaskController.text = '';

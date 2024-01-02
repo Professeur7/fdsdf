@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:fashion2/models/habit.dart';
 import 'package:fashion2/models/image_model.dart';
 import 'package:fashion2/models/mesClients.dart';
@@ -25,6 +26,10 @@ class _MesuresPageState extends State<MesuresPage> {
   File? selectedImage1;
   File? selectedImage2;
 
+  late MesClients clients;
+  late Habit habit;
+  late Models model;
+
   TextEditingController descriptionController1 = TextEditingController();
   TextEditingController descriptionController2 = TextEditingController();
   TextEditingController valeurController = TextEditingController();
@@ -49,7 +54,8 @@ class _MesuresPageState extends State<MesuresPage> {
       TourCou = TextEditingController();
 
   FirebaseStorage storage = FirebaseStorage.instance;
-
+  List<MesClients> items = [];
+  String? selectedValue;
   String? modelImageUrl;
   String? habitImageUrls;
 
@@ -73,6 +79,7 @@ class _MesuresPageState extends State<MesuresPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    items = _management.mesClients;
     if (widget.mesure != null) {
       widget.mesure!.habit.length != 0
           ? descriptionController1.text =
@@ -294,15 +301,104 @@ class _MesuresPageState extends State<MesuresPage> {
                   ],
                 ),
                 SizedBox(height: 15),
-                TextFormField(
-                  controller: clientNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Nom du client',
-                    border: OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.blue),
+                // TextFormField(
+                //   controller: clientNameController,
+                //   decoration: InputDecoration(
+                //     labelText: 'Nom du client',
+                //     border: OutlineInputBorder(),
+                //     focusedBorder: OutlineInputBorder(
+                //       borderSide: BorderSide(color: Colors.blue),
+                //     ),
+                //     labelStyle: TextStyle(color: Colors.blue),
+                //   ),
+                // ),
+                DropdownButtonHideUnderline(
+                  child: DropdownButton2<String>(
+                    isExpanded: true,
+                    hint: const Row(
+                      children: [
+                        Icon(
+                          Icons.list,
+                          size: 16,
+                          color: Colors.yellow,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Clients',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.yellow,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
-                    labelStyle: TextStyle(color: Colors.blue),
+                    items: items
+                        .map((MesClients item) => DropdownMenuItem<String>(
+                              value: item.telephone,
+                              child: Text(
+                                "${item.nom!}",
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ))
+                        .toList(),
+                    value: selectedValue,
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedValue = value;
+                        clients = items.firstWhere(
+                            (element) => element.telephone == value);
+                      });
+                    },
+                    buttonStyleData: ButtonStyleData(
+                      height: 50,
+                      width: 160,
+                      padding: const EdgeInsets.only(left: 14, right: 14),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: Colors.black26,
+                        ),
+                        color: Colors.redAccent,
+                      ),
+                      elevation: 2,
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_forward_ios_outlined,
+                      ),
+                      iconSize: 14,
+                      iconEnabledColor: Colors.yellow,
+                      iconDisabledColor: Colors.grey,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      maxHeight: 200,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(14),
+                        color: Colors.redAccent,
+                      ),
+                      offset: const Offset(-20, 0),
+                      scrollbarTheme: ScrollbarThemeData(
+                        radius: const Radius.circular(40),
+                        thickness: MaterialStateProperty.all<double>(6),
+                        thumbVisibility: MaterialStateProperty.all<bool>(true),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      height: 40,
+                      padding: EdgeInsets.only(left: 14, right: 14),
+                    ),
                   ),
                 ),
                 SizedBox(height: 15),
@@ -585,11 +681,7 @@ class _MesuresPageState extends State<MesuresPage> {
                         image: habitImageUrls!,
                         descriptionHabit: descriptionController1.text);
                     final mess = Mesures(
-                      client: [
-                        MesClients(
-                          nom: clientNameController.text,
-                        )
-                      ],
+                      client: [clients],
                       models: [model],
                       habit: [habit],
                       avance: avanceController.text,
@@ -634,8 +726,6 @@ class _MesuresPageState extends State<MesuresPage> {
     }
   }
 }
-
-
 
 // import 'package:flutter/material.dart';
 // import 'package:image_picker/image_picker.dart';

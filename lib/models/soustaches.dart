@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 class SousTaches {
   String? token;
   bool valide;
-  TimeOfDay debut;
-  TimeOfDay fin;
+  String debut;
+  String fin;
   Timestamp date;
   String description;
 
