@@ -124,7 +124,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
   @override
   Widget build(BuildContext context) {
-    var getVideo;
+    //var getVideo;
     return Scaffold(
       appBar: AppBar(
         title: Text('Nouveau Post'),

@@ -473,7 +473,7 @@ class _PublicationTileState extends State<PublicationTile> {
                     onPressed: () {
                       // Ajoutez ici la logique pour laisser un commentaire
                     },
-                    child: Text("Contactez-nous"),
+                    child: Text("Passer une commande"),
                   ),
                 )
               ],
@@ -585,26 +585,6 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                           ),
                   ),
                 ),
-                // InkWell(
-                //   onTap: () {
-                //     var location = "Garantibougou";
-                //     var imageUrl =
-                //         "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (context) => ProfilePage(
-                //                 name: ModalRoute.of(context)!
-                //                     .settings
-                //                     .arguments
-                //                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
-                //                 location: location = "",
-                //                 imageUrl: imageUrl,
-                //               )),
-                //     );
-                //     // Votre logique de navigation pour le profil de l'atelier ici
-                //   },
-                // ),
                 SizedBox(width: 14.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -621,6 +601,13 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                   ],
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              widget.comment,
+              style: TextStyle(fontSize: 16.0),
             ),
           ),
           AspectRatio(
@@ -759,7 +746,7 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                     onPressed: () {
                       // Ajoutez ici la logique pour laisser un commentaire
                     },
-                    child: Text("Contactez-nous"),
+                    child: Text("Passer une commande"),
                   ),
                 )
               ],

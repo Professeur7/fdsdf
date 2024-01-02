@@ -56,9 +56,10 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
         notchMargin: 10,
         child: Container(
           height: 60,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //scrollDirection: Axis.horizontal,
+            children: [
               Expanded(
                 child: MaterialButton(
                   minWidth: 30,
@@ -108,7 +109,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             : Colors.grey,
                       ),
                       Text(
-                        '   Post  ',
+                        'Poste',
                         style: TextStyle(
                           color: currentTab == 1
                               ? const Color(0xFF3b5999)
