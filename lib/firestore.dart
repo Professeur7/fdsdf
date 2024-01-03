@@ -1,8 +1,4 @@
-import 'dart:ffi';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dart_extensions/emum.dart';
-import 'package:fashion2/models/ClientModel.dart';
 import 'package:fashion2/models/achatProduitModel.dart';
 import 'package:fashion2/models/albums.dart';
 import 'package:fashion2/models/atelier.dart';
@@ -10,7 +6,6 @@ import 'package:fashion2/models/categorieModel.dart';
 import 'package:fashion2/models/client.dart';
 import 'package:fashion2/models/clientModels.dart';
 import 'package:fashion2/models/commandeModel.dart';
-import 'package:fashion2/models/favorisModel.dart';
 import 'package:fashion2/models/habit.dart';
 import 'package:fashion2/models/image_model.dart';
 import 'package:fashion2/models/likeModel.dart';

@@ -140,8 +140,8 @@ class _MesuresPageState extends State<MesuresPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF09126C),
         title: Text('Prise de Mesures'),
+        backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,

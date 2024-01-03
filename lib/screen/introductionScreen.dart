@@ -2,8 +2,6 @@ import 'package:fashion2/screen/clientHomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 
-import '../widgets/pageEnregistrementClient.dart';
-
 class FirstTimeUserIntroduction extends StatelessWidget {
   final introKey = GlobalKey<IntroductionScreenState>();
 
@@ -37,7 +35,8 @@ class FirstTimeUserIntroduction extends StatelessWidget {
         ),
         PageViewModel(
           title: "Commencez votre aventure",
-          body: "Trouvez les derniers vêtements et découvrez des mesures personnalisées.",
+          body:
+              "Trouvez les derniers vêtements et découvrez des mesures personnalisées.",
           image: Center(
             child: Image.asset("assets/images/doctor3.jpg", width: 300),
           ),

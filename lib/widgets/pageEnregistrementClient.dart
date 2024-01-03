@@ -1,17 +1,14 @@
 import 'dart:io';
 
 import 'package:fashion2/firestore.dart';
-import 'package:fashion2/screen/clientHomeScreen.dart';
 import 'package:fashion2/screen/introductionScreen.dart';
 import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:fashion2/models/models.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../models/client.dart';
-import '../screen/home_screen.dart'; // Importez vos modèles ici
+import '../models/client.dart'; // Importez vos modèles ici
 
 class ClientRegistrationPage extends StatefulWidget {
   @override

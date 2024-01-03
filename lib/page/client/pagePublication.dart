@@ -1,4 +1,3 @@
-import 'package:dart_extensions/dart_extensions.dart';
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/page/client/pageCommentaire.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
@@ -8,8 +7,6 @@ import 'package:get/get.dart';
 
 import 'package:video_player/video_player.dart';
 
-import '../../screen/clientHomeScreen.dart';
-import '../profileAtelierPage.dart';
 import 'ProfilePublication.dart';
 
 class Publications extends StatefulWidget {
