@@ -47,7 +47,7 @@ class _ProfileAtelierPageState extends State<ProfileAtelierPage> {
                 child: CircleAvatar(
                   radius: 50,
                   backgroundImage:
-                      NetworkImage(_management.atelier.first.imageUrl),
+                      NetworkImage(_management.atelier.first.imageUrl!),
                 ),
               ),
             ),

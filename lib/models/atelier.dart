@@ -6,14 +6,12 @@ class Atelier {
   String nom;
   String lieu;
   String? slogan;
-  Images? logo;
-  var imageUrl;
+  String? imageUrl;
 
   Atelier({
     required this.nom,
     required this.lieu,
     this.slogan,
-    this.logo,
     this.token,
     this.imageUrl,
   });
@@ -37,7 +35,6 @@ class Atelier {
       lieu: file["lieu"],
       slogan: file["slogan"],
       imageUrl: file["image"],
-      logo: logo, // Utilisez la variable logo que vous avez déclarée ci-dessus
     );
   }
 }

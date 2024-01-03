@@ -1,4 +1,9 @@
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/achatProduitModel.dart';
+import 'package:fashion2/models/commandeModel.dart';
+import 'package:fashion2/models/panierModel.dart';
+import 'package:fashion2/models/pannier.dart';
+import 'package:fashion2/models/produitModel.dart';
 import 'package:fashion2/page/client/pageCommentaire.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
 import 'package:fashion2/screen/home_screen.dart';
@@ -33,35 +38,38 @@ class _PublicationsClientState extends State<PublicationsClient>
     if (c.allPoste == []) {
     } else {
       for (final i in c.allPoste) {
-        atelierLieux.add(i.lieux);
-        atelierLogo.add(i.photAtelier);
-        atelierName.add(i.atelierNAme);
-        for (final c in i.pub.first.images!) {
-          imageLinks.add(c.image);
+        if (i.pub.isNotEmpty) {
+          atelierLieux.add(i.lieux);
+          atelierLogo.add(i.photAtelier);
+          atelierName.add(i.atelierNAme);
+          tailleurToken.add(i.tailleurToken);
+          for (final c in i.pub) {
+            imageLinks.add(c.images!.first.image);
+          }
         }
       }
       if (c.allPoste.isNotEmpty) {
-        for (final i in c.allPoste.first.pub) {
-          comment.add(i.description);
+        for (final i in c.allPoste) {
+          if (i.pub.isNotEmpty) comment.add(i.pub.first.description);
         }
       }
     }
     if (c.allVideoPostes == []) {
     } else {
       for (final i in c.allVideoPostes) {
-        atelierLieuxVideo.add(i.lieux);
-        atelierLogoVideo.add(i.photAtelier);
-        atelierNameVideo.add(i.atelierNAme);
         if (i.pub.isNotEmpty) {
+          atelierLieuxVideo.add(i.lieux);
+          atelierLogoVideo.add(i.photAtelier);
+          atelierNameVideo.add(i.atelierNAme);
           for (final c in i.pub.first.videos!) {
             imageLinksvideo.add(c.video);
           }
         }
       }
       if (c.allVideoPostes.isNotEmpty) {
-        if (c.allVideoPostes.isNotEmpty) {
-          for (final i in c.allVideoPostes.first.pub) {
-            commentvideo.add(i.description);
+        for (final i in c.allVideoPostes) {
+          if (i.pub.isNotEmpty) {
+            commentvideo.add(i.pub.first.description);
           }
         }
       }
@@ -73,11 +81,11 @@ class _PublicationsClientState extends State<PublicationsClient>
   List<String> atelierName = [];
   List<String> atelierLieux = [];
   List<String> atelierLogo = [];
+  List<String> tailleurToken = [];
 
   List<String> atelierNameVideo = [];
   List<String> atelierLieuxVideo = [];
   List<String> atelierLogoVideo = [];
-
   List<String> imageLinksvideo = [];
   List<String> commentvideo = [];
 
@@ -95,12 +103,7 @@ class _PublicationsClientState extends State<PublicationsClient>
             color: Colors.grey,
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(),
-              ),
-            );
+            Navigator.pop(context);
           },
         ),
         actions: [
@@ -134,6 +137,7 @@ class _PublicationsClientState extends State<PublicationsClient>
         controller: _tabController,
         children: [
           PublicationList(
+            tailleurToken: tailleurToken,
             type: "Photos",
             photos: imageLinks,
             comments: comment,
@@ -170,13 +174,14 @@ class FavoritesPage extends StatelessWidget {
 }
 
 class PublicationList extends StatelessWidget {
-  FirebaseManagement _management = Get.put(FirebaseManagement());
+  //FirebaseManagement _management = Get.put(FirebaseManagement());
   final String type;
   final List<String> photos;
   final List<String> comments;
   List<String> atelierName;
   List<String> atelierLieux;
   List<String> atelierLogo;
+  List<String> tailleurToken;
 
   PublicationList(
       {required this.type,
@@ -184,6 +189,7 @@ class PublicationList extends StatelessWidget {
       required this.atelierName,
       required this.atelierLogo,
       required this.photos,
+      required this.tailleurToken,
       required this.comments});
 
   @override
@@ -192,6 +198,7 @@ class PublicationList extends StatelessWidget {
       itemCount: photos.length,
       itemBuilder: (context, index) {
         return PublicationTile(
+          tailleurToken: tailleurToken[index],
           photoUrl: photos[index],
           comment: comments[index],
           workshopProfile: atelierLogo[index],
@@ -205,7 +212,7 @@ class PublicationList extends StatelessWidget {
 }
 
 class PublicationListVideo extends StatelessWidget {
-  FirebaseManagement _management = Get.put(FirebaseManagement());
+  //FirebaseManagement _management = Get.put(FirebaseManagement());
   final String type;
   final List<String> photos;
   final List<String> comments;
@@ -246,8 +253,10 @@ class PublicationTile extends StatefulWidget {
   final String workshopName;
   final String workshopLocation;
   final String workshopProfile;
+  final String tailleurToken;
 
   PublicationTile({
+    required this.tailleurToken,
     required this.photoUrl,
     required this.comment,
     required this.type,
@@ -263,7 +272,6 @@ class PublicationTile extends StatefulWidget {
 class _PublicationTileState extends State<PublicationTile> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
   late VideoPlayerController _controller;
-  bool _isVideoPlaying = false;
   bool isAddedToCart =
       false; // Exemple de variable pour savoir si l'article est ajouté au panier
   bool isLiked = false; // Exemple de variable pour savoir si l'article est aimé
@@ -319,7 +327,7 @@ class _PublicationTileState extends State<PublicationTile> {
                                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
                                 location:
                                     '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
-                                imageUrl: _management.atelier.first.imageUrl,
+                                imageUrl: _management.atelier.first.imageUrl!,
                               )),
                     );
                     // Naviguer vers la nouvelle page de profil ici
@@ -338,31 +346,11 @@ class _PublicationTileState extends State<PublicationTile> {
                         : FittedBox(
                             fit: BoxFit.cover,
                             child: Image.network(
-                              _management.atelier.first.imageUrl,
+                              _management.atelier.first.imageUrl!,
                             ),
                           ),
                   ),
                 ),
-                // InkWell(
-                //   onTap: () {
-                //     var location = "Garantibougou";
-                //     var imageUrl =
-                //         "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (context) => ProfilePage(
-                //                 name: ModalRoute.of(context)!
-                //                     .settings
-                //                     .arguments
-                //                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
-                //                 location: location = "",
-                //                 imageUrl: imageUrl,
-                //               )),
-                //     );
-                //     // Votre logique de navigation pour le profil de l'atelier ici
-                //   },
-                // ),
                 SizedBox(width: 14.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -380,15 +368,15 @@ class _PublicationTileState extends State<PublicationTile> {
                 ),
               ],
             ),
-          ), // Si ce n'est pas une vidéo, afficher une image
-          Image.network(widget.photoUrl),
+          ),
           Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
               widget.comment,
               style: TextStyle(fontSize: 16.0),
             ),
-          ),
+          ), // Si ce n'est pas une vidéo, afficher une image
+          Image.network(widget.photoUrl),
           Text(
             "Type: ${widget.type}",
             style: TextStyle(fontSize: 12.0),
@@ -409,6 +397,16 @@ class _PublicationTileState extends State<PublicationTile> {
                         setState(() {
                           cartCount += isAddedToCart ? -1 : 1;
                           isAddedToCart = !isAddedToCart;
+                          final achat = AchatProduitModel(
+                              nom: widget.workshopName,
+                              description: widget.comment,
+                              prix: 0,
+                              image: widget.photoUrl,
+                              qteCommande: 1);
+                          PanierModel panierModel = PanierModel(
+                              qteProduit: 1, prixTotal: 0, produit: [achat]);
+                          _management.createPannier(
+                              _management.clients.first.token!, panierModel);
                         });
                       },
                     ),
@@ -445,9 +443,18 @@ class _PublicationTileState extends State<PublicationTile> {
                         setState(() {
                           likeCount += isLiked ? -1 : 1;
                           isLiked = !isLiked;
+                          final like = ProduitModel(
+                              nom: widget.workshopName,
+                              description: widget.comment,
+                              prix: 0,
+                              image: widget.photoUrl);
+                          _management.addToLike(
+                              _management.clients.first.token!, like);
                           if (isDisliked) {
                             isDisliked = false;
                             dislikeCount--;
+                            // _management.deleteLike(
+                            //     _management.clients.first.token!, like);
                           }
                         });
                       },
@@ -456,28 +463,28 @@ class _PublicationTileState extends State<PublicationTile> {
                     Text('$likeCount'),
                   ],
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.thumb_down,
-                        color: dislikeCount > 0 ? Colors.orange : null,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          dislikeCount += isDisliked ? -1 : 1;
-                          isDisliked = !isDisliked;
-                          if (isLiked) {
-                            isLiked = false;
-                            likeCount--;
-                          }
-                        });
-                      },
-                    ),
-                    SizedBox(width: 4),
-                    Text('$dislikeCount'),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     IconButton(
+                //       icon: Icon(
+                //         Icons.thumb_down,
+                //         color: dislikeCount > 0 ? Colors.orange : null,
+                //       ),
+                //       onPressed: () {
+                //         setState(() {
+                //           dislikeCount += isDisliked ? -1 : 1;
+                //           isDisliked = !isDisliked;
+                //           if (isLiked) {
+                //             isLiked = false;
+                //             likeCount--;
+                //           }
+                //         });
+                //       },
+                //     ),
+                //     SizedBox(width: 4),
+                //     Text('$dislikeCount'),
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -505,8 +512,26 @@ class _PublicationTileState extends State<PublicationTile> {
                   child: ElevatedButton(
                     onPressed: () {
                       // Ajoutez ici la logique pour laisser un commentaire
+                      final commande = CommandeModel(
+                          tailleurToken: widget.tailleurToken,
+                          firebaseToken: _management.clients.first.token!,
+                          prix: 0,
+                          dateCommande: DateTime.now(),
+                          etatCommande: false,
+                          produit: [
+                            PanierModel(qteProduit: 0, prixTotal: 0, produit: [
+                              AchatProduitModel(
+                                  nom: widget.workshopName,
+                                  description: widget.comment,
+                                  prix: 0,
+                                  image: widget.photoUrl,
+                                  qteCommande: 1)
+                            ])
+                          ]);
+                      _management.createCommande(
+                          _management.clients.first.token!, commande);
                     },
-                    child: Text("Contactez-nous"),
+                    child: Text("Passer une commande"),
                   ),
                 )
               ],
@@ -594,7 +619,7 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
                                 location:
                                     '${_management.atelier.length != 0 ? _management.atelier.first.lieu : ""}',
-                                imageUrl: _management.atelier.first.imageUrl,
+                                imageUrl: _management.atelier.first.imageUrl!,
                               )),
                     );
                     // Naviguer vers la nouvelle page de profil ici
@@ -613,31 +638,11 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                         : FittedBox(
                             fit: BoxFit.cover,
                             child: Image.network(
-                              _management.atelier.first.imageUrl,
+                              _management.atelier.first.imageUrl!,
                             ),
                           ),
                   ),
                 ),
-                // InkWell(
-                //   onTap: () {
-                //     var location = "Garantibougou";
-                //     var imageUrl =
-                //         "https://w7.pngwing.com/pngs/650/656/png-transparent-model-fashion-model-celebrities-woman-fashion-model-thumbnail.png";
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(
-                //           builder: (context) => ProfilePage(
-                //                 name: ModalRoute.of(context)!
-                //                     .settings
-                //                     .arguments
-                //                     .toString(), // Exemple de récupération dynamique du nom depuis les arguments de la route
-                //                 location: location = "",
-                //                 imageUrl: imageUrl,
-                //               )),
-                //     );
-                //     // Votre logique de navigation pour le profil de l'atelier ici
-                //   },
-                // ),
                 SizedBox(width: 14.0),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -654,6 +659,13 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                   ],
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Text(
+              widget.comment,
+              style: TextStyle(fontSize: 16.0),
             ),
           ),
           AspectRatio(
@@ -695,6 +707,16 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                         setState(() {
                           cartCount += isAddedToCart ? -1 : 1;
                           isAddedToCart = !isAddedToCart;
+                          final achat = AchatProduitModel(
+                              nom: widget.workshopName,
+                              description: widget.comment,
+                              prix: 0,
+                              image: widget.photoUrl,
+                              qteCommande: 1);
+                          PanierModel panierModel = PanierModel(
+                              qteProduit: 1, prixTotal: 0, produit: [achat]);
+                          _management.createPannier(
+                              _management.clients.first.token!, panierModel);
                         });
                       },
                     ),
@@ -731,9 +753,18 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                         setState(() {
                           likeCount += isLiked ? -1 : 1;
                           isLiked = !isLiked;
+                          final like = ProduitModel(
+                              nom: widget.workshopName,
+                              description: widget.comment,
+                              prix: 0,
+                              image: widget.photoUrl);
+                          _management.addToLike(
+                              _management.clients.first.token!, like);
                           if (isDisliked) {
                             isDisliked = false;
                             dislikeCount--;
+                            // _management.deleteLike(
+                            //     _management.clients.first.token!, like);
                           }
                         });
                       },
@@ -742,28 +773,28 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                     Text('$likeCount'),
                   ],
                 ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.thumb_down,
-                        color: dislikeCount > 0 ? Colors.orange : null,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          dislikeCount += isDisliked ? -1 : 1;
-                          isDisliked = !isDisliked;
-                          if (isLiked) {
-                            isLiked = false;
-                            likeCount--;
-                          }
-                        });
-                      },
-                    ),
-                    SizedBox(width: 4),
-                    Text('$dislikeCount'),
-                  ],
-                ),
+                // Row(
+                //   children: [
+                //     IconButton(
+                //       icon: Icon(
+                //         Icons.thumb_down,
+                //         color: dislikeCount > 0 ? Colors.orange : null,
+                //       ),
+                //       onPressed: () {
+                //         setState(() {
+                //           dislikeCount += isDisliked ? -1 : 1;
+                //           isDisliked = !isDisliked;
+                //           if (isLiked) {
+                //             isLiked = false;
+                //             likeCount--;
+                //           }
+                //         });
+                //       },
+                //     ),
+                //     SizedBox(width: 4),
+                //     Text('$dislikeCount'),
+                //   ],
+                // ),
               ],
             ),
           ),
@@ -792,7 +823,7 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                     onPressed: () {
                       // Ajoutez ici la logique pour laisser un commentaire
                     },
-                    child: Text("Contactez-nous"),
+                    child: Text("Passer une commande"),
                   ),
                 )
               ],

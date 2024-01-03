@@ -50,6 +50,7 @@ class _ProfileClientPageState extends State<ProfileClientPage> {
                     backgroundImage: NetworkImage(
                       _management.clients.first.imageURL,
                     )),
+                //child: Image.network(_management.clients.first.imageURL),
               ),
             ),
             Padding(

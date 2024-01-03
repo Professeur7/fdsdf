@@ -7,7 +7,6 @@ import 'package:fashion2/models/paiement.dart';
 import 'package:fashion2/models/poste.dart';
 import 'package:fashion2/models/postevideo.dart';
 import 'package:fashion2/models/rendez_vous.dart';
-import 'package:fashion2/models/soustaches.dart';
 import 'package:fashion2/models/stock.dart';
 import 'package:fashion2/models/tache.dart';
 
@@ -159,7 +158,7 @@ class Tailleurs {
         albums: listAlbums,
         mesure: listMesures,
         username: file['username'],
-        image: file['image'] ?? "",
+        image: file["image"] ?? "",
         model: listModel,
         atelier: listAtelier,
         taches: listTaches,

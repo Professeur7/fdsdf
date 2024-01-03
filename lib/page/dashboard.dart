@@ -126,7 +126,7 @@ class _DashboardState extends State<Dashboard> {
                                 : FittedBox(
                                     fit: BoxFit.cover,
                                     child: Image.network(
-                                      _management.atelier.first.imageUrl,
+                                      _management.atelier.first.imageUrl!,
                                     ),
                                   ),
                           ),

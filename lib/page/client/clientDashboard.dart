@@ -1,5 +1,6 @@
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/specialesPromotions.dart';
+import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/page/client/SpecialesPromotions.dart';
 import 'package:fashion2/page/client/profileClientpage.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +10,6 @@ import 'package:get/get.dart';
 import '../search.dart';
 import 'clientDrawer.dart';
 
-class Tailleur {
-  final String nom;
-  final String image;
-  final double noteMoyenne;
-
-  Tailleur({required this.nom, required this.image, required this.noteMoyenne});
-}
-
 class Avis {
   final int etoiles;
   final String commentaire;
@@ -25,43 +18,21 @@ class Avis {
   Avis({required this.etoiles, required this.commentaire, required this.date});
 }
 
-class HomePageClient extends StatelessWidget {
+class HomePageClient extends StatefulWidget {
+  @override
+  State<HomePageClient> createState() => _HomePageClientState();
+}
+
+class _HomePageClientState extends State<HomePageClient> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
-  final List<Tailleur> tailleursRecommandes = [
-    Tailleur(
-        nom: 'Tailleur 1',
-        image: 'assets/images/doctor1.jpg',
-        noteMoyenne: 4.5),
-    Tailleur(
-        nom: 'Tailleur 2',
-        image: 'assets/images/doctor2.jpg',
-        noteMoyenne: 3.0),
-    Tailleur(
-        nom: 'Tailleur 3',
-        image: 'assets/images/doctor1.jpg',
-        noteMoyenne: 2.5),
-    Tailleur(
-        nom: 'Tailleur 4',
-        image: 'assets/images/doctor2.jpg',
-        noteMoyenne: 4.0),
-    Tailleur(
-        nom: 'Tailleur 1',
-        image: 'assets/images/doctor1.jpg',
-        noteMoyenne: 4.5),
-    Tailleur(
-        nom: 'Tailleur 2',
-        image: 'assets/images/doctor2.jpg',
-        noteMoyenne: 3.0),
-    Tailleur(
-        nom: 'Tailleur 3',
-        image: 'assets/images/doctor1.jpg',
-        noteMoyenne: 2.5),
-    Tailleur(
-        nom: 'Tailleur 4',
-        image: 'assets/images/doctor2.jpg',
-        noteMoyenne: 4.0),
-    // Ajoutez d'autres tailleurs recommandés
-  ];
+
+  List<Tailleurs> tailleursRecommandes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    tailleursRecommandes = _management.allsTailleur;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -255,16 +226,16 @@ class HomePageClient extends StatelessWidget {
                                     children: [
                                       CircleAvatar(
                                         backgroundImage:
-                                            AssetImage(tailleur.image),
+                                            NetworkImage(tailleur.image!),
                                         radius: 30,
                                       ),
                                       SizedBox(height: 8),
-                                      Text(tailleur.nom),
+                                      Text(tailleur.nom!),
                                       Row(
                                         children: [
                                           Icon(Icons.star,
                                               color: Colors.yellow),
-                                          Text('${tailleur.noteMoyenne}'),
+                                          Text('10'),
                                         ],
                                       ),
                                     ],
@@ -296,7 +267,7 @@ class HomePageClient extends StatelessWidget {
                                   crossAxisCount: 2,
                                   crossAxisSpacing: 8.0,
                                   mainAxisSpacing: 8.0,
-                                  childAspectRatio: 0.7,
+                                  childAspectRatio: 0.6,
                                 ),
                                 itemBuilder: (BuildContext context, int index) {
                                   return buildSpecialPromotionCard(

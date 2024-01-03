@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     Transaction(),
     ToDoListPage(),
   ];
-
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   @override
   void initState() {
     // TODO: implement initState
@@ -59,9 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
         notchMargin: 10,
         child: Container(
           height: 60,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: <Widget>[
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //scrollDirection: Axis.horizontal,
+            children: [
               Expanded(
                 child: MaterialButton(
                   minWidth: 30,

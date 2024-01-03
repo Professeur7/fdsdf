@@ -44,7 +44,7 @@ class ProfilePage extends StatelessWidget {
                         : CircleAvatar(
                             radius: 50,
                             backgroundImage: NetworkImage(
-                                _management.atelier.first.imageUrl),
+                                _management.atelier.first.imageUrl!),
                           ),
                   ),
                 ),

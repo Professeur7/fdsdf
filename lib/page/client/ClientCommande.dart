@@ -1,4 +1,7 @@
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/commandeModel.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../screen/home_screen.dart';
 
@@ -10,6 +13,20 @@ class ClientOrderPage extends StatefulWidget {
 }
 
 class _ClientOrderPageState extends State<ClientOrderPage> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+  List<CommandeModel> listCommande = [];
+  function() async {
+    listCommande =
+        await _management.getAllCommande(_management.clients.first.token!);
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    function();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +54,8 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: 5, // Remplacez par le nombre réel de commandes du client
+                itemCount: listCommande
+                    .length, // Remplacez par le nombre réel de commandes du client
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
@@ -45,14 +63,16 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ClientOrderDetailsPage(orderNumber: index + 1),
+                          builder: (context) =>
+                              ClientOrderDetailsPage(orderNumber: index + 1),
                         ),
                       );
                     },
                     child: Card(
                       margin: EdgeInsets.all(10),
                       child: ListTile(
-                        title: Text('Commande #${index + 1}'),
+                        title: Text(
+                            'Commande #${listCommande[index].tailleurToken}'),
                         subtitle: Text('Description de la commande'),
                         trailing: Icon(Icons.message), // Icône de discussion
                       ),
@@ -71,7 +91,8 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
 class ClientOrderDetailsPage extends StatelessWidget {
   final int orderNumber;
 
-  const ClientOrderDetailsPage({Key? key, required this.orderNumber}) : super(key: key);
+  const ClientOrderDetailsPage({Key? key, required this.orderNumber})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -109,7 +130,8 @@ class ClientOrderDetailsPage extends StatelessWidget {
 class ClientChatScreen extends StatelessWidget {
   final int orderNumber;
 
-  const ClientChatScreen({Key? key, required this.orderNumber}) : super(key: key);
+  const ClientChatScreen({Key? key, required this.orderNumber})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +141,13 @@ class ClientChatScreen extends StatelessWidget {
           child: ListView(
             // Affichez la liste des messages ici
             children: [
-              MessageItem(isTailor: true, text: "Bonjour! Comment puis-je vous aider?"),
-              MessageItem(isTailor: false, text: "Bonjour, j'ai besoin de votre aide."),
-              MessageItem(isTailor: false, text: "Je voudrais discuter de ma commande #$orderNumber."),
+              MessageItem(
+                  isTailor: true, text: "Bonjour! Comment puis-je vous aider?"),
+              MessageItem(
+                  isTailor: false, text: "Bonjour, j'ai besoin de votre aide."),
+              MessageItem(
+                  isTailor: false,
+                  text: "Je voudrais discuter de ma commande #$orderNumber."),
               // ... Ajoutez d'autres messages
             ],
           ),
@@ -132,7 +158,8 @@ class ClientChatScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
-                  decoration: InputDecoration(hintText: 'Écrivez un message...'),
+                  decoration:
+                      InputDecoration(hintText: 'Écrivez un message...'),
                 ),
               ),
               IconButton(
@@ -165,7 +192,8 @@ class MessageItem extends StatelessWidget {
           padding: EdgeInsets.all(8),
           child: Text(text),
         ),
-        color: isTailor ? Colors.blue : Colors.grey, // Couleur de fond du message
+        color:
+            isTailor ? Colors.blue : Colors.grey, // Couleur de fond du message
       ),
     );
   }

@@ -1,4 +1,7 @@
+import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/commandeModel.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../screen/home_screen.dart';
 
@@ -10,6 +13,17 @@ class Transaction extends StatefulWidget {
 }
 
 class _TransactionState extends State<Transaction> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+  List<CommandeModel> listCommande = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _management.tailleurCommande();
+    listCommande = _management.commandestailleurs;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +51,8 @@ class _TransactionState extends State<Transaction> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: 10, // Remplacez par le nombre réel de demandes de commande
+                itemCount: listCommande
+                    .length, // Remplacez par le nombre réel de demandes de commande
                 itemBuilder: (context, index) {
                   return GestureDetector(
                     onTap: () {
@@ -52,8 +67,10 @@ class _TransactionState extends State<Transaction> {
                     child: Card(
                       margin: EdgeInsets.all(10),
                       child: ListTile(
-                        title: Text('Demande de commande $index'),
-                        subtitle: Text('Description de la commande'),
+                        title: Text(
+                            'Demande de commande ${listCommande[index].tailleurToken}'),
+                        subtitle: Text(
+                            'Description de la commande ${listCommande[index].prix}'),
                         trailing: Icon(Icons.message), // Icône de discussion
                       ),
                     ),
@@ -81,7 +98,8 @@ class ChatScreen extends StatelessWidget {
             color: Colors.grey,
           ),
           onPressed: () {
-            Navigator.pop(context); // Revenir à la liste des demandes de commande
+            Navigator.pop(
+                context); // Revenir à la liste des demandes de commande
           },
         ),
       ),
@@ -91,9 +109,15 @@ class ChatScreen extends StatelessWidget {
             child: ListView(
               // Affichez la liste des messages ici
               children: [
-                MessageItem(isTailor: false, text: "Bonjour, j'ai besoin de votre aide."),
-                MessageItem(isTailor: true, text: "Bonjour! Comment puis-je vous aider?"),
-                MessageItem(isTailor: true, text: "Quel type de commande recherchez-vous?"),
+                MessageItem(
+                    isTailor: false,
+                    text: "Bonjour, j'ai besoin de votre aide."),
+                MessageItem(
+                    isTailor: true,
+                    text: "Bonjour! Comment puis-je vous aider?"),
+                MessageItem(
+                    isTailor: true,
+                    text: "Quel type de commande recherchez-vous?"),
                 // ... Ajoutez d'autres messages
               ],
             ),
@@ -104,7 +128,8 @@ class ChatScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
-                    decoration: InputDecoration(hintText: 'Écrivez un message...'),
+                    decoration:
+                        InputDecoration(hintText: 'Écrivez un message...'),
                   ),
                 ),
                 IconButton(
@@ -138,7 +163,8 @@ class MessageItem extends StatelessWidget {
           padding: EdgeInsets.all(8),
           child: Text(text),
         ),
-        color: isTailor ? Colors.blue : Colors.grey, // Couleur de fond du message
+        color:
+            isTailor ? Colors.blue : Colors.grey, // Couleur de fond du message
       ),
     );
   }
