@@ -162,7 +162,10 @@ class _NewPostPageState extends State<NewPostPage> {
             ElevatedButton.icon(
               onPressed: _importImage,
               icon: Icon(Icons.photo_camera),
-              label: Text('Télécharger des photos'),
+              label: Text(
+                'Télécharger des photos',
+                style: TextStyle(color: Color(0xFF09126C)),
+              ),
             ),
             SizedBox(height: 10),
             // Affichage des images sélectionnées
@@ -183,7 +186,10 @@ class _NewPostPageState extends State<NewPostPage> {
             ElevatedButton.icon(
               onPressed: _importVideo,
               icon: Icon(Icons.video_call),
-              label: Text('Télécharger une vidéo'),
+              label: Text(
+                'Télécharger une vidéo',
+                style: TextStyle(color: Color(0xFF09126C)),
+              ),
             ),
             // SizedBox(height: 10),
             // // Affichage de la vidéo sélectionnée
@@ -214,7 +220,10 @@ class _NewPostPageState extends State<NewPostPage> {
                 }
                 Navigator.pop(context);
               },
-              child: Text('Publier'),
+              child: Text(
+                'Publier',
+                style: TextStyle(color: Color(0xFF09126C)),
+              ),
             ),
           ],
         ),

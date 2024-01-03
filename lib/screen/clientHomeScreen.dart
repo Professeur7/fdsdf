@@ -139,7 +139,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                             : Colors.grey,
                       ),
                       Text(
-                        'Commande',
+                        'Achats',
                         style: TextStyle(
                           color: currentTab == 2
                               ? const Color(0xFF3b5999)

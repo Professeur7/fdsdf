@@ -41,9 +41,23 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     try {
       // Vérification de la longueur du mot de passe
       if (password.text.length < 6) {
-        Fluttertoast.showToast(
-            msg: "Le mot de passe doit avoir au moins 6 caractères");
-        Navigator.pop(context); // Fermer la boîte de dialogue
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Erreur"),
+              content: Text("Le mot de passe doit avoir au moins 6 caractères"),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(); // Ferme la boîte de dialogue
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            );
+          },
+        );
         return;
       }
 
@@ -148,9 +162,24 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
         // Vérification de l'unicité de l'email
         bool emailExists = await checkEmailExists(email.text);
         if (emailExists) {
-          Fluttertoast.showToast(
-              msg: "Cet email est déjà utilisé par un autre utilisateur");
-          Navigator.pop(context); // Fermer la boîte de dialogue
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text("Erreur"),
+                content:
+                    Text("Cet email est déjà utilisé par un autre utilisateur"),
+                actions: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop(); // Ferme la boîte de dialogue
+                    },
+                    child: Text("OK"),
+                  ),
+                ],
+              );
+            },
+          );
           return;
         }
       }

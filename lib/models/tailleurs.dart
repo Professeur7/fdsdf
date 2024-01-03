@@ -14,6 +14,7 @@ import 'package:fashion2/models/tache.dart';
 import 'mesure.dart';
 
 class Tailleurs {
+  String? nationalite;
   String? token;
   String? image;
   String username;
@@ -57,7 +58,8 @@ class Tailleurs {
       this.telephone,
       this.posteVideos,
       this.taches,
-      this.token});
+      this.token,
+      this.nationalite});
   factory Tailleurs.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
     final modelData = file!["Model"];
@@ -151,6 +153,7 @@ class Tailleurs {
       listvideopsote = [];
     }
     return Tailleurs(
+        nationalite: file["nationalite"] ?? "",
         rdv: listRDV,
         paiement: listPaiement,
         stock: listStock,

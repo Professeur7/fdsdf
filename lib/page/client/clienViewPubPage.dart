@@ -374,10 +374,10 @@ class _PublicationTileState extends State<PublicationTile> {
             ),
           ), // Si ce n'est pas une vidéo, afficher une image
           Image.network(widget.photoUrl),
-          Text(
-            "Type: ${widget.type}",
-            style: TextStyle(fontSize: 12.0),
-          ),
+          // Text(
+          //   "Type: ${widget.type}",
+          //   style: TextStyle(fontSize: 12.0),
+          // ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(

@@ -29,6 +29,7 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
   final TextEditingController sloganController = TextEditingController();
   FirebaseStorage storage = FirebaseStorage.instance;
   String? imageUrl;
+  File? selectedImage;
 
   @override
   void initState() {
@@ -57,19 +58,16 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
       return null;
     }
   }
-//  void pickImage(Function(File?) onImagePicked) async {
-//     final picker = ImagePicker();
-//     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
-//     if (pickedFile != null) {
-//       onImagePicked(File(pickedFile.path));
-//     }
-//   }
 
   Future<void> pickImage() async {
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     imageUrl = await uploadImage(File(pickedFile!.path), pickedFile.name);
+    if (pickedFile != null) {
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
+    }
   }
 
   final FirebaseManagement c = Get.put(FirebaseManagement());
@@ -103,7 +101,8 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
         body: SingleChildScrollView(
           padding: EdgeInsets.all(16.0),
           child: Column(
-            children: <Widget>[
+            children: [
+              Text('Importer Votre logo'),
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -112,39 +111,38 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
                     height: 150,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.grey,
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 2.0,
+                      ),
                     ),
-                    child: widget.selectedImage != null
-                        ? ClipOval(
-                            child: Image.file(
-                              widget.selectedImage!,
-                              width: 150,
-                              height: 150,
-                              fit: BoxFit.cover,
-                            ),
+                    child: selectedImage != null
+                        ? CircleAvatar(
+                            radius: 48,
+                            backgroundImage: FileImage(selectedImage!),
                           )
-                        : Icon(
-                            Icons.add_a_photo,
-                            size: 50, // Réduire la taille de l'icône
-                            color: Colors.white,
+                        : IconButton(
+                            icon: Icon(
+                              Icons.add_a_photo,
+                              size: 30, // Réduire la taille de l'icône
+                              color: Colors.grey,
+                            ),
+                            onPressed: pickImage,
                           ),
-                  ),
-                  Positioned(
-                    bottom: -3,
-                    child: Text(
-                      "Importer votre logo",
-                      style:
-                          TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                    ),
                   ),
                   Positioned(
                     bottom: 0,
                     right: 0,
-                    child: IconButton(
-                      onPressed: pickImage,
-                      icon: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        onPressed: pickImage,
+                        icon: Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

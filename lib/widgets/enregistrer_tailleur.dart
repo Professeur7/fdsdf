@@ -25,6 +25,8 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
   File? selectedImage;
   FirebaseStorage storage = FirebaseStorage.instance;
   String? imageUrl;
+  String selectedGender = 'Homme'; // Par défaut, 'Homme' est sélectionné
+  List<String> genderOptions = ['Homme', 'Femme']; // Options de genre
 
   Future<String?> uploadImage(File imageFile, String fileName) async {
     try {
@@ -81,15 +83,14 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Importer votre photo de profil'),
                 Stack(
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 150,
+                      height: 150,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -187,21 +188,34 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text('Genre'),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Colors.grey,
-                      width: 1.0,
+                ListTile(
+                  title: Text('Genre'),
+                  subtitle: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: TextFormField(
-                    controller: genreController,
+                    child: DropdownButtonFormField<String>(
+                      value: selectedGender,
+                      items: genderOptions.map((String gender) {
+                        return DropdownMenuItem<String>(
+                          value: gender,
+                          child: Text(gender),
+                        );
+                      }).toList(),
+                      onChanged: (newValue) {
+                        setState(() {
+                          selectedGender = newValue!;
+                        });
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
-                Text('Code'),
+                Text('Password'),
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -215,7 +229,7 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text('Atelier'),
+                Text('Nationnalite'),
                 Container(
                   decoration: BoxDecoration(
                     border: Border.all(
@@ -242,6 +256,7 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                           email: emailController.text,
                           genre: genreController.text,
                           prenom: prenomController.text,
+                          nationalite: atelierController.text,
                           telephone: telephoneController.text);
                       _management.updateTailleurInformation(newTailleuirs);
                       Navigator.pushReplacement(
@@ -269,7 +284,10 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                           SizedBox(
                               width:
                                   10), // Espacement entre l'icône et le texte
-                          Text('Enregistrer'),
+                          Text(
+                            'Enregistrer',
+                            style: TextStyle(color: Color(0xFF09126C)),
+                          ),
                         ],
                       ),
                     ),

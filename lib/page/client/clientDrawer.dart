@@ -1,6 +1,6 @@
 import 'package:fashion2/screen/clientHomeScreen.dart';
+import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:flutter/material.dart';
-
 
 class ClientPageDrawer extends StatefulWidget {
   @override
@@ -25,7 +25,8 @@ class _ClientPageDrawerState extends State<ClientPageDrawer> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ClientHomeScreen(), // Remplacez PageDefault par votre widget de page par défaut
+                builder: (context) =>
+                    ClientHomeScreen(), // Remplacez PageDefault par votre widget de page par défaut
               ),
             );
           },
@@ -51,6 +52,23 @@ class _ClientPageDrawerState extends State<ClientPageDrawer> {
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () {
               // Naviguer vers une page de sélection de langue
+            },
+          ),
+          ListTile(
+            title: Text('Se déconnecter'),
+            trailing: Icon(Icons.exit_to_app,
+                color: Color(
+                    0xFF09126C)), // Icône de déconnexion (exemple : flèche de sortie)
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => LoginSignupScreen(),
+                ),
+              );
+              // Déclencher la déconnexion
+              // Vous pouvez appeler une fonction de déconnexion ici
+              // Par exemple, auth.signOut() pour se déconnecter de Firebase
             },
           ),
           ListTile(

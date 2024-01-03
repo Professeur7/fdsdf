@@ -6,38 +6,38 @@ class Atelier {
   String nom;
   String lieu;
   String? slogan;
-  Images? logo;
+  // Images? logo;
   var imageUrl;
 
   Atelier({
     required this.nom,
     required this.lieu,
     this.slogan,
-    this.logo,
+    // this.logo,
     this.token,
     this.imageUrl,
   });
 
   factory Atelier.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
-    final imageLogo = file!["logo"];
+    // final imageLogo = file!["logo"];
 
-    Images? logo; // Déclarez logo comme une variable Images nullable
+    // Images? logo; // Déclarez logo comme une variable Images nullable
 
-    if (imageLogo != null) {
-      // Si imageLogo n'est pas null, créez une instance d'Images à partir des données
-      logo = Images.fromSnapshot(imageLogo);
-    } else {
-      logo = null; // Si imageLogo est null, affectez null à logo
-    }
+    // if (imageLogo != null) {
+    //   // Si imageLogo n'est pas null, créez une instance d'Images à partir des données
+    //   logo = Images.fromSnapshot(imageLogo);
+    // } else {
+    //   logo = null; // Si imageLogo est null, affectez null à logo
+    // }
 
     return Atelier(
       token: data.id,
-      nom: file["nom"],
+      nom: file!["nom"],
       lieu: file["lieu"],
       slogan: file["slogan"],
       imageUrl: file["image"],
-      logo: logo, // Utilisez la variable logo que vous avez déclarée ci-dessus
+      // logo: logo, // Utilisez la variable logo que vous avez déclarée ci-dessus
     );
   }
 }

@@ -140,7 +140,7 @@ class _MesuresPageState extends State<MesuresPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF3b5999),
+        backgroundColor: const Color(0xFF09126C),
         title: Text('Prise de Mesures'),
         leading: IconButton(
           icon: Icon(
@@ -615,7 +615,10 @@ class _MesuresPageState extends State<MesuresPage> {
                           builder: (context) => CustomerInformationPage()),
                     );
                   },
-                  child: Text('Enregistrer avec les images'),
+                  child: Text(
+                    'Enregistrer avec les images',
+                    style: TextStyle(color: Color(0xFF09126C)),
+                  ),
                 ),
               ],
             ),
