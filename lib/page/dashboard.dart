@@ -127,6 +127,12 @@ class _DashboardState extends State<Dashboard> {
                                     fit: BoxFit.cover,
                                     child: Image.network(
                                       _management.atelier.first.imageUrl!,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Center(
+                                          child: Icon(Icons.error),
+                                        );
+                                      },
                                     ),
                                   ),
                           ),

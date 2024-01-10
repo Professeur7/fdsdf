@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/achatProduitModel.dart';
 import 'package:fashion2/models/albums.dart';
 import 'package:fashion2/models/atelier.dart';
 import 'package:fashion2/models/categorieModel.dart';
+import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/client.dart';
 import 'package:fashion2/models/clientModels.dart';
 import 'package:fashion2/models/commandeModel.dart';
@@ -151,7 +154,7 @@ class FirebaseManagement extends GetxController {
       al.images = imgList;
     }
     final end = await getAtelier(tailleur.token!);
-    end == [] ? tailleur.atelier = [] : end.first;
+    tailleur.atelier = end;
     tailleur.mesClients = await getMesClient(tailleur.token!);
     tailleur.mesure = await getMesures(tailleur.token!);
     tailleur.rdv = await getRDV(tailleur.token!);
@@ -160,14 +163,22 @@ class FirebaseManagement extends GetxController {
     tailleur.stock = await getStock(tailleur.token!);
     tailleur.albums = albums;
     getAllClients();
+    commandes = await getAllCommande(tailleur.token!);
+    //commandestailleurs = await tailleurCommande();
+
     tailleur.postes = await getPublication(tailleur.token!);
     tailleur.posteVideos = await getVideoPublication(tailleur.token!);
     tailleurs.isEmpty
         ? tailleurs.add(tailleur)
         : {tailleurs.clear(), tailleurs.add(tailleur)};
     getAllTailleurs();
-
-    //commandes = await getAllCommande(client);
+    List<CommandeModel> list = [];
+    for (final i in commandes) {
+      if (i.tailleurToken == tailleur.token) {
+        list.add(i);
+      }
+    }
+    commandestailleurs = list;
   }
 
   getAllClients() async {
@@ -215,17 +226,20 @@ class FirebaseManagement extends GetxController {
         final listPost = await getPublication(i.token!);
         final listPostVideo = await getVideoPublication(i.token!);
         i.atelier = await getAtelier(i.token!);
-        allPoste.add(PostAtelier(
-            tailleurToken: i.token!,
-            atelierNAme: i.atelier!.first.nom,
-            lieux: i.atelier!.first.lieu,
-            photAtelier: i.atelier!.first.imageUrl!,
-            pub: listPost));
-        allVideoPostes.add(PostAtelierVideo(
-            atelierNAme: i.atelier!.first.nom,
-            lieux: i.atelier!.first.lieu,
-            photAtelier: i.atelier!.first.imageUrl!,
-            pub: listPostVideo));
+        if (i.atelier!.isNotEmpty) {
+          allPoste.add(PostAtelier(
+              tailleurToken: i.token!,
+              atelierNAme: i.atelier!.first.nom,
+              lieux: i.atelier!.first.lieu,
+              photAtelier: i.atelier!.first.imageUrl!,
+              pub: listPost));
+          allVideoPostes.add(PostAtelierVideo(
+              tailleurToken: i.token!,
+              atelierNAme: i.atelier!.first.nom,
+              lieux: i.atelier!.first.lieu,
+              photAtelier: i.atelier!.first.imageUrl!,
+              pub: listPostVideo));
+        }
       }
     } catch (e) {
       print("this the post error $e");
@@ -333,6 +347,7 @@ class FirebaseManagement extends GetxController {
           .collection("Images")
           .add({"image": image.image});
     }
+    print("publication done");
     Postes.add(poste);
     tailleurs.first.postes = Postes;
   }
@@ -672,7 +687,7 @@ class FirebaseManagement extends GetxController {
         .collection("ateliers")
         .get();
     atelier = monatelier.docs.map((e) => Atelier.fromSnapshot(e)).toList();
-    return monatelier.docs.map((e) => Atelier.fromSnapshot(e)).toList();
+    return atelier;
   }
 
   addImageToAlbums(String? image, String userToken, String modelToken) async {
@@ -857,10 +872,61 @@ class FirebaseManagement extends GetxController {
     return categories;
   }
 
+  createMessage(String idClient, String idCommande, MessageT m) async {
+    await _db
+        .collection("Clients")
+        .doc(idClient)
+        .collection("Commande")
+        .doc(idCommande)
+        .collection("Message")
+        .add({
+      "message": m.message,
+      "isTailleur": m.isTailleur,
+      "time": m.timestamp
+    });
+  }
+
+  StreamController<List<MessageT>> _messageController =
+      StreamController<List<MessageT>>();
+
+  Stream<List<MessageT>> getMessages(
+      String idClient, String idCommande) async* {
+    await _db
+        .collection("Clients")
+        .doc(idClient)
+        .collection("Commande")
+        .doc(idCommande)
+        .collection("Message")
+        .orderBy("time", descending: true)
+        .snapshots()
+        .listen((snapshot) {
+      List<MessageT> messages =
+          snapshot.docs.map((e) => MessageT.fromMap(e)).toList();
+      _messageController.add(messages);
+    });
+    yield* _messageController.stream;
+  }
+
+  Future<List<MessageT>> getMessage(String idClient, String idCommande) async {
+    final m = await _db
+        .collection("Clients")
+        .doc(idClient)
+        .collection("Commande")
+        .doc(idCommande)
+        .collection("Message")
+        .orderBy("time", descending: true)
+        .get();
+    List<MessageT> mess = [];
+    mess = m.docs.map((e) => MessageT.fromMap(e)).toList();
+    print(mess);
+    return mess;
+  }
+
   // function to create commande
   createCommande(String client, CommandeModel commande) async {
     final commandeRef =
         await _db.collection("Clients").doc(client).collection("Commande").add({
+      "clientToken": commande.clientToken,
       "Date": commande.dateCommande,
       "tailleurToken": commande.tailleurToken,
       "Etat": commande.etatCommande,
@@ -912,6 +978,14 @@ class FirebaseManagement extends GetxController {
           data.docs.map((e) => CommandeModel.fromSnapshot(e)).toList();
 
       for (final i in commandes) {
+        // final mess = await _db
+        //     .collection("Clients")
+        //     .doc(client)
+        //     .collection("Commande")
+        //     .doc(i.firebaseToken)
+        //     .collection("Message")
+        //     .get();
+        List<MessageT> m = await getMessage(client, i.firebaseToken);
         // Obtenir la liste spécifique des produits de la catégorie à partir de Firebase
         final products = await _db
             .collection("Clients")
@@ -939,6 +1013,7 @@ class FirebaseManagement extends GetxController {
               .toList();
           p.produit = produitListe;
         }
+        i.message = m;
         i.produit = pannierListe;
       }
 

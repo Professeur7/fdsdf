@@ -112,22 +112,6 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
             key: _formKey,
             child: Column(
               children: [
-                // TextFormField(
-                //   controller: clientNameController,
-                //   decoration: InputDecoration(
-                //     labelText: 'Nom du client',
-                //     prefixIcon: Icon(Icons.person),
-                //   ),
-                //   validator: (value) {
-                //     if (value == null || value.isEmpty) {
-                //       return 'Ce champ est requis';
-                //     }
-                //     return null;
-                //   },
-                //   onSaved: (value) {
-                //     clientName = value;
-                //   },
-                // ),
                 SizedBox(
                   height: 5,
                 ),
@@ -220,22 +204,6 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
                     ),
                   ),
                 ),
-                // TextFormField(
-                //   controller: clientNumController,
-                //   decoration: InputDecoration(
-                //     labelText: 'Numero du Client',
-                //     prefixIcon: Icon(Icons.numbers),
-                //   ),
-                //   validator: (value) {
-                //     if (value == null || value.isEmpty) {
-                //       return 'Ce champ est requis';
-                //     }
-                //     return null;
-                //   },
-                //   onSaved: (value) {
-                //     clientName = value;
-                //   },
-                // ),
                 SizedBox(height: 16),
                 Row(
                   children: [

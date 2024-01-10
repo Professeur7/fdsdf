@@ -1,7 +1,9 @@
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/commandeModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../screen/home_screen.dart';
 
@@ -15,6 +17,7 @@ class Transaction extends StatefulWidget {
 class _TransactionState extends State<Transaction> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
   List<CommandeModel> listCommande = [];
+  List<MessageT> messages = [];
 
   @override
   void initState() {
@@ -60,7 +63,8 @@ class _TransactionState extends State<Transaction> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChatScreen(),
+                          builder: (context) =>
+                              ChatScreen(commande: listCommande[index]),
                         ),
                       );
                     },
@@ -85,7 +89,44 @@ class _TransactionState extends State<Transaction> {
   }
 }
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
+  ChatScreen({required this.commande});
+  CommandeModel commande;
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+  TextEditingController messageController = TextEditingController();
+  late BehaviorSubject<List<MessageT>> _messagesStreamController;
+
+  @override
+  void initState() {
+    super.initState();
+    _messagesStreamController = BehaviorSubject<List<MessageT>>.seeded([]);
+    _initializeMessagesStream();
+  }
+
+  void _initializeMessagesStream() {
+    _management
+        .getMessages(widget.commande.clientToken, widget.commande.firebaseToken)
+        .listen((messages) {
+      _messagesStreamController.add(messages);
+    });
+  }
+
+  @override
+  void dispose() {
+    _messagesStreamController.close();
+    super.dispose();
+  }
+
+  Stream<List<MessageT>> getMessagesStream() {
+    return _messagesStreamController.stream;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,29 +146,27 @@ class ChatScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView(
-              // Affichez la liste des messages ici
-              children: [
-                MessageItem(
-                    isTailor: false,
-                    text: "Bonjour, j'ai besoin de votre aide."),
-                MessageItem(
-                    isTailor: true,
-                    text: "Bonjour! Comment puis-je vous aider?"),
-                MessageItem(
-                    isTailor: true,
-                    text: "Quel type de commande recherchez-vous?"),
-                // ... Ajoutez d'autres messages
-              ],
-            ),
-          ),
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: StreamBuilder(
+                  // stream: _management.getMessages(widget.commande.clientToken,
+                  //     widget.commande.firebaseToken),
+                  stream: getMessagesStream(),
+                  builder: (context, snapshot) {
+                    List<MessageT> m = snapshot.data ?? [];
+                    return ListView.builder(
+                        itemCount: m.length,
+                        itemBuilder: (context, index) {
+                          return MessageItem(message: m[index]);
+                        });
+                  })),
           Container(
             padding: EdgeInsets.all(10),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
+                    controller: messageController,
                     decoration:
                         InputDecoration(hintText: 'Écrivez un message...'),
                   ),
@@ -136,6 +175,16 @@ class ChatScreen extends StatelessWidget {
                   icon: Icon(Icons.send), // Icône d'envoi de message
                   onPressed: () {
                     // Ajoutez ici la logique pour envoyer le message
+                    setState(() {
+                      _management.createMessage(
+                          widget.commande.clientToken,
+                          widget.commande.firebaseToken,
+                          MessageT(
+                              message: messageController.text,
+                              timestamp: DateTime.now(),
+                              isTailleur: true));
+                      messageController.text = "";
+                    });
                   },
                 ),
               ],
@@ -148,23 +197,24 @@ class ChatScreen extends StatelessWidget {
 }
 
 class MessageItem extends StatelessWidget {
-  final bool isTailor;
-  final String text;
+  MessageT message;
 
-  MessageItem({required this.isTailor, required this.text});
+  MessageItem({required this.message});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: isTailor ? Alignment.centerRight : Alignment.centerLeft,
+      alignment:
+          message.isTailleur ? Alignment.centerRight : Alignment.centerLeft,
       margin: EdgeInsets.all(10),
       child: Card(
         child: Padding(
           padding: EdgeInsets.all(8),
-          child: Text(text),
+          child: Text(message.message),
         ),
-        color:
-            isTailor ? Colors.blue : Colors.grey, // Couleur de fond du message
+        color: message.isTailleur
+            ? Colors.blue
+            : Colors.grey, // Couleur de fond du message
       ),
     );
   }

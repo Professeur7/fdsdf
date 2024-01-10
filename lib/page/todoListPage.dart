@@ -4,6 +4,8 @@ import 'package:fashion2/models/soustaches.dart';
 import 'package:fashion2/models/tache.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 
 class ToDoListPage extends StatefulWidget {
   @override
@@ -16,6 +18,11 @@ class _ToDoListPageState extends State<ToDoListPage> {
   function() async {
     tasks = _management.tailleurs.first.taches!;
     // tasks = await _management.getTaches(_management.tailleurs.first.token!);
+  }
+
+  void main() {
+    initializeDateFormatting(); // Initialise la localisation pour les formats de date
+    // ... Votre code d'initialisation de l'application
   }
 
   @override
@@ -46,11 +53,26 @@ class _ToDoListPageState extends State<ToDoListPage> {
       body: ListView.builder(
         itemCount: tasks.length,
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(tasks[index].nom),
-            onTap: () {
-              navigateToTaskDetails(tasks[index]);
+          return Dismissible(
+            key: Key(tasks[index].token!),
+            onDismissed: (direction) {
+              // Supprimez la tâche de la liste lorsque l'utilisateur la fait glisser
+              setState(() {
+                tasks.removeAt(index);
+              });
             },
+            background: Container(
+              color: Colors.red,
+              child: Icon(Icons.delete, color: Colors.white),
+              alignment: Alignment.centerRight,
+              padding: EdgeInsets.only(right: 20.0),
+            ),
+            child: ListTile(
+              title: Text(tasks[index].nom),
+              onTap: () {
+                navigateToTaskDetails(tasks[index]);
+              },
+            ),
           );
         },
       ),
@@ -131,6 +153,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
 // Contrôleurs pour les champs
   final subTaskController1 = TextEditingController();
   final subTaskController2 = TextEditingController();
+  final subTaskController3 = TextEditingController();
   TextEditingController subTaskController = TextEditingController();
   FirebaseManagement _management = Get.put(FirebaseManagement());
   // Méthode pour afficher le sélecteur de date
@@ -180,7 +203,27 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                     itemCount: widget.task.sousTaches?.length,
                     itemBuilder: (context, index) {
                       return ListTile(
-                        title: Text(widget.task.sousTaches![index].description),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.task.sousTaches![index].description),
+                            Text(
+                              'Date: ${DateFormat('EEEE, d MMMM y', 'fr').format(widget.task.sousTaches![index].date as DateTime)}', // Remplacez avec la propriété de la date
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                            Text(
+                              'Heure début: ${DateFormat('HH:mm', 'fr').format(widget.task.sousTaches![index].debut as DateTime)}', // Remplacez avec la propriété de l'heure
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                            Text(
+                              'Heure fin: ${DateFormat('HH:mm', 'fr').format(widget.task.sousTaches![index].fin as DateTime)}', // Remplacez avec la propriété de l'heure
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                          ],
+                        ),
                         trailing: Checkbox(
                           value: widget.task.sousTaches![index].valide,
                           onChanged: (value) {
@@ -236,7 +279,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                       context); // Afficher le sélecteur d'heure au clic
                                 },
                                 decoration: InputDecoration(
-                                  labelText: 'Heure',
+                                  labelText: 'Heure debut',
+                                ),
+                              ),
+                              SizedBox(
+                                  height: 16), // Espacement entre les champs
+                              TextField(
+                                controller: subTaskController3,
+                                readOnly:
+                                    true, // Rendre le champ de texte en lecture seule
+                                onTap: () {
+                                  _selectTime(
+                                      context); // Afficher le sélecteur d'heure au clic
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Heure fin',
                                 ),
                               ),
                               // Autres champs pour debut, fin, valide, etc.

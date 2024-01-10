@@ -18,11 +18,13 @@ class PostAtelier {
 class PostAtelierVideo {
   List<PosteVideo> pub;
   String atelierNAme;
+  String tailleurToken;
   String lieux;
   String photAtelier;
   PostAtelierVideo(
       {required this.atelierNAme,
       required this.lieux,
+      required this.tailleurToken,
       required this.photAtelier,
       required this.pub});
 }

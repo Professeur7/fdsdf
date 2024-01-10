@@ -3,6 +3,8 @@ import 'package:fashion2/models/achatProduitModel.dart';
 import 'package:fashion2/models/commandeModel.dart';
 import 'package:fashion2/models/panierModel.dart';
 import 'package:fashion2/models/pannier.dart';
+import 'package:fashion2/models/poste.dart';
+import 'package:fashion2/models/postevideo.dart';
 import 'package:fashion2/models/produitModel.dart';
 import 'package:fashion2/page/client/pageCommentaire.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
@@ -35,59 +37,7 @@ class _PublicationsClientState extends State<PublicationsClient>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    if (c.allPoste == []) {
-    } else {
-      for (final i in c.allPoste) {
-        if (i.pub.isNotEmpty) {
-          atelierLieux.add(i.lieux);
-          atelierLogo.add(i.photAtelier);
-          atelierName.add(i.atelierNAme);
-          tailleurToken.add(i.tailleurToken);
-          for (final c in i.pub) {
-            imageLinks.add(c.images!.first.image);
-          }
-        }
-      }
-      if (c.allPoste.isNotEmpty) {
-        for (final i in c.allPoste) {
-          if (i.pub.isNotEmpty) comment.add(i.pub.first.description);
-        }
-      }
-    }
-    if (c.allVideoPostes == []) {
-    } else {
-      for (final i in c.allVideoPostes) {
-        if (i.pub.isNotEmpty) {
-          atelierLieuxVideo.add(i.lieux);
-          atelierLogoVideo.add(i.photAtelier);
-          atelierNameVideo.add(i.atelierNAme);
-          for (final c in i.pub.first.videos!) {
-            imageLinksvideo.add(c.video);
-          }
-        }
-      }
-      if (c.allVideoPostes.isNotEmpty) {
-        for (final i in c.allVideoPostes) {
-          if (i.pub.isNotEmpty) {
-            commentvideo.add(i.pub.first.description);
-          }
-        }
-      }
-    }
   }
-
-  List<String> imageLinks = [];
-  List<String> comment = [];
-  List<String> atelierName = [];
-  List<String> atelierLieux = [];
-  List<String> atelierLogo = [];
-  List<String> tailleurToken = [];
-
-  List<String> atelierNameVideo = [];
-  List<String> atelierLieuxVideo = [];
-  List<String> atelierLogoVideo = [];
-  List<String> imageLinksvideo = [];
-  List<String> commentvideo = [];
 
   final FirebaseManagement c = Get.put(FirebaseManagement());
   @override
@@ -103,7 +53,7 @@ class _PublicationsClientState extends State<PublicationsClient>
             color: Colors.grey,
           ),
           onPressed: () {
-            Navigator.pop(context);
+            //Navigator.pop(context);
           },
         ),
         actions: [
@@ -136,23 +86,46 @@ class _PublicationsClientState extends State<PublicationsClient>
       body: TabBarView(
         controller: _tabController,
         children: [
-          PublicationList(
-            tailleurToken: tailleurToken,
-            type: "Photos",
-            photos: imageLinks,
-            comments: comment,
-            atelierLieux: atelierLieux,
-            atelierLogo: atelierLogo,
-            atelierName: atelierName,
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: ListView.builder(
+                itemCount: c.allPoste.length,
+                itemBuilder: (context, index) {
+                  return PublicationList(
+                    tailleurToken: c.allPoste[index].tailleurToken,
+                    type: "Photos",
+                    postes: c.allPoste[index].pub,
+                    atelierLieux: c.allPoste[index].lieux,
+                    atelierLogo: c.allPoste[index].photAtelier,
+                    atelierName: c.allPoste[index].atelierNAme,
+                  );
+                }),
           ),
-          PublicationListVideo(
-            atelierLieux: atelierLieuxVideo,
-            atelierLogo: atelierLogoVideo,
-            atelierName: atelierNameVideo,
-            type: "Vidéos",
-            photos: imageLinksvideo,
-            comments: commentvideo,
+
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.9,
+            child: ListView.builder(
+                itemCount: c.allVideoPostes.length,
+                itemBuilder: (context, index) {
+                  return PublicationListVideo(
+                    tailleurToken: c.allVideoPostes[index].tailleurToken,
+                    type: "Vidéos",
+                    postes: c.allVideoPostes[index].pub,
+                    atelierLieux: c.allVideoPostes[index].lieux,
+                    atelierLogo: c.allVideoPostes[index].photAtelier,
+                    atelierName: c.allVideoPostes[index].atelierNAme,
+                  );
+                }),
           ),
+
+          // PublicationListVideo(
+          //   atelierLieux: c.allVideoPostes[index],
+          //   atelierLogo: atelierLogoVideo,
+          //   atelierName: atelierNameVideo,
+          //   type: "Vidéos",
+          //   tailleurToken: imageLinksvideo,
+          //   postes: commentvideo,
+          // ),
         ],
       ),
     );
@@ -174,39 +147,40 @@ class FavoritesPage extends StatelessWidget {
 }
 
 class PublicationList extends StatelessWidget {
-  //FirebaseManagement _management = Get.put(FirebaseManagement());
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   final String type;
-  final List<String> photos;
-  final List<String> comments;
-  List<String> atelierName;
-  List<String> atelierLieux;
-  List<String> atelierLogo;
-  List<String> tailleurToken;
+  List<Poste> postes;
+  String atelierName;
+  String atelierLieux;
+  String atelierLogo;
+  String tailleurToken;
 
   PublicationList(
       {required this.type,
+      required this.postes,
       required this.atelierLieux,
       required this.atelierName,
       required this.atelierLogo,
-      required this.photos,
-      required this.tailleurToken,
-      required this.comments});
+      required this.tailleurToken});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: photos.length,
-      itemBuilder: (context, index) {
-        return PublicationTile(
-          tailleurToken: tailleurToken[index],
-          photoUrl: photos[index],
-          comment: comments[index],
-          workshopProfile: atelierLogo[index],
-          type: type,
-          workshopName: atelierName[index],
-          workshopLocation: atelierLieux[index],
-        );
-      },
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.45,
+      child: ListView.builder(
+        itemCount: _management.allPoste.length,
+        itemBuilder: (context, index) {
+          return PublicationTile(
+            tailleurToken: tailleurToken,
+            photoUrl: postes[index].images!.first.image,
+            comment: postes[index].description,
+            workshopProfile: atelierLogo,
+            type: type,
+            workshopName: atelierName,
+            workshopLocation: atelierLieux,
+          );
+        },
+      ),
     );
   }
 }
@@ -214,34 +188,38 @@ class PublicationList extends StatelessWidget {
 class PublicationListVideo extends StatelessWidget {
   //FirebaseManagement _management = Get.put(FirebaseManagement());
   final String type;
-  final List<String> photos;
-  final List<String> comments;
-  List<String> atelierName;
-  List<String> atelierLieux;
-  List<String> atelierLogo;
+  List<PosteVideo> postes;
+  String atelierName;
+  String atelierLieux;
+  String atelierLogo;
+  String tailleurToken;
 
   PublicationListVideo(
       {required this.type,
       required this.atelierLieux,
       required this.atelierName,
       required this.atelierLogo,
-      required this.photos,
-      required this.comments});
+      required this.tailleurToken,
+      required this.postes});
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: photos.length,
-      itemBuilder: (context, index) {
-        return PublicationVideoTile(
-          photoUrl: photos[index],
-          comment: comments[index],
-          type: type,
-          workshopName: atelierName[index],
-          workshopProfile: atelierLogo[index],
-          workshopLocation: atelierLieux[index],
-        );
-      },
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.7,
+      child: ListView.builder(
+        itemCount: postes.length,
+        itemBuilder: (context, index) {
+          return PublicationVideoTile(
+            tailleurToken: tailleurToken,
+            photoUrl: postes[index].videos!.first.video,
+            comment: postes[index].description,
+            type: type,
+            workshopName: atelierName,
+            workshopProfile: atelierLogo,
+            workshopLocation: atelierLieux,
+          );
+        },
+      ),
     );
   }
 }
@@ -343,10 +321,13 @@ class _PublicationTileState extends State<PublicationTile> {
                     ),
                     child: _management.atelier.length == 0
                         ? Container()
-                        : FittedBox(
-                            fit: BoxFit.cover,
-                            child: Image.network(
-                              _management.atelier.first.imageUrl!,
+                        : SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.2,
+                            child: FittedBox(
+                              fit: BoxFit.cover,
+                              child: Image.network(
+                                _management.atelier.first.imageUrl!,
+                              ),
                             ),
                           ),
                   ),
@@ -511,8 +492,9 @@ class _PublicationTileState extends State<PublicationTile> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Ajoutez ici la logique pour laisser un commentaire
+                      // Ajoutez ici la logique pour laisser une commande
                       final commande = CommandeModel(
+                        clientToken: _management.clients.first.token!,
                           tailleurToken: widget.tailleurToken,
                           firebaseToken: _management.clients.first.token!,
                           prix: 0,
@@ -550,8 +532,10 @@ class PublicationVideoTile extends StatefulWidget {
   final String workshopName;
   final String workshopLocation;
   final String workshopProfile;
+  final String tailleurToken;
 
   PublicationVideoTile({
+    required this.tailleurToken,
     required this.photoUrl,
     required this.comment,
     required this.type,
@@ -773,28 +757,6 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                     Text('$likeCount'),
                   ],
                 ),
-                // Row(
-                //   children: [
-                //     IconButton(
-                //       icon: Icon(
-                //         Icons.thumb_down,
-                //         color: dislikeCount > 0 ? Colors.orange : null,
-                //       ),
-                //       onPressed: () {
-                //         setState(() {
-                //           dislikeCount += isDisliked ? -1 : 1;
-                //           isDisliked = !isDisliked;
-                //           if (isLiked) {
-                //             isLiked = false;
-                //             likeCount--;
-                //           }
-                //         });
-                //       },
-                //     ),
-                //     SizedBox(width: 4),
-                //     Text('$dislikeCount'),
-                //   ],
-                // ),
               ],
             ),
           ),
@@ -821,7 +783,26 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
-                      // Ajoutez ici la logique pour laisser un commentaire
+                      // Ajoutez ici la logique pour passer une commande
+                      final commande = CommandeModel(
+                        clientToken: _management.clients.first.token! ,
+                          tailleurToken: widget.tailleurToken,
+                          firebaseToken: _management.clients.first.token!,
+                          prix: 0,
+                          dateCommande: DateTime.now(),
+                          etatCommande: false,
+                          produit: [
+                            PanierModel(qteProduit: 0, prixTotal: 0, produit: [
+                              AchatProduitModel(
+                                  nom: widget.workshopName,
+                                  description: widget.comment,
+                                  prix: 0,
+                                  image: widget.photoUrl,
+                                  qteCommande: 1)
+                            ])
+                          ]);
+                      _management.createCommande(
+                          _management.clients.first.token!, commande);
                     },
                     child: Text("Passer une commande"),
                   ),

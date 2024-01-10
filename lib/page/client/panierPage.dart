@@ -40,46 +40,45 @@ class _PanierPageState extends State<PanierPage> {
             child: ListView.builder(
               itemCount: cartItems.length,
               itemBuilder: (context, index) {
-                return Dismissible(
-                  key: UniqueKey(),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    alignment: AlignmentDirectional.centerEnd,
-                    color: Colors.red,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0.0, 0.0, 10.0, 0.0),
-                      child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  onDismissed: (direction) {
-                    setState(() {
-                      cartItems.removeAt(index);
-                    });
-                  },
+                return Card(
+                  elevation: 2,
+                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                   child: ListTile(
                     leading: Container(
                       width: 80, // Large espace pour l'image
                       height: 80,
                       decoration: BoxDecoration(
                         color: Colors.grey,
+                        borderRadius: BorderRadius.circular(8),
                         // Ajoutez ici votre logique pour afficher l'image du produit
                       ),
                     ),
                     title: Text(cartItems[index].name),
-                    subtitle:
-                        Text('${cartItems[index].price.toString()} F CFA'),
+                    subtitle: Text(
+                      '${cartItems[index].price.toString()} F CFA',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: <Widget>[
-                        ElevatedButton(
+                        IconButton(
                           onPressed: () {
-                            // Implémentez ici la logique pour acheter ce produit
-                            buyProduct(index);
+                            setState(() {
+                              cartItems[index].quantity++;
+                            });
                           },
-                          child: Text('Acheter'),
+                          icon: Icon(Icons.shop_rounded),
+                        ),
+                        Text(cartItems[index].quantity.toString()),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              if (cartItems[index].quantity > 1) {
+                                cartItems[index].quantity--;
+                              }
+                            });
+                          },
+                          icon: Icon(Icons.payment),
                         ),
                       ],
                     ),
@@ -88,14 +87,22 @@ class _PanierPageState extends State<PanierPage> {
               },
             ),
           ),
+          ElevatedButton(
+            onPressed: () {
+              // Implémentez ici la logique pour acheter les produits
+              buyProducts();
+            },
+            child: Text('Acheter'),
+          ),
+          SizedBox(height: 16),
         ],
       ),
     );
   }
 
-  void buyProduct(int index) {
-    // Implémentez ici la logique d'achat du produit à l'index spécifié
-    // Par exemple, vous pouvez ouvrir une page de confirmation d'achat pour ce produit
+  void buyProducts() {
+    // Implémentez ici la logique pour acheter tous les produits du panier
+    // Par exemple, afficher une boîte de dialogue de confirmation d'achat
   }
 }
 

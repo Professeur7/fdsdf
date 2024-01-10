@@ -1,6 +1,6 @@
 import 'package:fashion2/screen/clientHomeScreen.dart';
+import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:flutter/material.dart';
-
 
 class ClientPageDrawer extends StatefulWidget {
   @override
@@ -25,7 +25,8 @@ class _ClientPageDrawerState extends State<ClientPageDrawer> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ClientHomeScreen(), // Remplacez PageDefault par votre widget de page par défaut
+                builder: (context) =>
+                    ClientHomeScreen(), // Remplacez PageDefault par votre widget de page par défaut
               ),
             );
           },
@@ -51,6 +52,28 @@ class _ClientPageDrawerState extends State<ClientPageDrawer> {
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () {
               // Naviguer vers une page de sélection de langue
+            },
+          ),
+          ListTile(
+            title: Text(
+              'Déconnexion',
+              style: TextStyle(
+                color: Color(0xFF09126C), // Utiliser la couleur spécifiée
+              ),
+            ),
+            trailing: Icon(
+              Icons.exit_to_app,
+              color: Color(0xFF09126C), // Utiliser la même couleur pour l'icône
+            ),
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => LoginSignupScreen()
+                    // Remplacez PageDefault par votre widget de page par défaut
+                    ),
+              );
+
+              // Logique de déconnexion
             },
           ),
           ListTile(

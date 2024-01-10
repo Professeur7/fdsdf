@@ -3,6 +3,7 @@ import 'package:fashion2/config/palette.dart';
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/client.dart';
 import 'package:fashion2/models/tailleurs.dart';
+import 'package:fashion2/page/client/clientDashboard.dart';
 import 'package:fashion2/screen/home_screen.dart';
 import 'package:fashion2/widgets/atelierRegisterScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_icons_null_safety/flutter_icons_null_safety.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import '../widgets/pageEnregistrementClient.dart';
 import 'clientHomeScreen.dart';
@@ -37,17 +39,17 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   CollectionReference userRef =
       FirebaseFirestore.instance.collection("tailleurs");
 
-  Future<void> login(BuildContext context, bool isLogin) async {
+  Future<int> login(BuildContext context, bool isLogin) async {
     try {
       // Vérification de la longueur du mot de passe
       if (password.text.length < 6) {
         Fluttertoast.showToast(
             msg: "Le mot de passe doit avoir au moins 6 caractères");
         Navigator.pop(context); // Fermer la boîte de dialogue
-        return;
+        return 0;
       }
 
-      Future<void> registerUser(User) async {
+      Future<int> registerUser(User) async {
         await _management.auth.value.createUserWithEmailAndPassword(
           email: User.email,
           password: User.password,
@@ -62,26 +64,17 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
             ? {
                 userRef = FirebaseFirestore.instance.collection("tailleurs"),
                 _management.createTailleurs(User),
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AtelierRegistrationPage()),
-                )
               }
             : {
                 userRef = FirebaseFirestore.instance.collection("Clients"),
-                _management.createClient(User),
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ClientRegistrationPage()))
+                _management.createClient(User)
               };
-
+        return User.runtimeType == Tailleurs ? -1 : -2;
         //Future.delayed(Duration(seconds: 30));
         // Naviguer vers HomeScreen après l'inscription réussie
       }
 
-      Future<void> loginUser(email, password) async {
+      Future<int> loginUser(email, password) async {
         UserCredential userCredential = await auth.signInWithEmailAndPassword(
           email: email,
           password: password,
@@ -99,6 +92,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
           listC = await _management.getAllClient();
         } catch (e) {
           print("errrrrrrrrrrrrroooooooooooooooooooooooo");
+          return 0;
         }
 
         if (listT
@@ -109,19 +103,15 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
               .where((element) =>
                   element.email == email && element.password == password)
               .first);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
-          );
+          //Navigator.pop(context);
+          return 1;
         } else {
           _management.getClient(listC
               .where((element) =>
                   element.email == email && element.password == password)
               .first);
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => ClientHomeScreen()),
-          );
+          //Navigator.pop(context);
+          return 2;
         }
       }
 
@@ -151,27 +141,51 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
           Fluttertoast.showToast(
               msg: "Cet email est déjà utilisé par un autre utilisateur");
           Navigator.pop(context); // Fermer la boîte de dialogue
-          return;
+          return 0;
         }
       }
 
       if (!isLogin) {
-        await loginUser(email.text, password.text);
+        final resut = await loginUser(email.text, password.text);
+        return resut;
       } else {
         String g = "";
+        int value = 0;
         isMale == true ? g = "Homme" : g = "Femme";
         isTailleur == true
-            ? await registerUser(Tailleurs(
+            ? value = await registerUser(Tailleurs(
                 password: password.text,
                 username: userName.text,
                 email: email.text,
                 genre: g))
-            : registerUser(Client(
+            : value = await registerUser(Client(
                 username: userName.text,
                 email: email.text,
                 genre: g,
                 password: password.text));
+        return value;
       }
+
+      Future<void> signInWithGoogle() async {
+        GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+        GoogleSignInAuthentication? googleAuth =
+            await googleUser?.authentication;
+
+        AuthCredential credential = GoogleAuthProvider.credential(
+            accessToken: googleAuth?.accessToken, idToken: googleAuth?.idToken);
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithCredential(credential);
+        print(userCredential.user?.displayName);
+
+        if (userCredential.user != null) {
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => AtelierRegistrationPage(),
+          ));
+        }
+      }
+
+      signInWithFacebook() {}
     } on FirebaseAuthException catch (e) {
       Fluttertoast.showToast(msg: "Erreur d'authentification: ${e.message}");
       print("Firebase Error Code: ${e.code}"); // Print Firebase error code
@@ -181,6 +195,7 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
     } finally {
       //Navigator.pop(context); // Fermer la boîte de dialogue
     }
+    return 3;
   }
 
   @override
@@ -594,7 +609,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
   TextButton buildTextButton(
       IconData icon, String title, Color backgroundColor) {
     return TextButton(
-      onPressed: () {},
+      onPressed: () {
+        //login(context, signInWith)
+      },
       style: TextButton.styleFrom(
         foregroundColor: Colors.white,
         side: const BorderSide(width: 1, color: Colors.grey),
@@ -625,8 +642,9 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
       left: 0,
       child: Center(
         child: GestureDetector(
-          onTap: () {
+          onTap: () async {
             showDialog(
+              useRootNavigator: false,
               context: context,
               builder: (context) {
                 return AlertDialog(
@@ -643,7 +661,29 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
                 );
               },
             );
-            login(context, isSignupScreen);
+            final b = await login(context, isSignupScreen);
+            Navigator.of(context).pop();
+            Future.delayed(Duration(seconds: 3));
+            print("voici qui a ete retourner $b");
+            if (b == 1) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()));
+            } else if (b == 2) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ClientHomeScreen()));
+            } else if (b == -1) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AtelierRegistrationPage()));
+            } else if (b == -2) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ClientRegistrationPage()));
+            } else {
+              print("it's okay");
+            }
           },
           child: Container(
             height: 90,

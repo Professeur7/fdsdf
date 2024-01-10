@@ -1,6 +1,7 @@
 import 'package:fashion2/api/firebase_api.dart';
 import 'package:fashion2/firebase_options.dart';
 import 'package:fashion2/widgets/splashPage.dart';
+import 'package:fashion2/screen/loginSignupScreen.dart';
 import 'package:fashion2/screen/notification_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ void main() async {
   await FirebaseApi().initNotifications();
   runApp(
     GetMaterialApp(
+      debugShowCheckedModeBanner: false,
       home: MyApp(),
     ),
   );

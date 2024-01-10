@@ -1,9 +1,12 @@
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/commandeModel.dart';
+import 'package:fashion2/page/client/clientDashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rxdart/rxdart.dart';
 
-import '../../screen/home_screen.dart';
+//import '../../screen/home_screen.dart';
 
 class ClientOrderPage extends StatefulWidget {
   const ClientOrderPage({super.key});
@@ -14,10 +17,8 @@ class ClientOrderPage extends StatefulWidget {
 
 class _ClientOrderPageState extends State<ClientOrderPage> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
-  List<CommandeModel> listCommande = [];
   function() async {
-    listCommande =
-        await _management.getAllCommande(_management.clients.first.token!);
+    await _management.getAllCommande(_management.clients.first.token!);
   }
 
   @override
@@ -31,7 +32,7 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mes Commandes'),
+        title: Text('Mes Commandes 1'),
         backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
@@ -42,7 +43,7 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomeScreen(),
+                builder: (context) => HomePageClient(),
               ),
             );
           },
@@ -54,7 +55,7 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: listCommande
+                itemCount: _management.commandes
                     .length, // Remplacez par le nombre réel de commandes du client
                 itemBuilder: (context, index) {
                   return GestureDetector(
@@ -63,8 +64,9 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ClientOrderDetailsPage(orderNumber: index + 1),
+                          builder: (context) => ClientOrderDetailsPage(
+                              orderNumber: index + 1,
+                              commande: _management.commandes[index]),
                         ),
                       );
                     },
@@ -72,7 +74,7 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
                       margin: EdgeInsets.all(10),
                       child: ListTile(
                         title: Text(
-                            'Commande #${listCommande[index].tailleurToken}'),
+                            'Commande #${_management.commandes[index].tailleurToken}'),
                         subtitle: Text('Description de la commande'),
                         trailing: Icon(Icons.message), // Icône de discussion
                       ),
@@ -90,8 +92,10 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
 
 class ClientOrderDetailsPage extends StatelessWidget {
   final int orderNumber;
+  CommandeModel commande;
 
-  const ClientOrderDetailsPage({Key? key, required this.orderNumber})
+  ClientOrderDetailsPage(
+      {Key? key, required this.orderNumber, required this.commande})
       : super(key: key);
 
   @override
@@ -119,7 +123,7 @@ class ClientOrderDetailsPage extends StatelessWidget {
           // ... Ajoutez d'autres détails de la commande
           // Ajoutez ici une section pour la discussion avec l'atelier (similaire à la page du tailleur)
           Expanded(
-            child: ClientChatScreen(orderNumber: orderNumber),
+            child: ClientChatScreen(commande: commande),
           ),
         ],
       ),
@@ -127,37 +131,68 @@ class ClientOrderDetailsPage extends StatelessWidget {
   }
 }
 
-class ClientChatScreen extends StatelessWidget {
-  final int orderNumber;
+class ClientChatScreen extends StatefulWidget {
+  CommandeModel commande;
 
-  const ClientChatScreen({Key? key, required this.orderNumber})
-      : super(key: key);
+  ClientChatScreen({Key? key, required this.commande}) : super(key: key);
+
+  @override
+  State<ClientChatScreen> createState() => _ClientChatScreenState();
+}
+
+class _ClientChatScreenState extends State<ClientChatScreen> {
+  FirebaseManagement _management = Get.put(FirebaseManagement());
+  TextEditingController message = TextEditingController();
+  late BehaviorSubject<List<MessageT>> _messagesStreamController;
+
+  @override
+  void initState() {
+    super.initState();
+    _messagesStreamController = BehaviorSubject<List<MessageT>>.seeded([]);
+    _initializeMessagesStream();
+  }
+
+  void _initializeMessagesStream() {
+    _management
+        .getMessages(widget.commande.clientToken, widget.commande.firebaseToken)
+        .listen((messages) {
+      _messagesStreamController.add(messages);
+    });
+  }
+
+  @override
+  void dispose() {
+    _messagesStreamController.close();
+    super.dispose();
+  }
+
+  Stream<List<MessageT>> getMessagesStream() {
+    return _messagesStreamController.stream;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Expanded(
-          child: ListView(
-            // Affichez la liste des messages ici
-            children: [
-              MessageItem(
-                  isTailor: true, text: "Bonjour! Comment puis-je vous aider?"),
-              MessageItem(
-                  isTailor: false, text: "Bonjour, j'ai besoin de votre aide."),
-              MessageItem(
-                  isTailor: false,
-                  text: "Je voudrais discuter de ma commande #$orderNumber."),
-              // ... Ajoutez d'autres messages
-            ],
-          ),
-        ),
+        SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: StreamBuilder(
+                stream: getMessagesStream(),
+                builder: (context, snapshot) {
+                  List<MessageT> m = snapshot.data ?? [];
+                  return ListView.builder(
+                      itemCount: m.length,
+                      itemBuilder: (context, index) {
+                        return MessageItem(message: m[index]);
+                      });
+                })),
         Container(
           padding: EdgeInsets.all(10),
           child: Row(
             children: [
               Expanded(
                 child: TextField(
+                  controller: message,
                   decoration:
                       InputDecoration(hintText: 'Écrivez un message...'),
                 ),
@@ -166,6 +201,16 @@ class ClientChatScreen extends StatelessWidget {
                 icon: Icon(Icons.send), // Icône d'envoi de message
                 onPressed: () {
                   // Ajoutez ici la logique pour envoyer le message
+                  setState(() {
+                    _management.createMessage(
+                        _management.clients.first.token!,
+                        widget.commande.firebaseToken,
+                        MessageT(
+                            message: message.text,
+                            timestamp: DateTime.now(),
+                            isTailleur: false));
+                    message.clear();
+                  });
                 },
               ),
             ],
@@ -177,23 +222,24 @@ class ClientChatScreen extends StatelessWidget {
 }
 
 class MessageItem extends StatelessWidget {
-  final bool isTailor;
-  final String text;
+  MessageT message;
 
-  MessageItem({required this.isTailor, required this.text});
+  MessageItem({required this.message});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      alignment: isTailor ? Alignment.centerRight : Alignment.centerLeft,
+      alignment:
+          message.isTailleur ? Alignment.centerRight : Alignment.centerLeft,
       margin: EdgeInsets.all(10),
       child: Card(
         child: Padding(
           padding: EdgeInsets.all(8),
-          child: Text(text),
+          child: Text(message.message),
         ),
-        color:
-            isTailor ? Colors.blue : Colors.grey, // Couleur de fond du message
+        color: message.isTailleur
+            ? Colors.blue
+            : Colors.grey, // Couleur de fond du message
       ),
     );
   }

@@ -62,12 +62,26 @@ dependencies:
   cached_network_image: ^3.3.0
   video_player: ^2.8.1
   dropdown_button2: ^2.3.9
+  google_sign_in: ^6.1.6
+  flutter_facebook_auth: ^6.0.3
+  local_auth: ^2.1.7
+  status_alert: ^1.0.1
+  google_fonts: ^6.1.0
+  sign_in_button: ^3.2.0
+  flutter_riverpod: ^2.4.9
+  
 
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/Fashion.png"
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

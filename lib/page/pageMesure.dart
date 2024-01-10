@@ -318,7 +318,7 @@ class _MesuresPageState extends State<MesuresPage> {
                     hint: const Row(
                       children: [
                         Icon(
-                          Icons.list,
+                          Icons.person,
                           size: 16,
                           color: Colors.yellow,
                         ),
@@ -327,11 +327,11 @@ class _MesuresPageState extends State<MesuresPage> {
                         ),
                         Expanded(
                           child: Text(
-                            'Clients',
+                            'Selectionne le client dans votre liste',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.yellow,
+                              color: Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -362,14 +362,14 @@ class _MesuresPageState extends State<MesuresPage> {
                     },
                     buttonStyleData: ButtonStyleData(
                       height: 50,
-                      width: 160,
+                      width: 400,
                       padding: const EdgeInsets.only(left: 14, right: 14),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.black26,
                         ),
-                        color: Colors.redAccent,
+                        color: Colors.grey,
                       ),
                       elevation: 2,
                     ),
@@ -386,7 +386,7 @@ class _MesuresPageState extends State<MesuresPage> {
                       width: 200,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
-                        color: Colors.redAccent,
+                        color: Colors.grey,
                       ),
                       offset: const Offset(-20, 0),
                       scrollbarTheme: ScrollbarThemeData(

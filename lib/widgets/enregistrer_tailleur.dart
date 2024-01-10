@@ -88,8 +88,8 @@ class _TailleurRegistrationPageState extends State<TailleurRegistrationPage> {
                   alignment: Alignment.center,
                   children: [
                     Container(
-                      width: 100,
-                      height: 100,
+                      width: 150,
+                      height: 150,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
