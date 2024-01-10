@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/commandeModel.dart';
@@ -101,16 +103,24 @@ class _ChatScreenState extends State<ChatScreen> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
   TextEditingController messageController = TextEditingController();
   late BehaviorSubject<List<MessageT>> _messagesStreamController;
+  late StreamSubscription<List<MessageT>> _messagesSubscription;
+  //static bool isListing = true;
+  List<MessageT> list = [];
+  function() async {
+    list = await _management.getMessage(
+        widget.commande.clientToken, widget.commande.firebaseToken);
+  }
 
   @override
   void initState() {
     super.initState();
     _messagesStreamController = BehaviorSubject<List<MessageT>>.seeded([]);
     _initializeMessagesStream();
+    //isListing = false;
   }
 
   void _initializeMessagesStream() {
-    _management
+    _messagesSubscription = _management
         .getMessages(widget.commande.clientToken, widget.commande.firebaseToken)
         .listen((messages) {
       _messagesStreamController.add(messages);
@@ -120,6 +130,9 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _messagesStreamController.close();
+    // _management.getMessages(
+    //     widget.commande.clientToken, widget.commande.firebaseToken);
+    _messagesSubscription.cancel();
     super.dispose();
   }
 
@@ -152,6 +165,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   // stream: _management.getMessages(widget.commande.clientToken,
                   //     widget.commande.firebaseToken),
                   stream: getMessagesStream(),
+                  //initialData: list,
                   builder: (context, snapshot) {
                     List<MessageT> m = snapshot.data ?? [];
                     return ListView.builder(

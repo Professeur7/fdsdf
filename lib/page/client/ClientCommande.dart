@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/commandeModel.dart';
@@ -143,8 +145,10 @@ class ClientChatScreen extends StatefulWidget {
 class _ClientChatScreenState extends State<ClientChatScreen> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
   TextEditingController message = TextEditingController();
-  late BehaviorSubject<List<MessageT>> _messagesStreamController;
 
+  late BehaviorSubject<List<MessageT>> _messagesStreamController;
+  static bool isListing = true;
+  late StreamSubscription<List<MessageT>> _messagesSubscription;
   @override
   void initState() {
     super.initState();
@@ -153,7 +157,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
   }
 
   void _initializeMessagesStream() {
-    _management
+    _messagesSubscription = _management
         .getMessages(widget.commande.clientToken, widget.commande.firebaseToken)
         .listen((messages) {
       _messagesStreamController.add(messages);
@@ -163,6 +167,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
   @override
   void dispose() {
     _messagesStreamController.close();
+    _messagesSubscription.cancel();
     super.dispose();
   }
 

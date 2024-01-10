@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:rxdart/rxdart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fashion2/models/achatProduitModel.dart';
 import 'package:fashion2/models/albums.dart';
@@ -886,12 +886,28 @@ class FirebaseManagement extends GetxController {
     });
   }
 
-  StreamController<List<MessageT>> _messageController =
+  StreamController<List<MessageT>> _messagesStreamController =
       StreamController<List<MessageT>>();
+  BehaviorSubject<List<MessageT>> _messagesSubject =
+      BehaviorSubject<List<MessageT>>.seeded([]);
 
   Stream<List<MessageT>> getMessages(
       String idClient, String idCommande) async* {
-    await _db
+    // _db
+    //     .collection("Clients")
+    //     .doc(idClient)
+    //     .collection("Commande")
+    //     .doc(idCommande)
+    //     .collection("Message")
+    //     .orderBy("time", descending: true)
+    //     .snapshots()
+    //     .listen((snapshot) {
+    //   List<MessageT> messages =
+    //       snapshot.docs.map((e) => MessageT.fromMap(e)).toList();
+    //   _messagesStreamController.add(messages);
+    // });
+
+    _db
         .collection("Clients")
         .doc(idClient)
         .collection("Commande")
@@ -899,12 +915,15 @@ class FirebaseManagement extends GetxController {
         .collection("Message")
         .orderBy("time", descending: true)
         .snapshots()
-        .listen((snapshot) {
-      List<MessageT> messages =
-          snapshot.docs.map((e) => MessageT.fromMap(e)).toList();
-      _messageController.add(messages);
+        .map((snapshot) =>
+            snapshot.docs.map((e) => MessageT.fromMap(e)).toList())
+        .listen((messages) {
+      _messagesSubject.add(messages);
     });
-    yield* _messageController.stream;
+
+    yield* _messagesSubject.stream;
+
+    //yield* _messagesStreamController.stream;
   }
 
   Future<List<MessageT>> getMessage(String idClient, String idCommande) async {
