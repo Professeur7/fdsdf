@@ -1,4 +1,7 @@
+import 'package:fashion2/firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import '../../screen/clientHomeScreen.dart';
 
 class PanierPage extends StatefulWidget {
@@ -7,11 +10,7 @@ class PanierPage extends StatefulWidget {
 }
 
 class _PanierPageState extends State<PanierPage> {
-  List<CartItem> cartItems = [
-    CartItem(name: 'Produit 1', price: 5000, quantity: 1),
-    CartItem(name: 'Produit 2', price: 7500, quantity: 1),
-    // Ajoutez d'autres éléments au panier
-  ];
+  final FirebaseManagement c = Get.put(FirebaseManagement());
 
   @override
   Widget build(BuildContext context) {
@@ -36,56 +35,68 @@ class _PanierPageState extends State<PanierPage> {
       ),
       body: Column(
         children: <Widget>[
-          Expanded(
-            child: ListView.builder(
-              itemCount: cartItems.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  elevation: 2,
-                  margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                  child: ListTile(
-                    leading: Container(
-                      width: 80, // Large espace pour l'image
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(8),
-                        // Ajoutez ici votre logique pour afficher l'image du produit
+          FutureBuilder(
+            future: c.getAllPannier(c.clients.first.token!),
+            builder: (context, snap) {
+              final data = snap.data;
+              return Expanded(
+                child: ListView.builder(
+                  itemCount: data != null ? data.length : 0,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      elevation: 2,
+                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      child: ListTile(
+                        leading: Container(
+                          width: 80, // Large espace pour l'image
+                          height: 80,
+                          decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(8),
+                              // Ajoutez ici votre logique pour afficher l'image du produit
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                      data![index].produit.isNotEmpty
+                                          ? data[index].produit.first.image
+                                          : ""))),
+                        ),
+                        title: Text(data![index].produit.isNotEmpty
+                            ? data[index].produit.first.nom
+                            : "no product"),
+                        subtitle: Text(
+                          '${data[index].produit.first.prix.toString()} F CFA',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  data[index].prixTotal++;
+                                });
+                              },
+                              icon: Icon(Icons.shop_rounded),
+                            ),
+                            Text(data[index].prixTotal.toString()),
+                            IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  if (data[index].prixTotal > 1) {
+                                    data[index].prixTotal--;
+                                  }
+                                });
+                              },
+                              icon: Icon(Icons.payment),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    title: Text(cartItems[index].name),
-                    subtitle: Text(
-                      '${cartItems[index].price.toString()} F CFA',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              cartItems[index].quantity++;
-                            });
-                          },
-                          icon: Icon(Icons.shop_rounded),
-                        ),
-                        Text(cartItems[index].quantity.toString()),
-                        IconButton(
-                          onPressed: () {
-                            setState(() {
-                              if (cartItems[index].quantity > 1) {
-                                cartItems[index].quantity--;
-                              }
-                            });
-                          },
-                          icon: Icon(Icons.payment),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
           ElevatedButton(
             onPressed: () {

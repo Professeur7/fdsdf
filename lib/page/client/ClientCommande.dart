@@ -147,7 +147,6 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
   TextEditingController message = TextEditingController();
 
   late BehaviorSubject<List<MessageT>> _messagesStreamController;
-  static bool isListing = true;
   late StreamSubscription<List<MessageT>> _messagesSubscription;
   @override
   void initState() {

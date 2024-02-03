@@ -105,11 +105,6 @@ class _ChatScreenState extends State<ChatScreen> {
   late BehaviorSubject<List<MessageT>> _messagesStreamController;
   late StreamSubscription<List<MessageT>> _messagesSubscription;
   //static bool isListing = true;
-  List<MessageT> list = [];
-  function() async {
-    list = await _management.getMessage(
-        widget.commande.clientToken, widget.commande.firebaseToken);
-  }
 
   @override
   void initState() {
@@ -130,8 +125,6 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void dispose() {
     _messagesStreamController.close();
-    // _management.getMessages(
-    //     widget.commande.clientToken, widget.commande.firebaseToken);
     _messagesSubscription.cancel();
     super.dispose();
   }

@@ -75,11 +75,12 @@ class _PublicationsClientState extends State<PublicationsClient>
             Tab(text: "Vidéos"),
           ],
           indicator: ShapeDecoration(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                  25), // Ajustez le rayon selon votre besoin
-            ),
-            color: Colors.blue, // Couleur de l'indicateur
+            shape: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.blue, // Couleur de l'indicateur
+                width: 3.0, // Ajustez l'épaisseur de la ligne selon vos besoins
+              ),
+            ), // Couleur de l'indicateur
           ),
         ),
       ),
@@ -103,7 +104,7 @@ class _PublicationsClientState extends State<PublicationsClient>
           ),
 
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.9,
+            height: MediaQuery.of(context).size.height,
             child: ListView.builder(
                 itemCount: c.allVideoPostes.length,
                 itemBuilder: (context, index) {
@@ -166,9 +167,9 @@ class PublicationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.45,
+      height: MediaQuery.of(context).size.height,
       child: ListView.builder(
-        itemCount: _management.allPoste.length,
+        itemCount: postes.length,
         itemBuilder: (context, index) {
           return PublicationTile(
             tailleurToken: tailleurToken,
@@ -205,7 +206,7 @@ class PublicationListVideo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: MediaQuery.of(context).size.height,
       child: ListView.builder(
         itemCount: postes.length,
         itemBuilder: (context, index) {
@@ -322,7 +323,7 @@ class _PublicationTileState extends State<PublicationTile> {
                     child: _management.atelier.length == 0
                         ? Container()
                         : SizedBox(
-                            height: MediaQuery.of(context).size.height * 0.2,
+                            height: MediaQuery.of(context).size.height,
                             child: FittedBox(
                               fit: BoxFit.cover,
                               child: Image.network(
@@ -358,10 +359,10 @@ class _PublicationTileState extends State<PublicationTile> {
             ),
           ), // Si ce n'est pas une vidéo, afficher une image
           Image.network(widget.photoUrl),
-          Text(
-            "Type: ${widget.type}",
-            style: TextStyle(fontSize: 12.0),
-          ),
+          // Text(
+          //   "Type: ${widget.type}",
+          //   style: TextStyle(fontSize: 12.0),
+          // ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(
@@ -494,7 +495,7 @@ class _PublicationTileState extends State<PublicationTile> {
                     onPressed: () {
                       // Ajoutez ici la logique pour laisser une commande
                       final commande = CommandeModel(
-                        clientToken: _management.clients.first.token!,
+                          clientToken: _management.clients.first.token!,
                           tailleurToken: widget.tailleurToken,
                           firebaseToken: _management.clients.first.token!,
                           prix: 0,
@@ -785,7 +786,7 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                     onPressed: () {
                       // Ajoutez ici la logique pour passer une commande
                       final commande = CommandeModel(
-                        clientToken: _management.clients.first.token! ,
+                          clientToken: _management.clients.first.token!,
                           tailleurToken: widget.tailleurToken,
                           firebaseToken: _management.clients.first.token!,
                           prix: 0,

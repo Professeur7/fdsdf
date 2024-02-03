@@ -118,21 +118,23 @@ class _DashboardState extends State<Dashboard> {
                             height: 40,
                             width: 40,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
+                              borderRadius: BorderRadius.circular(20),
                               color: Colors.white,
                             ),
                             child: _management.atelier.length == 0
-                                ? Container()
-                                : FittedBox(
-                                    fit: BoxFit.cover,
-                                    child: Image.network(
-                                      _management.atelier.first.imageUrl!,
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return Center(
-                                          child: Icon(Icons.error),
-                                        );
-                                      },
+                                ? Container() // Gérez le cas où _management.atelier est vide
+                                : ClipOval(
+                                    child: FittedBox(
+                                      fit: BoxFit.cover,
+                                      child: Image.network(
+                                        _management.atelier.first.imageUrl!,
+                                        errorBuilder:
+                                            (context, error, stackTrace) {
+                                          return Center(
+                                            child: Icon(Icons.error),
+                                          );
+                                        },
+                                      ),
                                     ),
                                   ),
                           ),

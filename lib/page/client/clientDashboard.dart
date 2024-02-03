@@ -93,21 +93,22 @@ class _HomePageClientState extends State<HomePageClient> {
                             );
                           },
                           child: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(15),
-                              color: Colors.white,
-                            ),
-                            child: _management.clients.length == 0
-                                ? Container()
-                                : FittedBox(
-                                    fit: BoxFit.cover,
-                                    child: Image.network(
-                                      _management.clients.first.imageURL,
-                                    ),
-                                  ),
-                          ),
+                              height: 40,
+                              width: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.white,
+                              ),
+                              child: _management.clients.length == 0
+                                  ? Container()
+                                  : ClipOval(
+                                      child: FittedBox(
+                                        fit: BoxFit.cover,
+                                        child: Image.network(
+                                          _management.clients.first.imageURL,
+                                        ),
+                                      ),
+                                    )),
                         )
                       ],
                     ),
@@ -186,9 +187,16 @@ class _HomePageClientState extends State<HomePageClient> {
                     CarouselSlider(
                       // ... (votre code pour le carrousel)
                       items: [
-                        Image.asset('assets/images/woman.png'),
-                        Image.asset('assets/images/woman.png'),
-                        Image.asset('assets/images/woman.png'),
+                        Image.asset('assets/images/homme.jpg'),
+                        Image.asset('assets/images/femme.jpg'),
+                        Image.asset('assets/images/enfant.jpg'),
+                        Image.asset('assets/images/fille.jpg'),
+                        Image.asset('assets/images/classe.jpg'),
+                        Image.asset('assets/images/garcon.jpg'),
+                        Image.asset('assets/images/jeune.jpg'),
+                        Image.asset('assets/images/joli.jpg'),
+                        Image.asset('assets/images/jolie.jpg'),
+                        Image.asset('assets/images/man.jpg'),
                       ],
                       options: CarouselOptions(
                         autoPlay: true,

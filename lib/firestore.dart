@@ -56,6 +56,8 @@ class FirebaseManagement extends GetxController {
 
   List<Poste> Postes = <Poste>[].obs;
   List<PosteVideo> posteVideos = <PosteVideo>[].obs;
+  final StreamController<List<Tailleurs>> _tailleursController =
+      StreamController<List<Tailleurs>>.broadcast();
   final _db = FirebaseFirestore.instance;
 
   //create firebase Storage database instance
@@ -213,6 +215,17 @@ class FirebaseManagement extends GetxController {
 
     commandes = await getAllCommande(client.token!);
     return client;
+  }
+
+  Stream<List<Tailleurs>> streamTailleurs() {
+    // Utilisez la logique de Firebase pour obtenir les données des tailleurs
+    // et ajoutez-les au contrôleur de diffusion
+    getAllTailleurs().then((tailleurs) {
+      _tailleursController.add(tailleurs);
+    });
+
+    // Retournez le stream
+    return _tailleursController.stream;
   }
 
   Future<List<Tailleurs>> getAllTailleurs() async {
@@ -1087,8 +1100,8 @@ class FirebaseManagement extends GetxController {
           .doc(client)
           .collection("Pannier")
           .get();
-      final paniers =
-          data.docs.map((e) => PanierModel.fromSnapshot(e)).toList();
+      List<PanierModel> paniers = [];
+      paniers = data.docs.map((e) => PanierModel.fromSnapshot(e)).toList();
 
       for (final i in paniers) {
         // Obtenir la liste spécifique des produits de la catégorie à partir de Firebase
@@ -1097,7 +1110,7 @@ class FirebaseManagement extends GetxController {
             .doc(client)
             .collection("Pannier")
             .doc(i.token)
-            .collection("productCollection")
+            .collection("ProductCollection")
             .get();
         // Ajouter la liste des produits à la liste des produits du client
         final productListe = products.docs

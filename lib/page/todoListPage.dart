@@ -208,17 +208,17 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                           children: [
                             Text(widget.task.sousTaches![index].description),
                             Text(
-                              'Date: ${DateFormat('EEEE, d MMMM y', 'fr').format(widget.task.sousTaches![index].date as DateTime)}', // Remplacez avec la propriété de la date
+                              'Date: ${DateFormat('EEEE, d MMMM y', 'fr').format(widget.task.sousTaches![index].date.toDate())}',
                               style:
                                   TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                             Text(
-                              'Heure début: ${DateFormat('HH:mm', 'fr').format(widget.task.sousTaches![index].debut as DateTime)}', // Remplacez avec la propriété de l'heure
+                              'Heure début: ${DateFormat('HH:mm', 'fr').format((widget.task.sousTaches![index].debut as Timestamp).toDate())}',
                               style:
                                   TextStyle(fontSize: 12, color: Colors.grey),
                             ),
                             Text(
-                              'Heure fin: ${DateFormat('HH:mm', 'fr').format(widget.task.sousTaches![index].fin as DateTime)}', // Remplacez avec la propriété de l'heure
+                              'Heure fin: ${DateFormat('HH:mm', 'fr').format((widget.task.sousTaches![index].fin as Timestamp).toDate())}',
                               style:
                                   TextStyle(fontSize: 12, color: Colors.grey),
                             ),

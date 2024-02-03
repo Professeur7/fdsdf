@@ -107,11 +107,12 @@ class _PublicationsState extends State<Publications>
             Tab(text: "Vidéos"),
           ],
           indicator: ShapeDecoration(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                  25), // Ajustez le rayon selon votre besoin
-            ),
-            color: Colors.blue, // Couleur de l'indicateur
+            shape: UnderlineInputBorder(
+              borderSide: BorderSide(
+                color: Colors.blue, // Couleur de l'indicateur
+                width: 3.0, // Ajustez l'épaisseur de la ligne selon vos besoins
+              ),
+            ), // Couleur de l'indicateur
           ),
         ),
       ),
@@ -347,19 +348,20 @@ class _PublicationTileState extends State<PublicationTile> {
                 ),
               ],
             ),
-          ), // Si ce n'est pas une vidéo, afficher une image
-          Image.network(widget.photoUrl),
+          ),
           Padding(
             padding: EdgeInsets.all(16.0),
             child: Text(
               widget.comment,
               style: TextStyle(fontSize: 16.0),
             ),
-          ),
-          Text(
-            "Type: ${widget.type}",
-            style: TextStyle(fontSize: 12.0),
-          ),
+          ), // Si ce n'est pas une vidéo, afficher une image
+          Image.network(widget.photoUrl),
+
+          // Text(
+          //   "Type: ${widget.type}",
+          //   style: TextStyle(fontSize: 12.0),
+          // ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
             child: Row(

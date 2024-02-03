@@ -144,7 +144,12 @@ class _NewPostPageState extends State<NewPostPage> {
                           videos: listVideos),
                       _management.tailleurs.first.token!);
                 }
-                Navigator.pop(context);
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Publications(),
+                  ),
+                );
               },
               child: Text('Publier'),
             ),
