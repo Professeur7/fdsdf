@@ -14,11 +14,6 @@ class ToDoListPage extends StatefulWidget {
 
 class _ToDoListPageState extends State<ToDoListPage> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
-  List<Taches> tasks = [];
-  function() async {
-    tasks = _management.tailleurs.first.taches!;
-    // tasks = await _management.getTaches(_management.tailleurs.first.token!);
-  }
 
   void main() {
     initializeDateFormatting(); // Initialise la localisation pour les formats de date
@@ -29,12 +24,10 @@ class _ToDoListPageState extends State<ToDoListPage> {
   void initState() {
     super.initState();
     // TODO: implement initState
-    function();
   }
 
   @override
   Widget build(BuildContext context) {
-    function();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF09126C),
@@ -50,29 +43,35 @@ class _ToDoListPageState extends State<ToDoListPage> {
           },
         ),
       ),
-      body: ListView.builder(
-        itemCount: tasks.length,
-        itemBuilder: (context, index) {
-          return Dismissible(
-            key: Key(tasks[index].token!),
-            onDismissed: (direction) {
-              // Supprimez la tâche de la liste lorsque l'utilisateur la fait glisser
-              setState(() {
-                tasks.removeAt(index);
-              });
+      body: StreamBuilder(
+        stream: _management.getTaches(_management.tailleurs.first.token!),
+        builder: (context, snapshot) {
+          final tache = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: tache.length,
+            itemBuilder: (context, index) {
+              return Dismissible(
+                key: Key(tache[index].token!),
+                onDismissed: (direction) {
+                  // Supprimez la tâche de la liste lorsque l'utilisateur la fait glisser
+                  setState(() {
+                    tache.removeAt(index);
+                  });
+                },
+                background: Container(
+                  color: Colors.red,
+                  child: Icon(Icons.delete, color: Colors.white),
+                  alignment: Alignment.centerRight,
+                  padding: EdgeInsets.only(right: 20.0),
+                ),
+                child: ListTile(
+                  title: Text(tache[index].nom),
+                  onTap: () {
+                    navigateToTaskDetails(tache[index]);
+                  },
+                ),
+              );
             },
-            background: Container(
-              color: Colors.red,
-              child: Icon(Icons.delete, color: Colors.white),
-              alignment: Alignment.centerRight,
-              padding: EdgeInsets.only(right: 20.0),
-            ),
-            child: ListTile(
-              title: Text(tasks[index].nom),
-              onTap: () {
-                navigateToTaskDetails(tasks[index]);
-              },
-            ),
           );
         },
       ),
@@ -123,7 +122,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
     setState(() {
       Taches newTask = Taches(nom: taskName);
       _management.createTache(newTask, _management.tailleurs.first.token!);
-      tasks.add(newTask);
+      //tasks.add(newTask);
     });
   }
 
@@ -183,13 +182,50 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
       setState(() {
         selectedTime = pickedTime;
         // Mettre à jour le contrôleur avec l'heure sélectionnée
+        subTaskController3.text = selectedTime!.format(context);
+      });
+    }
+  }
+
+  void _selectTime1(BuildContext context) async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (pickedTime != null && pickedTime != selectedTime) {
+      setState(() {
+        selectedTime = pickedTime;
+        // Mettre à jour le contrôleur avec l'heure sélectionnée
         subTaskController2.text = selectedTime!.format(context);
       });
     }
   }
 
+  // Add a flag to track whether locale data has been initialized
+  bool _localeDataInitialized1 = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // Initialize locale data in the initState method
+    initializeDateFormatting('fr_FR', null).then((_) {
+      setState(() {
+        _localeDataInitialized1 = true;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_localeDataInitialized1) {
+      return Scaffold(
+        body: Center(
+          child:
+              CircularProgressIndicator(), // Show a loading indicator while initializing locale data
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.task.nom),
@@ -199,42 +235,49 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
           widget.task.sousTaches == null
               ? Container()
               : Expanded(
-                  child: ListView.builder(
-                    itemCount: widget.task.sousTaches?.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(widget.task.sousTaches![index].description),
-                            Text(
-                              'Date: ${DateFormat('EEEE, d MMMM y', 'fr').format(widget.task.sousTaches![index].date.toDate())}',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                            Text(
-                              'Heure début: ${DateFormat('HH:mm', 'fr').format((widget.task.sousTaches![index].debut as Timestamp).toDate())}',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                            Text(
-                              'Heure fin: ${DateFormat('HH:mm', 'fr').format((widget.task.sousTaches![index].fin as Timestamp).toDate())}',
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                        trailing: Checkbox(
-                          value: widget.task.sousTaches![index].valide,
-                          onChanged: (value) {
-                            setState(() {
-                              widget.task.sousTaches![index].valide = value!;
-                            });
+                  child: StreamBuilder(
+                      stream: _management.getSousTaches(
+                          _management.tailleurs.first.token!,
+                          widget.task.token!),
+                      builder: (context, snapshot) {
+                        final s = snapshot.data ?? [];
+                        return ListView.builder(
+                          itemCount: s.length,
+                          itemBuilder: (context, index) {
+                            return ListTile(
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(s[index].description),
+                                  Text(
+                                    'Date: ${DateFormat('EEEE, d MMMM y', 'fr').format(s[index].date.toDate())}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    'Heure début: ${s[index].debut}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    'Heure fin: ${s[index].fin}',
+                                    style: TextStyle(
+                                        fontSize: 12, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                              trailing: Checkbox(
+                                value: s[index].valide,
+                                onChanged: (value) {
+                                  setState(() {
+                                    s[index].valide = value!;
+                                  });
+                                },
+                              ),
+                            );
                           },
-                        ),
-                      );
-                    },
-                  ),
+                        );
+                      }),
                 ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -275,7 +318,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                 readOnly:
                                     true, // Rendre le champ de texte en lecture seule
                                 onTap: () {
-                                  _selectTime(
+                                  _selectTime1(
                                       context); // Afficher le sélecteur d'heure au clic
                                 },
                                 decoration: InputDecoration(
@@ -321,7 +364,7 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                             s,
                                             _management.tailleurs.first.token!,
                                             widget.task.token!);
-                                        widget.task.sousTaches!.add(s);
+                                        //widget.task.sousTaches!.add(s);
                                       });
                                     }
 
