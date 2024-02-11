@@ -6,6 +6,8 @@ import 'package:fashion2/models/poste.dart';
 import 'package:fashion2/models/postevideo.dart';
 import 'package:fashion2/models/video_model.dart';
 import 'package:fashion2/page/client/pagePublication.dart';
+import 'package:fashion2/page/gridview/specialePromotion.dart';
+import 'package:fashion2/screen/home_screen.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -82,6 +84,21 @@ class _NewPostPageState extends State<NewPostPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Nouveau Post'),
+        backgroundColor: const Color(0xFF09126C),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ),
+            );
+          },
+        ),
         actions: [
           IconButton(
             icon: Icon(Icons.article_outlined),
@@ -91,6 +108,18 @@ class _NewPostPageState extends State<NewPostPage> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => Publications(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.star_outline),
+            onPressed: () {
+              // Implémentez ici la logique pour voir les promotions spéciales
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PublishSpecialPromotionPage(),
                 ),
               );
             },

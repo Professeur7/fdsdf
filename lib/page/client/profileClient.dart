@@ -1,18 +1,18 @@
 import 'dart:io';
 import 'package:fashion2/firestore.dart';
+import 'package:fashion2/page/client/PageEnCours.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../screen/clientHomeScreen.dart';
 
-class ProfilePage extends StatefulWidget {
+class ProfileDuClientPage extends StatefulWidget {
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _ProfileDuClientPageState createState() => _ProfileDuClientPageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfileDuClientPageState extends State<ProfileDuClientPage> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
 
   @override
@@ -95,11 +95,17 @@ class _ProfilePageState extends State<ProfilePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           ListTile(
-            title: Text('Commande 1'),
+            title: Text('Commande '),
             subtitle: Text('Détails de la commande'),
             trailing: Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // Actions à effectuer lorsqu'une commande est sélectionnée
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(
+              //     builder: (context) =>
+              //         CommandeDetailsPage(commande: ),
+              //   ),
+              // );
             },
           ),
           // Ajoutez d'autres tuiles de commande si nécessaire

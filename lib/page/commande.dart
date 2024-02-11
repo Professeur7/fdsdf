@@ -33,8 +33,8 @@ class _TransactionState extends State<Transaction> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF09126C),
         title: Text('Demandes de Commande'),
+        backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,

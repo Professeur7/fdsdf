@@ -6,10 +6,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:io';
 import 'package:get/get.dart';
+import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 import 'package:uuid/uuid.dart';
 
 import '../../screen/home_screen.dart';
+import 'package:progress_dialog_fork/progress_dialog_fork.dart';
 
 class PageModels extends StatefulWidget {
   @override
@@ -19,7 +22,7 @@ class PageModels extends StatefulWidget {
 class _PageModelsState extends State<PageModels> {
   List<GalleryButton> galleryButtons = [];
   final FirebaseStorage _storage = FirebaseStorage.instance;
-  //FirebaseManagement _management = FirebaseManagement();
+
   @override
   void initState() {
     super.initState();
@@ -201,6 +204,22 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
 
   //FirebaseManagement _management = FirebaseManagement();
 
+  // void _takePicture(XFile image) async {
+  //   File imageFile = File(image.path);
+  //   final uuid = Uuid();
+  //   final uniqueId = uuid.v4();
+  //   final storageRef = _storage.ref().child('images/$uniqueId.jpg');
+
+  //   try {
+  //     await storageRef.putFile(imageFile);
+  //     final imageUrl = await storageRef.getDownloadURL();
+  //     //_management.addImageToAlbums(Images(image: imageUrl), _management.tailleurs.first.token!, modelToken)
+  //     widget.onPictureTaken(imageUrl);
+  //   } catch (e) {
+  //     print('Erreur lors du téléchargement de l\'image : $e');
+  //   }
+  // }
+
   void _takePicture(XFile image) async {
     File imageFile = File(image.path);
     final uuid = Uuid();
@@ -209,8 +228,11 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
 
     try {
       await storageRef.putFile(imageFile);
+
+      // Fetch the download URL after successful upload
       final imageUrl = await storageRef.getDownloadURL();
-      //_management.addImageToAlbums(Images(image: imageUrl), _management.tailleurs.first.token!, modelToken)
+
+      // Pass the download URL to the callback function
       widget.onPictureTaken(imageUrl);
     } catch (e) {
       print('Erreur lors du téléchargement de l\'image : $e');
@@ -249,12 +271,32 @@ class _GalleryPageState extends State<GalleryPage> {
   late CameraController _controller;
   List<String> galleryPhotos = [];
   FirebaseStorage storage = FirebaseStorage.instance;
+  late ProgressDialog pr;
+
   @override
   void initState() {
     super.initState();
+    pr = ProgressDialog(context);
+    pr.style(
+      message: 'Chargement...',
+      progressWidget: CircularProgressIndicator(),
+      elevation: 10.0,
+      insetAnimCurve: Curves.easeInOut,
+      messageTextStyle: TextStyle(
+        color: Colors.black,
+        fontSize: 16.0,
+        fontWeight: FontWeight.w600,
+      ),
+    );
     _initializeCamera();
     _loadGalleryPhotos(widget.galerieToken);
   }
+
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  // }
 
   Future<void> _initializeCamera() async {
     final cameras = await availableCameras();
@@ -284,15 +326,29 @@ class _GalleryPageState extends State<GalleryPage> {
   }
 
   void _importImage() async {
-    final pickedFile =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
+    try {
+      pr.show(); // Affiche le ProgressDialog pendant le chargement
 
-    if (pickedFile != null) {
-      //galleryPhotos.add(pickedFile.path);
-      File file = File(pickedFile.path);
-      c.addImageToAlbums(await uploadImage(file, pickedFile.name),
-          c.tailleurs.first.token!, widget.galerieToken);
-      //setState(() {});
+      final pickedFile =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        File file = File(pickedFile.path);
+        String? imageUrl = await uploadImage(file, pickedFile.name);
+
+        // Masque le ProgressDialog après l'importation de l'image
+        pr.hide();
+
+        c.addImageToAlbums(
+            imageUrl, c.tailleurs.first.token!, widget.galerieToken);
+      } else {
+        // Masque le ProgressDialog en cas d'erreur ou d'annulation
+        pr.hide();
+      }
+    } catch (e) {
+      print('Erreur lors de l\'importation de l\'image : $e');
+      // Masque le ProgressDialog en cas d'erreur
+      pr.hide();
     }
   }
 
@@ -313,8 +369,32 @@ class _GalleryPageState extends State<GalleryPage> {
   }
 
   void _viewImage(String imageUrl) {
-    // Ouvrez une page pour afficher l'image en plein écran ou avec des fonctionnalités d'édition.
-    // Vous pouvez utiliser des packages tels que photo_view ou autres pour afficher l'image en plein écran.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _buildImageGallery(imageUrl),
+      ),
+    );
+  }
+
+  Widget _buildImageGallery(String imageUrl) {
+    return Scaffold(
+      body: PhotoViewGallery.builder(
+        itemCount: 1,
+        builder: (context, index) {
+          return PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(imageUrl),
+            minScale: PhotoViewComputedScale.contained,
+            maxScale: PhotoViewComputedScale.covered * 2,
+          );
+        },
+        scrollPhysics: BouncingScrollPhysics(),
+        backgroundDecoration: BoxDecoration(
+          color: Colors.black,
+        ),
+        pageController: PageController(),
+      ),
+    );
   }
 
   void _deleteImage(int index) {
@@ -325,6 +405,7 @@ class _GalleryPageState extends State<GalleryPage> {
 
   @override
   Widget build(BuildContext context) {
+    ProgressDialog pr;
     _loadGalleryPhotos(widget.galerieToken);
     return Scaffold(
       appBar: AppBar(

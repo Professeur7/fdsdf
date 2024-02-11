@@ -98,25 +98,6 @@ class _SearchPageState extends State<SearchPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Container(
-              //   color: Colors.white,
-              //   padding: EdgeInsets.all(20),
-              //   child: TextField(
-              //     onChanged: (value) {
-              //       setState(() {
-              //         searchName =
-              //             value.toLowerCase(); // Mettre la recherche en minuscules
-              //       });
-              //     },
-              //     decoration: InputDecoration(
-              //       hintText: 'Rechercher...',
-              //       border: OutlineInputBorder(
-              //         borderRadius: BorderRadius.circular(10),
-              //       ),
-              //       prefixIcon: Icon(Icons.search),
-              //     ),
-              //   ),
-              // ),
               if (searchName.isNotEmpty)
                 Container(
                   padding: EdgeInsets.all(10),

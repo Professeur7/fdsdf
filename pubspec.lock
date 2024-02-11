@@ -1064,6 +1064,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.4.0"
+  photo_view:
+    dependency: "direct main"
+    description:
+      name: photo_view
+      sha256: "8036802a00bae2a78fc197af8a158e3e2f7b500561ed23b4c458107685e645bb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.14.0"
   pigeon:
     dependency: transitive
     description:
@@ -1096,6 +1104,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.7.3"
+  progress_dialog_fork:
+    dependency: "direct main"
+    description:
+      name: progress_dialog_fork
+      sha256: a8b688fb7d3dba83e1d89d7f0d5a35c4e85ed87ad1aa9856730bd056dc1dc629
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   provider:
     dependency: "direct main"
     description:

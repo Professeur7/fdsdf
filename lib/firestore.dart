@@ -56,8 +56,6 @@ class FirebaseManagement extends GetxController {
 
   List<Poste> Postes = <Poste>[].obs;
   List<PosteVideo> posteVideos = <PosteVideo>[].obs;
-  final StreamController<List<Tailleurs>> _tailleursController =
-      StreamController<List<Tailleurs>>.broadcast();
   final _db = FirebaseFirestore.instance;
 
   //create firebase Storage database instance
@@ -215,17 +213,6 @@ class FirebaseManagement extends GetxController {
 
     commandes = await getAllCommande(client.token!);
     return client;
-  }
-
-  Stream<List<Tailleurs>> streamTailleurs() {
-    // Utilisez la logique de Firebase pour obtenir les données des tailleurs
-    // et ajoutez-les au contrôleur de diffusion
-    getAllTailleurs().then((tailleurs) {
-      _tailleursController.add(tailleurs);
-    });
-
-    // Retournez le stream
-    return _tailleursController.stream;
   }
 
   Future<List<Tailleurs>> getAllTailleurs() async {
@@ -937,6 +924,11 @@ class FirebaseManagement extends GetxController {
     yield* _messagesSubject.stream;
 
     //yield* _messagesStreamController.stream;
+  }
+
+  Stream<List<Tailleurs>> streamTailleurs() async* {
+    List<Tailleurs> t = await getAllTailleurs();
+    yield t;
   }
 
   Future<List<MessageT>> getMessage(String idClient, String idCommande) async {

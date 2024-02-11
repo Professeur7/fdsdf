@@ -1,13 +1,8 @@
 import 'package:fashion2/page/client/clienViewPubPage.dart';
 import 'package:flutter/material.dart';
-import 'package:fashion2/page/client.dart';
-import 'package:fashion2/page/dashboard.dart';
-import 'package:fashion2/page/pageMesure.dart';
-import 'package:fashion2/page/todoListPage.dart';
 
 import '../page/client/ClientCommande.dart';
 import '../page/client/clientDashboard.dart';
-import '../page/client/pagePublication.dart';
 import '../page/client/panierPage.dart';
 import '../page/client/profileClient.dart';
 
@@ -24,7 +19,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
     HomePageClient(),
     PublicationsClient(), // Remplacez par votre widget de publications
     ClientOrderPage(),
-    ProfilePage(),
+    ProfileDuClientPage(),
   ];
 
   final PageStorageBucket bucket = PageStorageBucket();
@@ -155,7 +150,7 @@ class _ClientHomeScreenState extends State<ClientHomeScreen> {
                   minWidth: 25,
                   onPressed: () {
                     setState(() {
-                      currentScreen = ProfilePage();
+                      currentScreen = ProfileDuClientPage();
                       currentTab = 3;
                     });
                   },
