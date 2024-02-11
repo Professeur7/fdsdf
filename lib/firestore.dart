@@ -158,7 +158,7 @@ class FirebaseManagement extends GetxController {
     tailleur.mesClients = await getMesClient(tailleur.token!);
     tailleur.mesure = await getMesures(tailleur.token!);
     tailleur.rdv = await getRDV(tailleur.token!);
-    tailleur.taches = await getTaches(tailleur.token!);
+    //tailleur.taches = await getTaches(tailleur.token!);
     tailleur.paiement = await getPaiement(tailleur.token!);
     tailleur.stock = await getStock(tailleur.token!);
     tailleur.albums = albums;
@@ -768,14 +768,21 @@ class FirebaseManagement extends GetxController {
     tailleurs.first.taches = taches;
   }
 
-  Future<List<Taches>> getTaches(String usertoken) async {
-    final tc = await _db
+  BehaviorSubject<List<Taches>> _todoSubject =
+      BehaviorSubject<List<Taches>>.seeded([]);
+
+  Stream<List<Taches>> getTaches(String usertoken) async* {
+    await _db
         .collection("tailleurs")
         .doc(usertoken)
         .collection("Taches")
-        .get();
-    final lisTaches = await tc.docs.map((e) => Taches.fromSnapshot(e)).toList();
-    for (final i in lisTaches) {
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((e) => Taches.fromSnapshot(e)).toList())
+        .listen((messages) {
+      _todoSubject.add(messages);
+    });
+    for (final i in _todoSubject.value) {
       final tcs = await _db
           .collection("tailleurs")
           .doc(usertoken)
@@ -787,8 +794,27 @@ class FirebaseManagement extends GetxController {
           tcs.docs.map((e) => SousTaches.fromSnapshot(e)).toList();
       i.sousTaches = soustaches;
     }
-    taches = lisTaches;
-    return lisTaches;
+    yield* _todoSubject.stream;
+  }
+
+  BehaviorSubject<List<SousTaches>> _todosousTacheSubject =
+      BehaviorSubject<List<SousTaches>>.seeded([]);
+
+  Stream<List<SousTaches>> getSousTaches(
+      String userToken, String tacheToke) async* {
+    await _db
+        .collection("tailleurs")
+        .doc(userToken)
+        .collection("Taches")
+        .doc(tacheToke)
+        .collection("SousTaches")
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((e) => SousTaches.fromSnapshot(e)).toList())
+        .listen((messages) {
+      _todosousTacheSubject.add(messages);
+    });
+    yield* _todosousTacheSubject.stream;
   }
 
   //function to get All client
@@ -886,8 +912,6 @@ class FirebaseManagement extends GetxController {
     });
   }
 
-  StreamController<List<MessageT>> _messagesStreamController =
-      StreamController<List<MessageT>>();
   BehaviorSubject<List<MessageT>> _messagesSubject =
       BehaviorSubject<List<MessageT>>.seeded([]);
 

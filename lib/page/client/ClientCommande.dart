@@ -186,6 +186,7 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
                 builder: (context, snapshot) {
                   List<MessageT> m = snapshot.data ?? [];
                   return ListView.builder(
+                      reverse: true,
                       itemCount: m.length,
                       itemBuilder: (context, index) {
                         return MessageItem(message: m[index]);

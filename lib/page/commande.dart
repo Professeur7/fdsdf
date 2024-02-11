@@ -155,13 +155,11 @@ class _ChatScreenState extends State<ChatScreen> {
           SizedBox(
               height: MediaQuery.of(context).size.height * 0.7,
               child: StreamBuilder(
-                  // stream: _management.getMessages(widget.commande.clientToken,
-                  //     widget.commande.firebaseToken),
                   stream: getMessagesStream(),
-                  //initialData: list,
                   builder: (context, snapshot) {
                     List<MessageT> m = snapshot.data ?? [];
                     return ListView.builder(
+                        reverse: true,
                         itemCount: m.length,
                         itemBuilder: (context, index) {
                           return MessageItem(message: m[index]);

@@ -9,23 +9,21 @@ class AchatProduitModel {
   int qteCommande;
   //List<Produit> produit;
 
-  AchatProduitModel({
-    required this.nom,
-    required this.description,
-    required this.prix,
-    required this.image,
-    required this.qteCommande
-  });
+  AchatProduitModel(
+      {required this.nom,
+      required this.description,
+      required this.prix,
+      required this.image,
+      required this.qteCommande});
 
   factory AchatProduitModel.fromSnapshot(DocumentSnapshot snapshot) {
     Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
 
     return AchatProduitModel(
-      nom: data['Nom'],
-      description: data['Description'],
-      prix: data['Prix'],
-      image: data['Image'],
-      qteCommande: data['qteCommande']
-    );
+        nom: data['Nom'],
+        description: data['Description'],
+        prix: data['Prix'],
+        image: data['Image'],
+        qteCommande: data['qteCommande']);
   }
 }
