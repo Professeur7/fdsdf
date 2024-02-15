@@ -154,7 +154,7 @@ class _ChatScreenState extends State<ChatScreen> {
         children: [
           SizedBox(
               height: MediaQuery.of(context).size.height * 0.7,
-              child: StreamBuilder(
+              child: StreamBuilder( 
                   stream: getMessagesStream(),
                   builder: (context, snapshot) {
                     List<MessageT> m = snapshot.data ?? [];
