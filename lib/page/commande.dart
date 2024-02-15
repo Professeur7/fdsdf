@@ -74,9 +74,8 @@ class _TransactionState extends State<Transaction> {
                       margin: EdgeInsets.all(10),
                       child: ListTile(
                         title: Text(
-                            'Demande de commande ${listCommande[index].tailleurToken}'),
-                        subtitle: Text(
-                            'Description de la commande ${listCommande[index].prix}'),
+                            'Demande de commande ${listCommande[index].clientToken}'),
+                        subtitle: Text(' ${listCommande[index].dateCommande}'),
                         trailing: Icon(Icons.message), // Icône de discussion
                       ),
                     ),

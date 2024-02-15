@@ -22,7 +22,7 @@ class FirstTimeUserIntroduction extends StatelessWidget {
       key: introKey,
       pages: [
         PageViewModel(
-          title: "Bienvenue sur l'application Fashion2",
+          title: "Bienvenue sur l'application Fashion",
           body: "Découvrez comment vous pouvez utiliser notre application.",
           image: Center(
             child: Image.asset("assets/images/doctor1.jpg", width: 300),
@@ -37,7 +37,8 @@ class FirstTimeUserIntroduction extends StatelessWidget {
         ),
         PageViewModel(
           title: "Commencez votre aventure",
-          body: "Trouvez les derniers vêtements et découvrez des mesures personnalisées.",
+          body:
+              "Trouvez les derniers vêtements et découvrez des mesures personnalisées.",
           image: Center(
             child: Image.asset("assets/images/doctor3.jpg", width: 300),
           ),

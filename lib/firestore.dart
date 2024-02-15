@@ -1145,7 +1145,7 @@ class FirebaseManagement extends GetxController {
   //function to update pannier
   updatePannier(client, AchatProduitModel pannier, pannierToken) async {
     await _db
-        .collection("Client")
+        .collection("Clients")
         .doc(client)
         .collection("Pannier")
         .doc(pannierToken)
@@ -1162,7 +1162,7 @@ class FirebaseManagement extends GetxController {
 
   deleteProductPannier(client, PanierModel panier, produit) async {
     await _db
-        .collection("Client")
+        .collection("Clients")
         .doc(client)
         .collection("Pannier")
         .doc(panier.token)
@@ -1173,7 +1173,7 @@ class FirebaseManagement extends GetxController {
 
   deletePannier(client, PanierModel panier) async {
     await _db
-        .collection("Client")
+        .collection("Clients")
         .doc(client)
         .collection("Pannier")
         .doc(panier.token)
@@ -1182,7 +1182,7 @@ class FirebaseManagement extends GetxController {
 
   //function to like product
   addToLike(String client, ProduitModel like) async {
-    await _db.collection("Client").doc(client).collection("Like").add({
+    await _db.collection("Clients").doc(client).collection("Like").add({
       "Nom": like.nom,
       "Description": like.description,
       "Prix": like.prix,

@@ -98,14 +98,14 @@ class _PanierPageState extends State<PanierPage> {
               );
             },
           ),
-          ElevatedButton(
-            onPressed: () {
-              // Implémentez ici la logique pour acheter les produits
-              buyProducts();
-            },
-            child: Text('Acheter'),
-          ),
-          SizedBox(height: 16),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     // Implémentez ici la logique pour acheter les produits
+          //     buyProducts();
+          //   },
+          //   child: Text('Acheter'),
+          // ),
+          // SizedBox(height: 16),
         ],
       ),
     );

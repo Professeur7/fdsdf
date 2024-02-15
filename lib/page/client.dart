@@ -82,7 +82,7 @@ class _CustomerInformationPageState extends State<CustomerInformationPage> {
                       title: form.client.isEmpty
                           ? Text("Pas de client")
                           : Text(
-                              'Nom du client: ${form.client.first.nom}',
+                              '${form.client.first.prenom} ${form.client.first.nom}',
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                       subtitle: Column(

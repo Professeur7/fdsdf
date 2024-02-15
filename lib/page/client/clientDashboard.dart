@@ -198,6 +198,9 @@ class _HomePageClientState extends State<HomePageClient> {
                         Image.asset('assets/images/joli.jpg'),
                         Image.asset('assets/images/jolie.jpg'),
                         Image.asset('assets/images/man.jpg'),
+                        Image.asset('assets/images/h.jpg'),
+                        Image.asset('assets/images/g.jpg'),
+                        Image.asset('assets/images/k.jpg'),
                       ],
                       options: CarouselOptions(
                         autoPlay: true,

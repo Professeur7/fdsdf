@@ -342,7 +342,7 @@ class _MesuresPageState extends State<MesuresPage> {
                         .map((MesClients item) => DropdownMenuItem<String>(
                               value: item.telephone,
                               child: Text(
-                                "${item.nom!}",
+                                "${item.nom!} ${item.prenom!}",
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:camera/camera.dart';
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/albums.dart';
@@ -13,6 +16,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../screen/home_screen.dart';
 import 'package:progress_dialog_fork/progress_dialog_fork.dart';
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:io';
 
 class PageModels extends StatefulWidget {
   @override
@@ -238,6 +244,53 @@ class _CameraPreviewPageState extends State<CameraPreviewPage> {
       print('Erreur lors du téléchargement de l\'image : $e');
     }
   }
+//   void _onImageCaptured(CameraImage cameraImage) async {
+//   try {
+//     // Handle the CameraImage object accordingly, e.g., converting to a File
+//     // You may need to use image processing libraries or convert to a format that suits your needs
+//     // For example, you can use the image package to process the CameraImage.
+
+//     // Example: Convert CameraImage to File
+//     File imageFile = await convertCameraImageToFile(cameraImage);
+
+//     // Now, you can perform operations on the imageFile or upload it to Firebase Storage.
+//     // Ensure to handle exceptions appropriately during image processing or uploading.
+
+//   } catch (e) {
+//     print('Error processing/capturing image: $e');
+//   }
+// }
+
+// Future<File> convertCameraImageToFile(CameraImage cameraImage) async {
+//   try {
+//     final Completer<File> completer = Completer<File>();
+
+//     // Convert the CameraImage to a format suitable for Flutter's Image widget
+//     final Image image = Image.memory(Uint8List.fromList(cameraImage.planes[0].bytes),
+//         width: cameraImage.width.toDouble(), height: cameraImage.height.toDouble());
+
+//     // Create a ByteData buffer to store the image data
+//     final ByteData byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+//     if (byteData != null) {
+//       // Extract the bytes from the ByteData buffer
+//       final Uint8List pngBytes = byteData.buffer.asUint8List();
+
+//       // Save the bytes to a File
+//       final File imageFile = File('path_to_save/image.png');
+//       await imageFile.writeAsBytes(pngBytes);
+
+//       completer.complete(imageFile);
+//     } else {
+//       completer.completeError('Error converting CameraImage to ByteData');
+//     }
+
+//     return completer.future;
+//   } catch (e) {
+//     print('Error converting CameraImage to File: $e');
+//     rethrow; // Re-throw the exception for better error handling
+//   }
+// }
 
   @override
   Widget build(BuildContext context) {
