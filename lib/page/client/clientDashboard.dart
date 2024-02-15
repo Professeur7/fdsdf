@@ -3,6 +3,7 @@ import 'package:fashion2/models/specialesPromotions.dart';
 import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/page/client/SpecialesPromotions.dart';
 import 'package:fashion2/page/client/profileClientpage.dart';
+import 'package:fashion2/page/searchClient.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
@@ -118,7 +119,7 @@ class _HomePageClientState extends State<HomePageClient> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SearchPage(),
+                          builder: (context) => SearchPageClient(),
                         ),
                       );
                     },
@@ -197,6 +198,9 @@ class _HomePageClientState extends State<HomePageClient> {
                         Image.asset('assets/images/joli.jpg'),
                         Image.asset('assets/images/jolie.jpg'),
                         Image.asset('assets/images/man.jpg'),
+                        Image.asset('assets/images/h.jpg'),
+                        Image.asset('assets/images/g.jpg'),
+                        Image.asset('assets/images/k.jpg'),
                       ],
                       options: CarouselOptions(
                         autoPlay: true,

@@ -4,6 +4,7 @@ import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/commandeModel.dart';
 import 'package:fashion2/page/client/clientDashboard.dart';
+import 'package:fashion2/screen/clientHomeScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rxdart/rxdart.dart';
@@ -34,7 +35,7 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mes Commandes 1'),
+        title: Text('Mes Commandes '),
         backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
@@ -45,7 +46,7 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => HomePageClient(),
+                builder: (context) => ClientHomeScreen(),
               ),
             );
           },

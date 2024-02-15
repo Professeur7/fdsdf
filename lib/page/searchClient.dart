@@ -1,12 +1,10 @@
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/tailleurs.dart';
+import 'package:fashion2/page/tailleursInfosClient.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 
 class SearchPageClient extends StatefulWidget {
   SearchPageClient({super.key});
@@ -16,15 +14,15 @@ class SearchPageClient extends StatefulWidget {
 }
 
 class _SearchPageClientState extends State<SearchPageClient> {
-  FirebaseManagement _management = Get.put(FirebaseManagement());
+  //FirebaseManagement _management = Get.put(FirebaseManagement());
   ScrollController _scrollController = ScrollController();
   String searchName = '';
-  List<Tailleurs> tailleursRecommandes = [];
+  late Stream<List<Tailleurs>> tailleursRecommandes;
 
   @override
   void initState() {
     super.initState();
-    tailleursRecommandes = Get.find<FirebaseManagement>().allsTailleur;
+    tailleursRecommandes = Get.find<FirebaseManagement>().streamTailleurs();
   }
 
   @override
@@ -52,15 +50,15 @@ class _SearchPageClientState extends State<SearchPageClient> {
         ),
       ),
       body: StreamBuilder<List<Tailleurs>>(
-        stream: Get.find<FirebaseManagement>()
-            .streamTailleurs(), // Utilisez la méthode qui retourne le stream depuis Firebase
+        stream: tailleursRecommandes,
+        // Utilisez la méthode qui retourne le stream depuis Firebase
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return CircularProgressIndicator();
           }
 
           // Mettez à jour la liste avec les données du stream
-          tailleursRecommandes = snapshot.data!;
+          final t = snapshot.data ?? [];
 
           return Container(
             color: Colors.white,
@@ -68,11 +66,18 @@ class _SearchPageClientState extends State<SearchPageClient> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               controller: _scrollController,
-              itemCount: tailleursRecommandes.length,
+              itemCount: t.length,
               itemBuilder: (context, index) {
-                final tailleur = tailleursRecommandes[index];
+                final tailleur = t[index];
                 return GestureDetector(
                   onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            TailleurDetailsPage(tailleur: t[index]),
+                      ),
+                    );
                     // Ajoutez ici la logique pour afficher les détails du tailleur
                   },
                   child: Container(

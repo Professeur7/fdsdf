@@ -228,6 +228,21 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color(0xFF09126C),
+        leading: IconButton(
+          icon: Icon(
+            Icons.arrow_back_ios_new,
+            color: Colors.grey,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ToDoListPage(),
+              ),
+            );
+          },
+        ),
         title: Text(widget.task.nom),
       ),
       body: Column(
@@ -391,7 +406,10 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                       },
                     );
                   },
-                  child: Icon(Icons.add),
+                  child: Icon(
+                    Icons.add,
+                    color: const Color(0xFF09126C),
+                  ),
                   tooltip: 'Ajouter une sous-tâche',
                 ),
               ],

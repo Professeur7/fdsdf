@@ -33,8 +33,8 @@ class _TransactionState extends State<Transaction> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF09126C),
         title: Text('Demandes de Commande'),
+        backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
             Icons.arrow_back_ios_new,
@@ -74,9 +74,8 @@ class _TransactionState extends State<Transaction> {
                       margin: EdgeInsets.all(10),
                       child: ListTile(
                         title: Text(
-                            'Demande de commande ${listCommande[index].tailleurToken}'),
-                        subtitle: Text(
-                            'Description de la commande ${listCommande[index].prix}'),
+                            'Demande de commande ${listCommande[index].clientToken}'),
+                        subtitle: Text(' ${listCommande[index].dateCommande}'),
                         trailing: Icon(Icons.message), // Icône de discussion
                       ),
                     ),

@@ -134,7 +134,7 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
-                              color: Colors.yellow,
+                              color: Colors.black,
                             ),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -145,7 +145,7 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
                         .map((MesClients item) => DropdownMenuItem<String>(
                               value: item.telephone,
                               child: Text(
-                                "${item.nom!}",
+                                "${item.nom!} ${item.prenom!}",
                                 style: const TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
@@ -165,14 +165,14 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
                     },
                     buttonStyleData: ButtonStyleData(
                       height: 50,
-                      width: 160,
+                      width: 300,
                       padding: const EdgeInsets.only(left: 14, right: 14),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
                           color: Colors.black26,
                         ),
-                        color: Colors.redAccent,
+                        color: Colors.grey,
                       ),
                       elevation: 2,
                     ),
@@ -189,7 +189,7 @@ class _InvoiceAndAccountingPageState extends State<InvoiceAndAccountingPage> {
                       width: 200,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(14),
-                        color: Colors.redAccent,
+                        color: Colors.grey,
                       ),
                       offset: const Offset(-20, 0),
                       scrollbarTheme: ScrollbarThemeData(

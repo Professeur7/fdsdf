@@ -57,16 +57,16 @@ class _PublicationsClientState extends State<PublicationsClient>
           },
         ),
         actions: [
-          IconButton(
-            icon: Icon(Icons.favorite),
-            onPressed: () {
-              // Naviguez vers la page Favoris
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => NewPostPage()),
-              );
-            },
-          ),
+          // IconButton(
+          //   icon: Icon(Icons.favorite),
+          //   onPressed: () {
+          //     // Naviguez vers la page Favoris
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => NewPostPage()),
+          //     );
+          //   },
+          // ),
         ],
         bottom: TabBar(
           controller: _tabController,
@@ -513,6 +513,16 @@ class _PublicationTileState extends State<PublicationTile> {
                           ]);
                       _management.createCommande(
                           _management.clients.first.token!, commande);
+                      // Afficher un SnackBar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Commande effectuée avec succès dans la partie Achats '),
+                          duration: Duration(
+                              seconds:
+                                  3), // Durée pendant laquelle le SnackBar reste visible
+                        ),
+                      );
                     },
                     child: Text("Passer une commande"),
                   ),
@@ -804,6 +814,16 @@ class _PublicationVideoTileState extends State<PublicationVideoTile> {
                           ]);
                       _management.createCommande(
                           _management.clients.first.token!, commande);
+                      // Afficher un SnackBar
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              'Commande effectuée avec succès dans la partie Achats'),
+                          duration: Duration(
+                              seconds:
+                                  3), // Durée pendant laquelle le SnackBar reste visible
+                        ),
+                      );
                     },
                     child: Text("Passer une commande"),
                   ),

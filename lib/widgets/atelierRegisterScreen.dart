@@ -88,8 +88,8 @@ class _AtelierRegistrationPageState extends State<AtelierRegistrationPage> {
         "token tailleur ${c.tailleurs.length != 0 ? c.tailleurs.first.token : 22222222}");
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color(0xFF09126C),
           title: Text("Atelier Registration"),
+          backgroundColor: const Color(0xFF09126C),
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back_ios_new,
