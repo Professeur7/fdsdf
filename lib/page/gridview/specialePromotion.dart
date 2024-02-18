@@ -1,10 +1,12 @@
 import 'dart:io';
 
+import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/specialesPromotions.dart';
 import 'package:fashion2/page/gridview/SpecialePromoTailleur.dart';
 import 'package:fashion2/page/gridview/pagePromotion.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class PublishSpecialPromotionPage extends StatefulWidget {
@@ -16,6 +18,7 @@ class PublishSpecialPromotionPage extends StatefulWidget {
 class _PublishSpecialPromotionPageState
     extends State<PublishSpecialPromotionPage> {
   final _formKey = GlobalKey<FormState>();
+  FirebaseManagement _management = Get.put(FirebaseManagement());
 
   TextEditingController _titleController = TextEditingController();
   TextEditingController _descriptionController = TextEditingController();
@@ -56,11 +59,9 @@ class _PublishSpecialPromotionPageState
     final pickedFile =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     _imageUrl = await uploadImage(File(pickedFile!.path), pickedFile.name);
-    if (pickedFile != null) {
-      setState(() {
-        selectedImage = File(pickedFile.path);
-      });
-    }
+    setState(() {
+      selectedImage = File(pickedFile.path);
+    });
   }
 
   @override
@@ -165,7 +166,8 @@ class _PublishSpecialPromotionPageState
                       imageUrl: _imageUrl ?? "",
                       date: _dateController.text,
                     );
-
+                    _management.postPublicationSpeciale(
+                        newPromotion, _management.tailleurs.first.token!);
                     // Ajouter la logique pour gérer la nouvelle promotion spéciale
                     // Vous pouvez l'ajouter à votre liste existante ou la sauvegarder dans votre base de données.
 

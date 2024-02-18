@@ -35,8 +35,8 @@ class Client {
 
   factory Client.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> data) {
     final file = data.data();
-    final modelData = file!["Model"];
-    final imageProfil = file["Profil"];
+    final imageProfil = file!["Profil"];
+    final modelData = file["Model"];
 
     Images? profil; // Déclarez logo comme une variable Images nullable
 

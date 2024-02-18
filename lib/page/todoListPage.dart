@@ -286,6 +286,11 @@ class _TaskDetailsPageState extends State<TaskDetailsPage> {
                                 onChanged: (value) {
                                   setState(() {
                                     s[index].valide = value!;
+                                    _management.updateSousTaches(
+                                        value,
+                                        _management.tailleurs.first.token!,
+                                        widget.task.token!,
+                                        s[index].token!);
                                   });
                                 },
                               ),

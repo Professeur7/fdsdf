@@ -25,14 +25,14 @@ class FirstTimeUserIntroduction extends StatelessWidget {
           title: "Bienvenue sur l'application Fashion",
           body: "Découvrez comment vous pouvez utiliser notre application.",
           image: Center(
-            child: Image.asset("assets/images/doctor1.jpg", width: 300),
+            child: Image.asset("assets/images/intro2.png", width: 300),
           ),
         ),
         PageViewModel(
           title: "Inscrivez-vous en tant que client",
           body: "Remplissez les détails et commencez à explorer Fashion2.",
           image: Center(
-            child: Image.asset("assets/images/doctor2.jpg", width: 300),
+            child: Image.asset("assets/images/intro1.png", width: 300),
           ),
         ),
         PageViewModel(
@@ -40,7 +40,7 @@ class FirstTimeUserIntroduction extends StatelessWidget {
           body:
               "Trouvez les derniers vêtements et découvrez des mesures personnalisées.",
           image: Center(
-            child: Image.asset("assets/images/doctor3.jpg", width: 300),
+            child: Image.asset("assets/images/intro3.png", width: 300),
           ),
         ),
       ],

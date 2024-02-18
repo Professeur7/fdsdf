@@ -18,11 +18,11 @@ class SpecialPromotion {
     final file = data.data();
 
     return SpecialPromotion(
-      title: file!["prix"],
+      title: file!["titre"],
       imageUrl: file["image"],
-      description: file["produitName"],
+      description: file["description"],
       token: data.id,
-      date: file["produitPrix"],
+      date: file["date"],
     );
   }
 }

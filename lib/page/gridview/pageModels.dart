@@ -11,14 +11,11 @@ import 'dart:io';
 import 'package:get/get.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
+import 'package:progress_dialog_fork/progress_dialog_fork.dart';
 
 import 'package:uuid/uuid.dart';
 
 import '../../screen/home_screen.dart';
-import 'package:progress_dialog_fork/progress_dialog_fork.dart';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-import 'dart:io';
 
 class PageModels extends StatefulWidget {
   @override

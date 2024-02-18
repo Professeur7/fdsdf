@@ -32,7 +32,7 @@ class CommentPage extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.all(15.0),
-                primary: Colors.blue, // Couleur du bouton
+                foregroundColor: Colors.blue, // Couleur du bouton
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),

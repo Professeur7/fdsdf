@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/chat/message.dart';
 import 'package:fashion2/models/commandeModel.dart';
+import 'package:fashion2/models/tailleurs.dart';
 import 'package:fashion2/page/client/clientDashboard.dart';
 import 'package:fashion2/screen/clientHomeScreen.dart';
 import 'package:flutter/material.dart';
@@ -11,8 +12,10 @@ import 'package:rxdart/rxdart.dart';
 
 //import '../../screen/home_screen.dart';
 
+import 'package:flutter/material.dart';
+
 class ClientOrderPage extends StatefulWidget {
-  const ClientOrderPage({super.key});
+  const ClientOrderPage({Key? key}) : super(key: key);
 
   @override
   State<ClientOrderPage> createState() => _ClientOrderPageState();
@@ -20,22 +23,31 @@ class ClientOrderPage extends StatefulWidget {
 
 class _ClientOrderPageState extends State<ClientOrderPage> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
-  function() async {
+
+  Future<void> loadData() async {
     await _management.getAllCommande(_management.clients.first.token!);
+    for (var command in _management.commandes) {
+      var tailleur = await _management.getTaill(command.tailleurToken);
+      if (tailleur != null) {
+        tailleurs.add(tailleur);
+      }
+    }
+    setState(() {});
   }
+
+  List<Tailleurs> tailleurs = [];
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    function();
+    loadData();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mes Commandes '),
+        title: Text('Mes Commandes'),
         backgroundColor: const Color(0xFF09126C),
         leading: IconButton(
           icon: Icon(
@@ -57,34 +69,37 @@ class _ClientOrderPageState extends State<ClientOrderPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              child: ListView.builder(
-                itemCount: _management.commandes
-                    .length, // Remplacez par le nombre réel de commandes du client
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      // Naviguez vers la page de détails de la commande lorsqu'un élément est tapé.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ClientOrderDetailsPage(
-                              orderNumber: index + 1,
-                              commande: _management.commandes[index]),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      margin: EdgeInsets.all(10),
-                      child: ListTile(
-                        title: Text(
-                            'Commande #${_management.commandes[index].tailleurToken}'),
-                        subtitle: Text('Description de la commande'),
-                        trailing: Icon(Icons.message), // Icône de discussion
-                      ),
-                    ),
-                  );
-                },
-              ),
+              child: tailleurs.isNotEmpty
+                  ? ListView.builder(
+                      itemCount: tailleurs.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ClientOrderDetailsPage(
+                                  orderNumber: index + 1,
+                                  commande: _management.commandes[index],
+                                ),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            margin: EdgeInsets.all(10),
+                            child: ListTile(
+                              title: Text(
+                                'Commande #${tailleurs[index].nom! + " " + tailleurs[index].prenom!}',
+                              ),
+                              subtitle: Text('Description de la commande'),
+                              trailing:
+                                  Icon(Icons.message), // Icône de discussion
+                            ),
+                          ),
+                        );
+                      },
+                    )
+                  : CircularProgressIndicator(), // Afficher un indicateur de chargement si les tailleurs ne sont pas encore chargés
             ),
           ],
         ),
@@ -177,52 +192,54 @@ class _ClientChatScreenState extends State<ClientChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-            height: MediaQuery.of(context).size.height * 0.7,
-            child: StreamBuilder(
-                stream: getMessagesStream(),
-                builder: (context, snapshot) {
-                  List<MessageT> m = snapshot.data ?? [];
-                  return ListView.builder(
-                      reverse: true,
-                      itemCount: m.length,
-                      itemBuilder: (context, index) {
-                        return MessageItem(message: m[index]);
-                      });
-                })),
-        Container(
-          padding: EdgeInsets.all(10),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: message,
-                  decoration:
-                      InputDecoration(hintText: 'Écrivez un message...'),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+              height: MediaQuery.of(context).size.height * 0.7,
+              child: StreamBuilder(
+                  stream: getMessagesStream(),
+                  builder: (context, snapshot) {
+                    List<MessageT> m = snapshot.data ?? [];
+                    return ListView.builder(
+                        reverse: true,
+                        itemCount: m.length,
+                        itemBuilder: (context, index) {
+                          return MessageItem(message: m[index]);
+                        });
+                  })),
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: message,
+                    decoration:
+                        InputDecoration(hintText: 'Écrivez un message...'),
+                  ),
                 ),
-              ),
-              IconButton(
-                icon: Icon(Icons.send), // Icône d'envoi de message
-                onPressed: () {
-                  // Ajoutez ici la logique pour envoyer le message
-                  setState(() {
-                    _management.createMessage(
-                        _management.clients.first.token!,
-                        widget.commande.firebaseToken,
-                        MessageT(
-                            message: message.text,
-                            timestamp: DateTime.now(),
-                            isTailleur: false));
-                    message.clear();
-                  });
-                },
-              ),
-            ],
+                IconButton(
+                  icon: Icon(Icons.send), // Icône d'envoi de message
+                  onPressed: () {
+                    // Ajoutez ici la logique pour envoyer le message
+                    setState(() {
+                      _management.createMessage(
+                          _management.clients.first.token!,
+                          widget.commande.firebaseToken,
+                          MessageT(
+                              message: message.text,
+                              timestamp: DateTime.now(),
+                              isTailleur: false));
+                      message.clear();
+                    });
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

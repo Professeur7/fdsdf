@@ -33,6 +33,7 @@ class _HomePageClientState extends State<HomePageClient> {
   void initState() {
     super.initState();
     tailleursRecommandes = _management.allsTailleur;
+    specialPromotions = _management.special;
   }
 
   @override
@@ -305,30 +306,6 @@ class _HomePageClientState extends State<HomePageClient> {
   }
 
   List<SpecialPromotion> specialPromotions = [
-    SpecialPromotion(
-      title: "Réduction Été",
-      description: "Profitez de réductions incroyables pour l'été!",
-      imageUrl: "https://via.placeholder.com/300",
-      date: "15 Juillet 2023",
-    ),
-    SpecialPromotion(
-      title: "Nouvelle Collection",
-      description: "Découvrez notre nouvelle collection dès maintenant!",
-      imageUrl: "https://via.placeholder.com/300",
-      date: "10 Août 2023",
-    ),
-    SpecialPromotion(
-      title: "Nouvelle Collection",
-      description: "Découvrez notre nouvelle collection dès maintenant!",
-      imageUrl: "https://via.placeholder.com/300",
-      date: "10 Août 2023",
-    ),
-    SpecialPromotion(
-      title: "Offre Limitée",
-      description: "Offre spéciale valable pour une durée limitée!",
-      imageUrl: "https://via.placeholder.com/300",
-      date: "25 Septembre 2023",
-    ),
     // Ajoutez d'autres promotions spéciales selon vos besoins
   ];
 

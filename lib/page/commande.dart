@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/chat/message.dart';
+import 'package:fashion2/models/client.dart';
 import 'package:fashion2/models/commandeModel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -9,8 +10,12 @@ import 'package:rxdart/rxdart.dart';
 
 import '../screen/home_screen.dart';
 
+import 'package:flutter/material.dart';
+
+import 'package:flutter/material.dart';
+
 class Transaction extends StatefulWidget {
-  const Transaction({super.key});
+  const Transaction({Key? key}) : super(key: key);
 
   @override
   State<Transaction> createState() => _TransactionState();
@@ -20,13 +25,27 @@ class _TransactionState extends State<Transaction> {
   FirebaseManagement _management = Get.put(FirebaseManagement());
   List<CommandeModel> listCommande = [];
   List<MessageT> messages = [];
+  List<Client> clientss = [];
+  bool isLoading = true;
+
+  Future<void> loadData() async {
+    await _management.tailleurCommande();
+    listCommande = _management.commandestailleurs;
+    for (var element in _management.commandestailleurs) {
+      var client = await _management.getCli(element.clientToken);
+      if (client != null) {
+        clientss.add(client);
+      }
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _management.tailleurCommande();
-    listCommande = _management.commandestailleurs;
+    loadData();
   }
 
   @override
@@ -51,40 +70,51 @@ class _TransactionState extends State<Transaction> {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: listCommande
-                    .length, // Remplacez par le nombre réel de demandes de commande
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      // Naviguez vers la page de discussion lorsqu'un élément est tapé.
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ChatScreen(commande: listCommande[index]),
-                        ),
-                      );
-                    },
-                    child: Card(
-                      margin: EdgeInsets.all(10),
-                      child: ListTile(
-                        title: Text(
-                            'Demande de commande ${listCommande[index].clientToken}'),
-                        subtitle: Text(' ${listCommande[index].dateCommande}'),
-                        trailing: Icon(Icons.message), // Icône de discussion
-                      ),
+        child: isLoading
+            ? CircularProgressIndicator() // Afficher un indicateur de chargement si les clients ne sont pas encore chargés
+            : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: listCommande.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ChatScreen(commande: listCommande[index]),
+                              ),
+                            );
+                          },
+                          child: Card(
+                            margin: EdgeInsets.all(10),
+                            child: ListTile(
+                              leading: Icon(Icons.message),
+                              title: Text(
+                                'Demande de commande ${clientss[index].nom!} ${clientss[index].prenom!}',
+                              ),
+                              subtitle:
+                                  Text('${listCommande[index].dateCommande}'),
+                              trailing: listCommande[index].etatCommande
+                                  ? Icon(
+                                      Icons.delivery_dining,
+                                      color: Colors.green,
+                                    )
+                                  : Icon(
+                                      Icons.delivery_dining,
+                                      color: Colors.red,
+                                    ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -148,53 +178,65 @@ class _ChatScreenState extends State<ChatScreen> {
                 context); // Revenir à la liste des demandes de commande
           },
         ),
-      ),
-      body: Column(
-        children: [
-          SizedBox(
-              height: MediaQuery.of(context).size.height * 0.7,
-              child: StreamBuilder( 
-                  stream: getMessagesStream(),
-                  builder: (context, snapshot) {
-                    List<MessageT> m = snapshot.data ?? [];
-                    return ListView.builder(
-                        reverse: true,
-                        itemCount: m.length,
-                        itemBuilder: (context, index) {
-                          return MessageItem(message: m[index]);
-                        });
-                  })),
-          Container(
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: messageController,
-                    decoration:
-                        InputDecoration(hintText: 'Écrivez un message...'),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send), // Icône d'envoi de message
-                  onPressed: () {
-                    // Ajoutez ici la logique pour envoyer le message
-                    setState(() {
-                      _management.createMessage(
-                          widget.commande.clientToken,
-                          widget.commande.firebaseToken,
-                          MessageT(
-                              message: messageController.text,
-                              timestamp: DateTime.now(),
-                              isTailleur: true));
-                      messageController.text = "";
-                    });
-                  },
-                ),
-              ],
-            ),
-          ),
+        actions: [
+          TextButton(
+              onPressed: () {
+                setState(() {
+                  _management.updateCommande(widget.commande.clientToken,
+                      widget.commande.firebaseToken, true);
+                });
+              },
+              child: Text("Valider la commande"))
         ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(
+                height: MediaQuery.of(context).size.height * 0.7,
+                child: StreamBuilder(
+                    stream: getMessagesStream(),
+                    builder: (context, snapshot) {
+                      List<MessageT> m = snapshot.data ?? [];
+                      return ListView.builder(
+                          reverse: true,
+                          itemCount: m.length,
+                          itemBuilder: (context, index) {
+                            return MessageItem(message: m[index]);
+                          });
+                    })),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration:
+                          InputDecoration(hintText: 'Écrivez un message...'),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send), // Icône d'envoi de message
+                    onPressed: () {
+                      // Ajoutez ici la logique pour envoyer le message
+                      setState(() {
+                        _management.createMessage(
+                            widget.commande.clientToken,
+                            widget.commande.firebaseToken,
+                            MessageT(
+                                message: messageController.text,
+                                timestamp: DateTime.now(),
+                                isTailleur: true));
+                        messageController.text = "";
+                      });
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

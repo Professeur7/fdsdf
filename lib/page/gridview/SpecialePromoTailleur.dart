@@ -1,10 +1,12 @@
+import 'package:fashion2/firestore.dart';
 import 'package:fashion2/models/specialesPromotions.dart';
 import 'package:fashion2/page/gridview/specialePromotion.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SpecialPromotions extends StatelessWidget {
   final List<SpecialPromotion> specialPromotions;
-
+  FirebaseManagement _management = Get.put(FirebaseManagement());
   SpecialPromotions({required this.specialPromotions});
 
   @override
@@ -28,10 +30,17 @@ class SpecialPromotions extends StatelessWidget {
           },
         ),
       ),
-      body: ListView.builder(
-        itemCount: specialPromotions.length,
-        itemBuilder: (context, index) {
-          return buildSpecialPromotionCard(specialPromotions[index]);
+      body: FutureBuilder(
+        future: _management
+            .getPublicationSpreciales(_management.tailleurs.first.token!),
+        builder: (context, snapshot) {
+          final dataset = snapshot.data ?? [];
+          return ListView.builder(
+            itemCount: dataset.length,
+            itemBuilder: (context, index) {
+              return buildSpecialPromotionCard(dataset[index]);
+            },
+          );
         },
       ),
     );
